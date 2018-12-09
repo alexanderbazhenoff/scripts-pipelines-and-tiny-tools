@@ -8,6 +8,11 @@
 #    * git pacakge (apt or yum install git)
 #    * shflags library: https://code.google.com/archive/p/shflags/
 #      or: git clone https://github.com/kward/shflags.git
+# 
+# Usage:
+#    # ./clean_expired_baros_volumes.sh --name Full- --action delete --expire 10
+# or
+#   # ./clean_expired_baros_volumes.sh --help
 
 
 # Path of logs file
@@ -16,6 +21,7 @@ logpath=""
 
 # Path of the pool
 poolpath="/mnt/nas"
+
 
 # getting shflags to current directory if absent
 if [ ! -d "shflags" ]; then
