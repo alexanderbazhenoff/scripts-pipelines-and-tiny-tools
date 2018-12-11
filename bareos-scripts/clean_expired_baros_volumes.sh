@@ -4,6 +4,9 @@
 #                Clean expired volumes from Bareos storage pool script                #
 # ----------------------------------------------------------------------------------- #
 # Requirments:
+#    * permissions to run 'bconsole' command and acess $poolpath
+#      (don't mind if you run this script from bareos Admin Job you're, otherwise -
+#      edit /etc/sudoers or run from root)
 #    * git pacakge (apt or yum install git)
 #    * shflags library: https://code.google.com/archive/p/shflags/
 #      or: git clone https://github.com/kward/shflags.git
