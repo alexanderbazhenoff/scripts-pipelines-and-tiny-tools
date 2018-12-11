@@ -12,7 +12,10 @@ This script is usefull if you need to delete a few volumes in the pool choosen b
 
 **Usage:**
 
-- Example: delete 'Pruned' volumes selected by name mask 'Full-' ("Full" storage pool) after 10 days. `# ./clean_expired_baros_volumes.sh --name Full- --action delete --expire 10 --filter Pruned`
+- Example: delete 'Pruned' volumes selected by name mask 'Full-' ("Full" storage pool) after 10 days:
+```
+# ./clean_expired_baros_volumes.sh --name Full- --action delete --expire 10 --filter Pruned
+```
 - Use `--test yes` key for test mode.
 - Or run: `# ./clean_expired_baros_volumes.sh --help` for the help.
 
