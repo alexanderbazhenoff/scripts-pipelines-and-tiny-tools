@@ -2,7 +2,7 @@
 
 ## clean_expired_baros_volumes.sh
 
-Sometimes you need to delete a few volumes in the pool choosen by expiration date, pool name and(or) volume status. Basically this script is for autoclean of Bareos storage pool. But you can also you can also gather expiration statistics chosen by volume status. Use `--test yes` key for this. On large installations it takes a long time to purge or shift data. May be you also want to force delete some volumes. So you can use crontab or Bareos "Admin Job" with this script.
+This script is usefull if you need to delete a few volumes in the pool choosen by expiration date, pool name and(or) volume status. Basically this script is for autoclean of Bareos storage pool. But you can also you can also gather expiration statistics chosen by volume status, using `--test yes` key.
 
 **Requirments:**
 
