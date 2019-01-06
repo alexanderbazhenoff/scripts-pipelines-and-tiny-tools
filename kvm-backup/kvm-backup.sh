@@ -20,9 +20,13 @@
 #         # kvm-backup.sh --clean vmname1 vmname2
 
 
-#
 # SETTINGS:
-#
+# specify backup folder here:
+backup_dir=/var/lib/libvirt/images/backup
+# specify log file path here:
+logfile="/var/log/kvmbackup.log"
+
+
 
 starting_logfile() {
 			echo "`date +"%Y-%m-%d_%H-%M-%S"` Starting backup of $activevm"
@@ -48,13 +52,6 @@ vmdisks_get() {
 			disk_path_hr=$(echo $disk_path | sed "s/ /, /g")
                         echo "`date +"%Y-%m-%d_%H-%M-%S"` VM disk(s) / path of disk(s): $disk_list_hr -> $disk_path_hr"
 }
-
-# specify backup folder here:
-backup_dir=/var/lib/libvirt/images/backup
-
-# specify log file path here:
-logfile="/var/log/kvmbackup.log"
-
 
 # getting script action from run command
 command_use=$1; shift
