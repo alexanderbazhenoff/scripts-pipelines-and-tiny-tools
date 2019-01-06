@@ -38,6 +38,12 @@ function process_volume {
 
         if [ $FLAGS_test = "no" ]; then
                 echo "$FLAGS_action volume=${filename}${i} yes" | bconsole
+                # If "--action delete" perform physical delete of files from $poolpath
+                # Doesn't matter if this volume is absent in bareos database, this will be removed.
+                if [ $FLAGS_action = "delete" ]; then
+                        echo "Perfomring physical delete of ${filename} from ${poolpath}..."
+                        rm -f $poolpath/$filename && echo "Removed." || echo "${filename} not found." 
+                fi
         else
                 echo "(test mode): echo \"$FLAGS_action volume=${filename}${i} yes\" | bconsole"
         fi
