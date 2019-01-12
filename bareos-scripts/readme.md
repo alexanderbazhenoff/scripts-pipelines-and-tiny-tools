@@ -49,3 +49,6 @@ This script physically delete non-existent volumes from Pool in the bareos datab
 
 ## purge_all_volumes_from_pool.sh
 Set all voluems in defined pool to "purged" state. Set your `$poolname` inside the script and run.
+
+## remove_purged_volumes.sh
+Removes all voluems physically from the disk which is in 'purged' state.
