@@ -1,6 +1,6 @@
 # Bareos scripts:
 
-## clean_expired_baros_volumes.sh
+### clean_expired_baros_volumes.sh
 
 This script is usefull if you need to delete a few volumes in the pool choosen by expiration date, pool name and(or) volume status. Basically this script is for autoclean of Bareos storage pool. But you can also gather expiration volumes statistics, running with `--test yes` option.
 
@@ -40,15 +40,15 @@ Job {
     }
 }
 ```
-# Other bareos automation examples:
+# Other bareos troubleshooting examples:
 
 Examples how to troubleshoot some things in bareos. All parametrs inside of the scripts.
 
-## clean_missing_volumes.sh
+### clean_missing_volumes.sh
 This script physically delete non-existent volumes from Pool in the bareos database. Just set up your `$poolpath` inside the script and run.
 
-## purge_all_volumes_from_pool.sh
+### purge_all_volumes_from_pool.sh
 Set all voluems in defined pool to "purged" state. Set your `$poolname` inside the script and run.
 
-## remove_purged_volumes.sh
+### remove_purged_volumes.sh
 Removes all voluems physically from the disk which is in 'purged' state.
