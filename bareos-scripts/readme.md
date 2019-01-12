@@ -40,4 +40,5 @@ Job {
     }
 }
 ```
-
+## clean_missing_volumes.sh
+This script physically delete non-existent volumes from Pool in the bareos database. Just set up your `$poolpath` inside the script and run.
