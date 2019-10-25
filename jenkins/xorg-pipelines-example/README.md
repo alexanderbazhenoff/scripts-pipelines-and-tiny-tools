@@ -1,6 +1,12 @@
 # Run Xorg jenkins pipeline.
 
-This example illustrates how to prepare linux system to run Xorg and run gui tests from Jenkins pipelines. In example below we install openbox at Ubuntu Server 16.04 (actually you can use any latest distro) to run jenkins pipeline that connects to RDP for several seconds. You can change RDP connections (a several bash lines) on your own (e.g. run [Selenium](https://www.seleniumhq.org/) or other GUI-related testing).
+This example illustrates how to prepare linux system to run Xorg and run GUI tests from Jenkins pipelines. In example below we install openbox at Ubuntu Server 16.04 (actually you can use any latest distro) to run jenkins pipeline that connects to RDP for several seconds. You can change RDP connections (a several bash lines) on your own (e.g. run [Selenium](https://www.seleniumhq.org/) or other GUI-related testing).
+
+# Requirments:
+
+1. Jenkins master node installed.
+2. (Additional) Jenkins node (or master) with Ubuntu 16.04 Server (or later): to install Xorg and execute Jenkins pipeline here.
+3. (Additional) Gitlab: to clone Jenkins pipeline code from.
 
 ## Install openbox
 
