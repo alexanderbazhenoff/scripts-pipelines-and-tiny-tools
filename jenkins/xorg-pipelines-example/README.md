@@ -54,7 +54,7 @@ The point of this method is to run Xorg before your custom tasks then kill X ses
 
 ## Create jenkins pipeline
 
-Now create jenkins pipeline with the last bash example or use [this groovy example](https://github.com/alexanderbazhenoff/scripts-various/blob/master/jenkins/xorg-pipeline-example/xorg-jenkins-pipeline.groovy) with 'Pipeline script from SCM' to clone from your git project.
+Now create jenkins pipeline with the last bash example or use [this groovy example](https://github.com/alexanderbazhenoff/scripts-various/blob/master/jenkins/xorg-pipelines-example/xorg-jenkins-pipeline.groovy) with 'Pipeline script from SCM' to clone from your git project.
 
 Asuming you have only one video output and GUI-releated task on your system. So you also need: 
 - set 'Do not allow concurrent builds' in your pipleine settings and select 'Throttle Concurrent Builds'
