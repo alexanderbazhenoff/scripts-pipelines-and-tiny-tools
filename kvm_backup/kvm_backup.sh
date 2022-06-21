@@ -2,17 +2,17 @@
 
 
 # BACKUP SCRIPT FOR KVM VIRTUAL MACHINES
-# Written by Alexander Bazhenov
+# Written by Alexander Bazhenov. July, 2018.
 #
 # This Source Code Form is subject to the terms of the MIT
 # License. If a copy of the MPL was not distributed with
 # this file, You can obtain one at https://github.com/aws/mit-0
 #
 # WARNING! Running this script may cause potential data loss. Do on your own
-# risk, otherwise you know what you're doing and accepted the license.
+# risk, otherwise you know what you're doing.
 
 #        Usage:
-#        kvm-backup.sh [command] <vmname1 vmname2 vmname3 ... vmnameN>
+#        kvm_backup.sh [command] <vmname1 vmname2 vmname3 ... vmnameN>
 #
 #        Commands:
 #         --active           Create backup of running VM(s). Requierd
@@ -22,9 +22,9 @@
 #         --clean            Clean previous packups from backup folder
 #
 #        Examples:
-#         # kvm-backup.sh --active vmname1 vmname2
+#         # kvm_backup.sh --active vmname1 vmname2
 #        or
-#         # kvm-backup.sh --clean vmname1 vmname2
+#         # kvm_backup.sh --clean vmname1 vmname2
 
 
 # specify backup folder here:
@@ -57,6 +57,11 @@ vmdisks_get() {
 
 # entry
 COMMAND_USE=$1; shift
+
+if [ "$EUID" -ne 0 ]; then
+  echo "Please run as root."
+  exit
+fi
 
 if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $COMMAND_USE == "--clean" ]]; then
 
@@ -122,7 +127,7 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
 
       echo "$(date +'%Y-%m-%d %H:%M:%S') Backup of $ACTIVEVM finished" | tee -a $LOGFILE
     done
-  exit 0
+  # exit 0
   fi
 
   #
@@ -136,35 +141,29 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
       vmdisks_get
 
       # creating backup subdirectory
-      echo "$(date +'%Y-%m-%d %H:%M:%S') Creating backup subdirectory $RESULT_CMD" | tee -a $LOGFILE
-      {
-        mkdir "$BACKUP_DIR/$ACTIVEVM"
-      } &> /dev/null
+      echo "$(date +'%Y-%m-%d %H:%M:%S') Creating backup subdirectory... $(mkdir "$BACKUP_DIR/$ACTIVEVM" 2>&1 && \
+        echo "OK.")" 2>&1 | tee -a $LOGFILE
 
       # shutdown VM
-      echo "$(date +'%Y-%m-%d %H:%M:%S') Waiting $ACTIVEVM shutdown..." | tee -a $LOGFILE
-      {
-        virsh shutdown "$ACTIVEVM"
-      } &> /dev/null
+      echo "$(date +'%Y-%m-%d %H:%M:%S') Shutting down $ACTIVEVM... $(virsh shutdown "$ACTIVEVM" 2>&1 | \
+        sed -z "s/\n//g")" 2>&1 | tee -a $LOGFILE
 
       # wait while VM is not running
-      COUNTER=300
-        while ( virsh list | grep "$ACTIVEVM " > /dev/null ) && [[ $COUNTER -gt 0 ]]
-        do
-          sleep 1
-          (( COUNTER-- )) || true
-          echo "$(date +'%Y-%m-%d %H:%M:%S') Waiting $ACTIVEVM becomes down." | tee -a $LOGFILE
-        done
+      COUNTER=100
+      while (virsh list | grep "$ACTIVEVM " > /dev/null) && [[ $COUNTER -gt 0 ]]
+      do
+        sleep 3
+        (( COUNTER-- )) || true
+        echo "$(date +'%Y-%m-%d %H:%M:%S') Waiting $ACTIVEVM becomes down." | tee -a $LOGFILE
+      done
 
       # perform force power-off if VM is still running
       if (virsh list | grep "$ACTIVEVM " > /dev/null)
       then
-        echo "$(date +'%Y-%m-%d %H:%M:%S') Unable to shutdown $ACTIVEVM. Performing force power-off." | tee -a $LOGFILE
-        {
-          virsh destroy "$ACTIVEVM"
-        } &> /dev/null
+        echo "$(date +'%Y-%m-%d %H:%M:%S') Unable to shutdown $ACTIVEVM. Performing force power-off... $(virsh destroy \
+          "$ACTIVEVM" 2>&1 | sed -z "s/\n//g")" 2>&1 | tee -a $LOGFILE
 
-        while ( virsh list | grep "$ACTIVEVM " > /dev/null ) && [ $COUNTER -gt 0 ]
+        while (virsh list | grep "$ACTIVEVM " > /dev/null) && [[ $COUNTER -gt 0 ]]
         do
           sleep 1
           (( COUNTER++ )) || true
@@ -184,18 +183,16 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
           echo "$(date +'%Y-%m-%d %H:%M:%S') Looks like removable media device, skipping" | tee -a $LOGFILE
         else
           # backup disk
-          RESULT_CMD=$(cp -rf "$PATH_ITEM" "$BACKUP_DIR/$ACTIVEVM/$FILENAME" > /dev/null)
-          echo "$(date +'%Y-%m-%d %H:%M:%S') Backup of $ACTIVEVM $PATH_ITEM created $RESULT_CMD" | tee -a $LOGFILE
+          echo "$(date +'%Y-%m-%d %H:%M:%S') Copying $ACTIVEVM $PATH_ITEM image... $(cp -rf \
+            "$PATH_ITEM" "$BACKUP_DIR/$ACTIVEVM/$FILENAME" 2>&1)" 2>&1 | tee -a $LOGFILE
         fi
       done
 
       # run VM
-      echo "$(date +'%Y-%m-%d %H:%M:%S') Staring $ACTIVEVM" | tee -a $LOGFILE
-      {
-        virsh start "$ACTIVEVM"
-      } &> /dev/null
+      echo "$(date +'%Y-%m-%d %H:%M:%S') Starting $ACTIVEVM $(virsh start "$ACTIVEVM" 2>&1 | sed -z "s/\n//g")" 2>&1 | \
+        tee -a $LOGFILE
     done
-  exit 0
+  # exit 0
   fi
 
   #
@@ -205,24 +202,19 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
     for ACTIVEVM in "${@}"
     do
       # clean content of the folder
-      echo "$(date +'%Y-%m-%d %H:%M:%S') Performing clean-up of $ACTIVEVM in $BACKUP_DIR" | tee -a $LOGFILE
-
-      {
-        rm -rfv "${BACKUP_DIR:?}/$ACTIVEVM"
-      } &> /dev/null
-
-      echo "$(date +'%Y-%m-%d %H:%M:%S') Clean-up of $ACTIVEVM in $BACKUP_DIR - OK." | tee -a $LOGFILE
+      echo "$(date +'%Y-%m-%d %H:%M:%S') Performing clean-up of $ACTIVEVM in $BACKUP_DIR... $(rm \
+        -rfv "${BACKUP_DIR:?}/$ACTIVEVM" 2>&1 && echo "OK")" 2>&1 | tee -a $LOGFILE
     done
-  exit 0
+  # exit 0
   fi
 else
   #
-  # Output when error command set
+  # Output on invalid option
   #
-  echo "kvm-backup: invalid option '$COMMAND_USE'"
+  echo "Error! invalid option '$COMMAND_USE'"
   echo ""
   echo "Usage:"
-  echo " kvm-backup.sh [command] <vmname1 vmname2 vmname3 ... vmnameN>"
+  echo " kvm_backup.sh [command] <vmname1 vmname2 vmname3 ... vmnameN>"
   echo ""
   echo "Commands:"
   echo " --active           Create backup of running VM(s). Requierd"
@@ -232,9 +224,9 @@ else
   echo " --clean            Clean previous packups from backup folder"
   echo ""
   echo "Examples:"
-  echo " # kvm-backup.sh --active vmname1 vmname2"
+  echo " # kvm_backup.sh --active vmname1 vmname2"
   echo "or"
-  echo " # kvm-backup.sh --clean vmname1 vmname2"
+  echo " # kvm_backup.sh --clean vmname1 vmname2"
   exit 1
 fi
 
