@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+
 ### Backup, tar.gz and encrypt main script.
 ### Keep your files with rclone on remote storages/clouds.
 ###

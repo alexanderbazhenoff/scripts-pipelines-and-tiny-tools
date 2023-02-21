@@ -16,6 +16,7 @@
 ### distributed with this file, You can obtain one at:
 ### https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
 
+
 usage_error() {
   echo "Error: unrecognized option(s): $POSITIONAL"
   echo ""

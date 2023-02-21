@@ -3,6 +3,7 @@
 
 # -------------------------------------------------------------------------------- #
 #     Physically delete non-existent volumes from Pool in the Bareos database.     #
+#      Written by Alexander Bazhenov. December, 2018. Updated December, 2021.      #
 # -------------------------------------------------------------------------------- #
 
 # This Source Code Form is subject to the terms of the MIT License. If a copy of the
