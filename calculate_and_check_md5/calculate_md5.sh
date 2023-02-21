@@ -8,8 +8,8 @@
 ###          script at your own risk.
 ### -----------------------------------------------------------------------------------------------
 ### This Source Code Form is subject to the terms of the MIT License. If a copy of the MPL was not
-### distributed with this file, You can obtain one at https://github.com/aws/mit-0
-
+### distributed with this file, You can obtain one at:
+### https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
 
 SOURCE_PATH="/mnt/backup/"
 
