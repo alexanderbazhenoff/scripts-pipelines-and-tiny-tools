@@ -13,3 +13,7 @@ restore filesystem path to remote drives with UID/GUI storing (especially for co
 ## Network scripts
 
 Configure and collect network settings on linux systems.
+
+- [**vlan_filtered_bridges**](network/vlan_filtered_bridges/README.md) - systemd unit and script to create bridge with
+VLAN filtering to prevent MAC-table overflow on the host. Actually this is an example how to organize linux bridges by
+script.
