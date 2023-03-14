@@ -1,0 +1,14 @@
+# /etc/systemd/system/cloud-bridge.service
+[Unit]
+Description=Cloud bridge systemd unit
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/bin/bash -ce "(/opt/bridge.sh && /opt/bridge.sh) > /opt/cloud-gate.log"
+StandardOutput=syslog
+StandardError=syslog
+TimeoutStartSec=0
+
+[Install]
+WantedBy=default.target
