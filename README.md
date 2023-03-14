@@ -7,6 +7,8 @@ restore filesystem path to remote drives with UID/GUI storing (especially for co
 - [**bareos_pool_operations**](backup/bareos_pool_operations/README.md) - batch process to remove and clean-up
 [Bareos](https://www.bareos.com/) volumes in the pool.
 - [**calculate_and_check_md5**](backup/calculate_and_check_md5) - calculate and check md5 of required folder.
+- [**gitlab_dump_and_restore**](backup/gitlab_dump_and_restore/README.md) - create GitLab dump and restore gitlab from 
+a dump.
 - [**kvm_vm_backup**](backup/kvm_vm_backup/README.md) - backup running or stopped
 [Kernel Virtual Machine (KVM)](https://www.linux-kvm.org/page/Main_Page) instance(s) on Linux systems.
 
@@ -14,6 +16,8 @@ restore filesystem path to remote drives with UID/GUI storing (especially for co
 
 Configure and collect network settings on linux systems.
 
+- [**get_dhcp_leases**](network/get_dhcp_leases/README.md) - get leases info from isc-dhcp server including client, 
+expiration and client vendor.
 - [**vlan_filtered_bridges**](network/vlan_filtered_bridges/README.md) - systemd unit and script to create bridge with
 VLAN filtering to prevent MAC-table overflow on the host. Actually this is an example how to organize linux bridges by
 script.

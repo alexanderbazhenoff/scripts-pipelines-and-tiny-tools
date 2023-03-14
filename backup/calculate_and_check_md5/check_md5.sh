@@ -28,7 +28,7 @@ task_error(){
   local ERROR_MESSAGE=$2
   if [[ $RETURN_CODE -ne 0 ]]; then
     echo "Sending $REMOTE_DRIVE_NAME error message"
-    chrt -i 0 /.$ERROR_NOTIFICATION_SCRIPT_PATH $ERROR_MESSAGE
+    chrt -i 0 /.$ERROR_NOTIFICATION_SCRIPT_PATH "$ERROR_MESSAGE"
   fi
 }
 
@@ -59,5 +59,5 @@ if [[ -z $(ls -1 | grep '.md5' | grep -v "md5.md5") ]]; then
    /./opt/scripts/check_error_notification.sh "no_md5_files_found!"
 fi
 
-find . -type f -name '*.md5' ! -name '*.md5.md5' -exec bash -c '[[ -f ${1//.md5} ]] && \
-  (md5sum -c ${1#./} || /./opt/scripts/check_error_notification.sh ${1#./})' -- {} \;
+find . -type f -name '*.md5' ! -name '*.md5.md5' -exec bash -c \
+  '[[ -f ${1//.md5} ]] && (md5sum -c ${1#./} || /./opt/scripts/check_error_notification.sh ${1#./})' -- {} \;

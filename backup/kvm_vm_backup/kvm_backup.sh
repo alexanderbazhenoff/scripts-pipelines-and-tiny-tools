@@ -49,8 +49,8 @@ backup_vm_config() {
 
 # Getting a list and a path of disk images
 vmdisks_get() {
-  DISK_LIST=$(virsh domblklist $ACTIVEVM | awk '{if(NR>2)print}' | awk '{print $1}')
-  DISK_PATH=$(virsh domblklist $ACTIVEVM | awk '{if(NR>2)print}' | awk '{print $2}')
+  DISK_LIST=$(virsh domblklist "$ACTIVEVM" | awk '{if(NR>2)print}' | awk '{print $1}')
+  DISK_PATH=$(virsh domblklist "$ACTIVEVM" | awk '{if(NR>2)print}' | awk '{print $2}')
   echo "$(date +'%Y-%m-%d %H:%M:%S') VM disk(s) / path of disk(s): ${DISK_LIST//$'\n'/, } -> ${DISK_PATH//$'\n'/, }" | \
     tee -a $LOGFILE
 }
@@ -230,4 +230,3 @@ else
   echo " # kvm_backup.sh --clean vmname1 vmname2"
   exit 1
 fi
-

@@ -41,7 +41,7 @@ task_error(){
   local ERROR_MESSAGE=$2
   if [[ $RETURN_CODE -ne 0 ]]; then
     echo "Sending $REMOTE_DRIVE_NAME error message"
-    chrt -i 0 /.$ERROR_NOTIFICATION_SCRIPT_PATH $ERROR_MESSAGE
+    chrt -i 0 /.$ERROR_NOTIFICATION_SCRIPT_PATH "$ERROR_MESSAGE"
   fi
 }
 
@@ -199,4 +199,3 @@ process_path "/var/lib/lxc/bareos.emzior" "$BACKUP_DESTINATION" "$ACTION" \
 echo $?; task_error $? '/var/lib/lxc/lxc_container_name'
 
 sync; echo 3 > /proc/sys/vm/drop_caches; sync
-
