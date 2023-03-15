@@ -1,5 +1,16 @@
 #!/usr/bin/env python3
 
+
+"""
+Get dhcp isc-dhcp-server leases info
+
+This Source Code Form is subject to the terms of the MIT
+ License. If a copy of the MPL was not distributed with
+ this file, You can obtain one at:
+ https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
+"""
+
+
 import bisect
 import datetime
 
@@ -263,7 +274,7 @@ vendors_file.close()
 now = timestamp_now()
 report_dataset = select_active_leases(leases, now, vendors)
 
-print('+--------------------------------------------------------------------------------------------')
+print('+' + '-' * 92)
 print('| DHCPD ACTIVE LEASES REPORT')
 print('+-----------------+-------------------+----------------------+----------------------+--------')
 print('| IP Address      | MAC Address       | Expires (days,H:M:S) | Client Hostname      | Vendor')
@@ -280,4 +291,4 @@ for lease in report_dataset:
 print('+-----------------+-------------------+----------------------+----------------------+--------')
 print('| Total Active Leases: %s' % (str(len(report_dataset))))
 print('| Report generated (UTC): %s' % (str(now)))
-print('+--------------------------------------------------------------------------------------------')
+print('+' + '-' * 92)
