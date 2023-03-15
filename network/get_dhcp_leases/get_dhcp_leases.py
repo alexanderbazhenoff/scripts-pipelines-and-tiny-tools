@@ -263,19 +263,21 @@ vendors_file.close()
 now = timestamp_now()
 report_dataset = select_active_leases(leases, now, vendors)
 
-print('+---------------------------------------------------------------------------------------')
+print('+--------------------------------------------------------------------------------------------')
 print('| DHCPD ACTIVE LEASES REPORT')
-print('+-----------------+-------------------+----------------------+-----------------+--------')
-print('| IP Address      | MAC Address       | Expires (days,H:M:S) | Client Hostname | Vendor')
-print('+-----------------+-------------------+----------------------+-----------------+--------')
+print('+-----------------+-------------------+----------------------+----------------------+--------')
+print('| IP Address      | MAC Address       | Expires (days,H:M:S) | Client Hostname      | Vendor')
+print('+-----------------+-------------------+----------------------+----------------------+--------')
 
 for lease in report_dataset:
-    print('| ' + format(lease['ip_address'], '<15') + ' | ' + \
-          format(lease['hardware'], '<17') + ' | ' + \
-          format(str((lease['ends'] - now) if lease['ends'] != 'never' else 'never'), '>20') + ' | ' + \
-          format(lease['client-hostname'], '<15') + ' | ' + lease['vendor'])
+    print('| %(ip_address)s | %(hardware)s | %(ends)s | %(client_hostname)s | %(vendor)s' % {
+        "ip_address": format(lease['ip_address'], '<15'),
+        "hardware": format(lease['hardware'], '<17'),
+        "ends": format(str((lease['ends'] - now) if lease['ends'] != 'never' else 'never'), '>20'),
+        "client_hostname": format(lease['client-hostname'], '<20'),
+        "vendor": lease['vendor']})
 
-print('+-----------------+-------------------+----------------------+-----------------+--------')
-print('| Total Active Leases: ' + str(len(report_dataset)))
-print('| Report generated (UTC): ' + str(now))
-print('+---------------------------------------------------------------------------------------')
+print('+-----------------+-------------------+----------------------+----------------------+--------')
+print('| Total Active Leases: %s' % (str(len(report_dataset))))
+print('| Report generated (UTC): %s' % (str(now)))
+print('+--------------------------------------------------------------------------------------------')
