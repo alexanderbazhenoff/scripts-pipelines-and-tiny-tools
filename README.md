@@ -24,9 +24,9 @@ linux bridge.
 VLAN filtering to prevent MAC-table overflow on the host. Actually this is an example how to organize linux bridges by
 script.
 
-## Visualize scripts
+## Visualization scripts
 
-Visualization scripts.
+Visualization and stats scripts.
 
 - [**traffic_item_stat_and_graph**](visualization/traffic_item_stat_and_graph/README.md) - script that build traffic
 item  statistics on the graph from [IxNetwork server](https://support.ixiacom.com/version/ixnetwork-916) CSV results

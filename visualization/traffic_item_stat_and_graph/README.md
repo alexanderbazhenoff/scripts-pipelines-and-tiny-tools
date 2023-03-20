@@ -14,4 +14,4 @@ python $PWD/graph/traffic_item_statistics.py -i $PWD/example/csv/Traffic\ Item\ 
   -o $PWD/example/ -t 'test_name' -m 'Traffic Item 1'
 ```
 to build graph from [`example/Traffic Item Statistics.csv`](example/Traffic%20Item%20Statistics.csv) and save them to
-html file, e.g: [`example/Traffic Item 1 Statistics.html`](example/Traffic%20Item%201%20Statistics.html).
+html file.
