@@ -257,9 +257,9 @@ def select_active_leases(leases_db, as_of_ts, vendor_db=None):
             else:
                 lease_rec['vendor'] = ''
             ip_as_int = ipv4_to_int(ip_address)
-            insertpos = bisect.bisect(sort_ed_array, ip_as_int)
-            sort_ed_array.insert(insertpos, ip_as_int)
-            ret_array.insert(insertpos, lease_rec)
+            insert_pos = bisect.bisect(sort_ed_array, ip_as_int)
+            sort_ed_array.insert(insert_pos, ip_as_int)
+            ret_array.insert(insert_pos, lease_rec)
 
     return ret_array
 
@@ -274,11 +274,11 @@ def parse_vendors_file(file):
 
 
 def get_start_end_line() -> str:
-    return f"{'+'}{'-' * 92}"
+    return f"{'+'}{'-' * 127}{'+'}"
 
 
 def get_line() -> str:
-    return '+-----------------+-------------------+----------------------+-------------------------+--------'
+    return f"{'+'}{'-' * 17}{'+'}{'-' * 19}{'+'}{'-' * 22}{'+'}{'-' * 25}{'+'}{'-' * 40}{'+'}"
 
 
 def get_table_header() -> str:
@@ -323,7 +323,7 @@ for lease in report_dataset:
         format(lease['hardware'], '<17'),
         format(get_value_for_ends(lease['ends']), '>20'),
         format(lease['client-hostname'], '<23'),
-        format(lease['vendor'], '<35')
+        format(lease['vendor'], '<38')
         + " |",
         sep=" | "
     )
