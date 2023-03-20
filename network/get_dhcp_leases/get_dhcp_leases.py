@@ -2,7 +2,7 @@
 
 
 """
-Get dhcp isc-dhcp-server leases info
+Get dhcp isc-dhcp-server leases info.
 
 This Source Code Form is subject to the terms of the MIT
  License. If a copy of the MPL was not distributed with
@@ -274,11 +274,11 @@ def parse_vendors_file(file):
 
 
 def get_start_end_line() -> str:
-    return f"{'+'}{'-' * 127}{'+'}"
+    return f"+{'-' * 127}+"
 
 
 def get_line() -> str:
-    return f"{'+'}{'-' * 17}{'+'}{'-' * 19}{'+'}{'-' * 22}{'+'}{'-' * 25}{'+'}{'-' * 40}{'+'}"
+    return f"+{'-' * 17}+{'-' * 19}+{'-' * 22}+{'-' * 25}+{'-' * 40}+"
 
 
 def get_table_header() -> str:
