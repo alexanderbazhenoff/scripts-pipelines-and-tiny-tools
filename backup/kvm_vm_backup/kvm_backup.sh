@@ -3,36 +3,38 @@
 
 # BACKUP SCRIPT FOR KVM VIRTUAL MACHINES
 # Written by Alexander Bazhenov. July, 2018.
-#
+
+
 # This Source Code Form is subject to the terms of the MIT
 # License. If a copy of the MPL was not distributed with
 # this file, You can obtain one at:
 # https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
-#
+
+
 # WARNING! Running this script may cause potential data loss. Do on your own
 # risk, otherwise you know what you're doing.
 
 #        Usage:
-#        kvm_backup.sh [command] <vmname1 vmname2 vmname3 ... vmnameN>
+#        kvm_backup.sh [command] <vm_name1 vm_name2 vm_name3 ... vm_nameN>
 #
 #        Commands:
-#         --active           Create backup of running VM(s). Requierd
+#         --active           Create backup of running VM(s). Required
 #                            qemu-guest-agent installed on virtual machine
 #                            and qemu-channel device created
 #         --stopped          Stop, create backup and run virtual machine
-#         --clean            Clean previous packups from backup folder
+#         --clean            Clean previous backups from backup folder
 #
 #        Examples:
-#         # kvm_backup.sh --active vmname1 vmname2
+#         # kvm_backup.sh --active vm_name1 vm_name2
 #        or
-#         # kvm_backup.sh --clean vmname1 vmname2
+#         # kvm_backup.sh --clean vm_name1 vm_name2
 
 
 # specify backup folder here:
 BACKUP_DIR="/var/lib/libvirt/images/backup"
 
 # specify log file path here:
-LOGFILE="/var/log/kvmbackup.log"
+LOGFILE="/var/log/kvm_backup.log"
 
 
 # start new log
@@ -48,7 +50,7 @@ backup_vm_config() {
 }
 
 # Getting a list and a path of disk images
-vmdisks_get() {
+vm_disks_get() {
   DISK_LIST=$(virsh domblklist "$ACTIVEVM" | awk '{if(NR>2)print}' | awk '{print $1}')
   DISK_PATH=$(virsh domblklist "$ACTIVEVM" | awk '{if(NR>2)print}' | awk '{print $2}')
   echo "$(date +'%Y-%m-%d %H:%M:%S') VM disk(s) / path of disk(s): ${DISK_LIST//$'\n'/, } -> ${DISK_PATH//$'\n'/, }" | \
@@ -74,7 +76,7 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
     do
       starting_logfile
       backup_vm_config
-      vmdisks_get
+      vm_disks_get
 
       # making a snapshot
       echo "$(date +'%Y-%m-%d %H:%M:%S') Creating snapshot of $ACTIVEVM" | tee -a $LOGFILE
@@ -139,7 +141,7 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
     do
       starting_logfile
       backup_vm_config
-      vmdisks_get
+      vm_disks_get
 
       # creating backup subdirectory
       echo "$(date +'%Y-%m-%d %H:%M:%S') Creating backup subdirectory... $(mkdir "$BACKUP_DIR/$ACTIVEVM" 2>&1 && \
@@ -215,18 +217,18 @@ else
   echo "Error! invalid option '$COMMAND_USE'"
   echo ""
   echo "Usage:"
-  echo " kvm_backup.sh [command] <vmname1 vmname2 vmname3 ... vmnameN>"
+  echo " kvm_backup.sh [command] <vm_name1 vm_name2 vm_name3 ... vm_nameN>"
   echo ""
   echo "Commands:"
-  echo " --active           Create backup of running VM(s). Requierd"
+  echo " --active           Create backup of running VM(s). Required"
   echo "                    qemu-guest-agent installed on virtual machine"
   echo "                    and qemu-channel device created"
   echo " --stopped          Stop, create backup and run virtual machine"
-  echo " --clean            Clean previous packups from backup folder"
+  echo " --clean            Clean previous backups from backup folder"
   echo ""
   echo "Examples:"
-  echo " # kvm_backup.sh --active vmname1 vmname2"
+  echo " # kvm_backup.sh --active vm_name1 vm_name2"
   echo "or"
-  echo " # kvm_backup.sh --clean vmname1 vmname2"
+  echo " # kvm_backup.sh --clean vm_name1 vm_name2"
   exit 1
 fi

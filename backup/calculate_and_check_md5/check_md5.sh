@@ -55,7 +55,7 @@ HOSTNAME="$(hostname)"
 echo "Ready to calculate md5 checksum on $HOSTNAME for directory: $SOURCE_PATH"
 cd "$SOURCE_PATH" || exit 1
 
-if [[ -z $(ls -1 | grep '.md5' | grep -v "md5.md5") ]]; then
+if ! ls -1 ./*.md5 -I ./*md5.md5; then
    /./opt/scripts/check_error_notification.sh "no_md5_files_found!"
 fi
 

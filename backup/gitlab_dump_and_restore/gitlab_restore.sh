@@ -3,7 +3,10 @@
 
 ### Restore GitLab dump data ###
 
-# Written by Alexander Bazhenov December, 2018.
+# More info: https://docs.gitlab.com/ee/raketasks/backup_restore.html
+
+
+# Written by Alexander Bazhenov. December, 2018.
 # This Source Code Form is subject to the terms of the MIT License. If a
 # copy of the MPL was not distributed with this file, You can obtain one at:
 # https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE

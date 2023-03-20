@@ -8,34 +8,34 @@
 
 
 ## Specify management network interfaces:
-ifacecontrol=ens3
+INTERFACE_CONTROL=ens3
 
 ## Specify bridge name:
-ifbrigename=brm
+IF_BRIDGE_NAME=brm
 
 ## Specify bridging interfaces:
-ifbridging="(enp10|enp12)"
+IF_BRIDGING="(enp10|enp12)"
 
-echo "Bridging ${ifbridging} to ${ifbrigename} started at: $(date)"
-ifacelist=$(basename -a /sys/class/net/* | grep -iE $ifbridging | grep -v 'lo' | grep -v $ifacecontrol)
+echo "Bridging ${IF_BRIDGING} to ${IF_BRIDGE_NAME} started at: $(date)"
+INTERFACE_LIST=$(basename -a /sys/class/net/* | grep -iE $IF_BRIDGING | grep -v 'lo' | grep -v $INTERFACE_CONTROL)
 echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
-sudo brctl addbr $ifbrigename
+sudo brctl addbr $IF_BRIDGE_NAME
 
-for ifacecurrent in $ifacelist
+for INTERFACE_CURRENT in $INTERFACE_LIST
 do
-  echo "Up and bridging: $ifacecurrent"
-  sudo ifconfig "$ifacecurrent" up
-  sudo brctl addif $ifbrigename "$ifacecurrent"
+  echo "Up and bridging: $INTERFACE_CURRENT"
+  sudo ifconfig "$INTERFACE_CURRENT" up
+  sudo brctl addif $IF_BRIDGE_NAME "$INTERFACE_CURRENT"
 done
 
-sudo ifconfig $ifbrigename up
-echo 1 | sudo tee /sys/class/net/$ifbrigename/bridge/vlan_filtering
+sudo ifconfig $IF_BRIDGE_NAME up
+echo 1 | sudo tee /sys/class/net/$IF_BRIDGE_NAME/bridge/vlan_filtering
 
-for ifacecurrent in $ifacelist
+for INTERFACE_CURRENT in $INTERFACE_LIST
 do
-  echo "Filtering on bridge vlan 4000-4094 for $ifacecurrent"
-  sudo bridge vlan add dev "$ifacecurrent" vid 4000-4094
+  echo "Filtering on bridge vlan 4000-4094 for $INTERFACE_CURRENT"
+  sudo bridge vlan add dev "$INTERFACE_CURRENT" vid 4000-4094
 done
 
 echo "Bridge stat:"
-sudo brctl show $ifbrigename
+sudo brctl show $IF_BRIDGE_NAME
