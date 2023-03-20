@@ -15,6 +15,16 @@ import bisect
 import datetime
 
 
+class ParseError(Exception):
+    msg = 'Parse error'
+
+    def __init__(self, msg_postfix=None):
+        self.message = f"{self.msg} in {msg_postfix}" if msg_postfix is not None else self.msg
+
+    def __str__(self):
+        return self.message
+
+
 def parse_timestamp(raw_str):
     tokens = raw_str.split()
 
@@ -23,14 +33,14 @@ def parse_timestamp(raw_str):
             return 'never'
 
         else:
-            raise Exception('Parse error in timestamp')
+            raise ParseError('timestamp')
 
     elif len(tokens) == 3:
         return datetime.datetime.strptime(' '.join(tokens[1:]),
                                           '%Y/%m/%d %H:%M:%S')
 
     else:
-        raise Exception('Parse error in timestamp')
+        raise ParseError('timestamp')
 
 
 def timestamp_is_ge(t1, t2):
@@ -49,7 +59,7 @@ def timestamp_is_lt(t1, t2):
         return False
 
     elif t2 == 'never':
-        return t1 != 'never'
+        return True
 
     else:
         return t1 < t2
@@ -66,7 +76,7 @@ def parse_hardware(raw_str):
         return tokens[1]
 
     else:
-        raise Exception('Parse error in hardware')
+        raise ParseError('hardware')
 
 
 def strip_end_quotes(raw_str):
@@ -84,7 +94,7 @@ def parse_binding_state(raw_str):
         return tokens[1]
 
     else:
-        raise Exception('Parse error in binding state')
+        raise ParseError('binding state')
 
 
 def parse_next_binding_state(raw_str):
@@ -94,7 +104,7 @@ def parse_next_binding_state(raw_str):
         return tokens[2]
 
     else:
-        raise Exception('Parse error in next binding state')
+        raise ParseError('next binding state')
 
 
 def parse_rewind_binding_state(raw_str):
@@ -104,7 +114,7 @@ def parse_rewind_binding_state(raw_str):
         return tokens[2]
 
     else:
-        raise Exception('Parse error in next binding state')
+        raise ParseError('next binding state')
 
 
 def parse_leases_file(leases_file):
@@ -155,7 +165,7 @@ def parse_leases_file(leases_file):
                 in_lease = True
 
             else:
-                raise Exception('Parse error in leases file')
+                raise ParseError('leases file')
 
         elif key == 'failover':
             in_failover = True
@@ -182,7 +192,7 @@ def parse_leases_file(leases_file):
                 in_failover = False
                 continue
             else:
-                raise Exception('Parse error in leases file')
+                raise ParseError('leases file')
 
         elif key in valid_keys:
             if in_lease:
@@ -195,14 +205,14 @@ def parse_leases_file(leases_file):
                     lease_rec[key] = True
 
             else:
-                raise Exception('Parse error in leases file')
+                raise ParseError('leases file')
 
         else:
             if in_lease:
-                raise Exception('Parse error in leases file')
+                raise ParseError('leases file')
 
     if in_lease:
-        raise Exception('Parse error in leases file')
+        raise ParseError('leases file')
 
     return leases_db
 
