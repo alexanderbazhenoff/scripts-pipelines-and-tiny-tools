@@ -12,14 +12,13 @@
 
 
 # Set Pool path
-POOLPATH=/mnt/poolpath
+POOL_PATH=/mnt/pool_path
 
-cd $POOLPATH || exit
+cd $POOL_PATH || exit
 FILELIST=$(find . -maxdepth 1 -type f -printf "%f\n")
 for I in $FILELIST; do
   echo "list volume=$I" | bconsole | if grep --quiet "No results to list"; then
     echo "$I is ready to be deleted"
-    rm -f $POOLPATH/"$I"
+    rm -f $POOL_PATH/"$I"
   fi
 done
-

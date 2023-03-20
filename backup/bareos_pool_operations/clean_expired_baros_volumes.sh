@@ -11,7 +11,7 @@
 #
 #
 # Requirements:
-#    * permissions to run 'bconsole' command and access to $poolpath
+#    * permissions to run 'bconsole' command and access to $pool_path
 #      (don't mind if you run this script from bareos Admin Job, otherwise - you should
 #      edit /etc/sudoers or run from root)
 #    * git pacakge (apt or yum install git)
@@ -31,10 +31,10 @@
 
 # Logs file path
 # Leave empty if you don't wish additional log file
-LOGPATH=""
+LOG_PATH=""
 
 # Path of the pool
-POOLPATH="/mnt/poolpath"
+POOL_PATH="/mnt/pool_path"
 
 
 # Process volume function. In test mode prints only command (use for debug).
@@ -43,20 +43,20 @@ process_volume() {
   local F_DATE=$2
   local MODE=$3
   echo "Processing: $F_NAME | $F_DATE"
-  if [[ -n "$LOGPATH" ]]; then
+  if [[ -n "$LOG_PATH" ]]; then
     echo "Processing: $F_NAME | $F_DATE"
   fi
 
   if [[ $MODE == "no" ]]; then
-    echo "$POOL_ACTION volume=$POOLPATH$F_NAME yes" | bconsole
-    # Perform physical delete of file from $POOLPATH when "--action delete".
+    echo "$POOL_ACTION volume=$POOL_PATH$F_NAME yes" | bconsole
+    # Perform physical delete of file from $POOL_PATH when "--action delete".
     # Doesn't matter if this volume is absent in bareos database, this will be removed.
     if [[ $POOL_ACTION = "delete" ]]; then
-      echo "Perfomring physical delete of ${F_NAME} from ${POOLPATH}..."
-      rm -f "$POOLPATH/$F_NAME" && echo "Removed." || echo "${F_NAME} not found."
+      echo "Performing physical delete of ${F_NAME} from ${POOL_PATH}..."
+      rm -f "$POOL_PATH/$F_NAME" && echo "Removed." || echo "${F_NAME} not found."
     fi
   else
-    echo "(test mode): echo \"$POOL_ACTION volume=$POOLPATH$F_NAME yes\" | bconsole"
+    echo "(test mode): echo \"$POOL_ACTION volume=$POOL_PATH$F_NAME yes\" | bconsole"
   fi
 }
 
@@ -133,7 +133,7 @@ done
 echo "Performing ${POOL_ACTION} \"${POOL_NAME}\" volumes after ${POOL_EXPIRE} days,"
 echo "filtered by \"${POOL_FILTER}\" status... Test mode: ${DRY_RUN}"
 if [[ $POOL_ACTION = "delete" ]] || [[ $POOL_ACTION = "prune" ]] || [[ $POOL_ACTION = "purge" ]]; then
-  cd $POOLPATH || exit 1
+  cd $POOL_PATH || exit 1
   filelist=$(find . -mtime +"$POOL_EXPIRE" -print | grep "$POOL_NAME" | sed 's/[./]//g')
   for FILENAME in $filelist
   do

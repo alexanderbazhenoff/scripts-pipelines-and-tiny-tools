@@ -31,7 +31,6 @@ for ifacecurrent in $ifacelist
     sudo ifconfig "$ifacecurrent" mtu 9200
   done
 
-#sudo ifconfig $ifbrigename up
 echo 1 | sudo tee /sys/class/net/$ifbrigename/bridge/vlan_filtering
 
 for ifacecurrent in $ifacelist

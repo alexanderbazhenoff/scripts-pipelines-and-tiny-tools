@@ -52,7 +52,6 @@ if [[ $VOL_ACTION != "prune" ]] && [[ $VOL_ACTION != "purge" ]] && [[ $VOL_ACTIO
 fi
 
 if [[ $OPTIONS_ERROR -gt 0 ]]; then
-	echo " "
 	echo "Usage:"
   echo "# ./batch_process_bareos_volumes.sh <action> <name_mask> <start> <end> <force|print>"
 	exit 1
@@ -70,4 +69,3 @@ do
     echo "${VOL_ACTION} volume=${VOL_MASK}${RANGE_ITEM} $([[ $VOL_OPT == 'force' ]] && echo 'yes')" | bconsole
   fi
 done
-

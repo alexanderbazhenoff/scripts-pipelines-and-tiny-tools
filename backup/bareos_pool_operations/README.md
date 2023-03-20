@@ -5,13 +5,13 @@ you're doing.
 
 ### clean_expired_baros_volumes.sh
 
-This script is usefull if you need to delete a few volumes in the pool choosen by expiration date, pool name and(or)
+This script is useful if you need to delete a few volumes in the pool chosen by expiration date, pool name and(or)
 volume status. Basically this script is for autoclean of Bareos storage pool. But you can also gather expiration volumes
 statistics, running with `--test yes` option.
 
 **Requirments:**
 
-- permissions to run `bconsole` command and acess to **$poolpath** (don't mind if you run this script from bareos Admin 
+- permissions to run `bconsole` command and acess to **$poolpath** (don't mind if you run this script from Bareos Admin 
   Job you're, otherwise you should edit `/etc/sudoers` or run from root).
 - git pacakge (`apt` or `yum install git` depending on your linux distro).
 - **shflags** library: https://code.google.com/archive/p/shflags/ This script automatically clone this to current
@@ -36,7 +36,7 @@ Job {
     Schedule = "Daily"
     Type = "Admin"
     Priority = 1
-    # 1 means to run immediately before othe backup jobs
+    # 1 means to run immediately before other backup jobs
 
     RunScript {
         Runs When = Before
@@ -44,7 +44,7 @@ Job {
         # We don't need to run on the client until your storage daemon is not on the client
         Fail Job On Error = yes
         Command = "/etc/bareos/bareos-dir.d/clean_expired_baros_volumes.sh --action delete --expire 60 --name Full-"
-        # Place this script in bareos director congigs repository and chmod +x
+        # Place this script in bareos director configs repository and chmod +x
     }
 }
 ```
@@ -63,7 +63,7 @@ skip confirmation request or 'print' to get the info about selected range of vol
 in volume status, just output an info.
 
 ### clean_missing_volumes.sh
-This script physically delete non-existent volumes from Pool in the bareos database. Just set up your `$POOLPATH` inside
+This script physically delete non-existent volumes from Pool in the Bareos database. Just set up your `$POOLPATH` inside
 the script and run.
 
 ### delete_all_volumes_from_pool_mysql.sh / delete_all_volumes_from_pool_pgsql.sh
