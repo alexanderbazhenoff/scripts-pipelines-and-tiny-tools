@@ -15,6 +15,9 @@ import bisect
 import datetime
 
 
+NEVER = 'never'
+
+
 class ParseError(Exception):
     msg = 'Parse error'
 
@@ -29,8 +32,8 @@ def parse_timestamp(raw_str):
     tokens = raw_str.split()
 
     if len(tokens) == 1:
-        if tokens[0].lower() == 'never':
-            return 'never'
+        if tokens[0].lower() == NEVER:
+            return NEVER
 
         else:
             raise ParseError('timestamp')
@@ -44,10 +47,10 @@ def parse_timestamp(raw_str):
 
 
 def timestamp_is_ge(t1, t2):
-    if t1 == 'never':
+    if t1 == NEVER:
         return True
 
-    elif t2 == 'never':
+    elif t2 == NEVER:
         return False
 
     else:
@@ -55,10 +58,10 @@ def timestamp_is_ge(t1, t2):
 
 
 def timestamp_is_lt(t1, t2):
-    if t1 == 'never':
+    if t1 == NEVER:
         return False
 
-    elif t2 == 'never':
+    elif t2 == NEVER:
         return True
 
     else:
@@ -270,6 +273,30 @@ def parse_vendors_file(file):
     return result
 
 
+def get_start_end_line() -> str:
+    return f"{'+'}{'-' * 92}"
+
+
+def get_line() -> str:
+    return '+-----------------+-------------------+----------------------+-------------------------+--------'
+
+
+def get_table_header() -> str:
+    header = '| DHCPD ACTIVE LEASES REPORT'
+    columns = '| IP Address      | MAC Address       | Expires (days,H:M:S) | Client Hostname         | Vendor'
+    return f"{start_line}\n{header}\n{split_line}\n{columns}\n{split_line}"
+
+
+def get_total() -> str:
+    header = f'| Total Active Leases: {str(len(report_dataset))}'
+    info_generated = f'| Report generated (UTC): {str(now)}'
+    return f"{start_line}\n{header}\n{info_generated}\n{split_line}"
+
+
+def get_value_for_ends(ends) -> str:
+    return str((ends - now) if ends != NEVER else ends)
+
+
 ##############################################################################
 
 
@@ -284,21 +311,21 @@ vendors_file.close()
 now = timestamp_now()
 report_dataset = select_active_leases(leases, now, vendors)
 
-print('+' + '-' * 92)
-print('| DHCPD ACTIVE LEASES REPORT')
-print('+-----------------+-------------------+----------------------+----------------------+--------')
-print('| IP Address      | MAC Address       | Expires (days,H:M:S) | Client Hostname      | Vendor')
-print('+-----------------+-------------------+----------------------+----------------------+--------')
+start_line = get_start_end_line()
+split_line = get_line()
+
+print(get_table_header())
 
 for lease in report_dataset:
-    print('| %(ip_address)s | %(hardware)s | %(ends)s | %(client_hostname)s | %(vendor)s' % {
-        "ip_address": format(lease['ip_address'], '<15'),
-        "hardware": format(lease['hardware'], '<17'),
-        "ends": format(str((lease['ends'] - now) if lease['ends'] != 'never' else 'never'), '>20'),
-        "client_hostname": format(lease['client-hostname'], '<20'),
-        "vendor": lease['vendor']})
+    print(
+        "| " +
+        format(lease['ip_address'], '<15'),
+        format(lease['hardware'], '<17'),
+        format(get_value_for_ends(lease['ends']), '>20'),
+        format(lease['client-hostname'], '<23'),
+        format(lease['vendor'], '<35')
+        + " |",
+        sep=" | "
+    )
 
-print('+-----------------+-------------------+----------------------+----------------------+--------')
-print('| Total Active Leases: %s' % (str(len(report_dataset))))
-print('| Report generated (UTC): %s' % (str(now)))
-print('+' + '-' * 92)
+print(get_total())
