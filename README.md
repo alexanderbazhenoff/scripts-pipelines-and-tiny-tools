@@ -12,6 +12,13 @@ a dump.
 - [**kvm_vm_backup**](backup/kvm_vm_backup/README.md) - backup running or stopped
 [Kernel Virtual Machine (KVM)](https://www.linux-kvm.org/page/Main_Page) instance(s) on Linux systems.
 
+## Benchmark scripts
+
+A set of scripts to benchmarks and performance stats.
+
+- [**filesystems_benchmarks**](benchmark/filesystems_benchmarks/README.md) - a set of filesystem benchmark and 
+performance comparison scripts.
+
 ## Network scripts
 
 Configure and collect network settings on linux systems.
@@ -29,5 +36,5 @@ script.
 Visualization and stats scripts.
 
 - [**traffic_item_stat_and_graph**](visualization/traffic_item_stat_and_graph/README.md) - script that build traffic
-item  statistics on the graph from [IxNetwork server](https://support.ixiacom.com/version/ixnetwork-916) CSV results
+item statistics on the graph from [IxNetwork server](https://support.ixiacom.com/version/ixnetwork-916) CSV results 
 file.
