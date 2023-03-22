@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-### Single btrfs disk performance testing. Performs several iterations of write read using ramdisk.
+### btrfs raid10 performance testing. Performs several iterations of write read using ramdisk.
 ### -----------------------------------------------------------------------------------------------
 ### Warning! Running this file you accept that you know what you're doing. All actions with this
 ###          script at your own risk.
@@ -12,21 +12,24 @@
 
 
 POOL_PATH="/mnt/ssd"
-FILENAME="dit-builder.qcow2"
+FILENAME="vm_image.qcow2"
 RAMDISK_PATH="/mnt/ramdisk"
+DISK_MOUNT_PATH="/mnt/ssd"
 SOURCE_FILE_PATH="/var/lib/libvirt/images"
-BLOCK_DEVICE_NAME="sdg1"
+BLOCK_DEVICES="/dev/sdc1 /dev/sde1 /dev/sdg1 /dev/sdi1"
 BTRFS_MOUNT_OPTIONS="autodefrag,space_cache=v2,ssd,ssd_spread"
-RAMDISK_SIZE="62"  # in gygabites
+RAMDISK_SIZE=62  # in gigabytes
 
 
 # perform write-read with rsync
 test_wr() {
+
   # clean files from pool
   for i in {1..3}
   do
     rm -f "${POOL_PATH}/${FILENAME}-${i}"
   done
+
   # write performance testing
   rm -fv "${RAMDISK_PATH}/*"
   cp "${SOURCE_FILE_PATH}/${FILENAME}" "${RAMDISK_PATH}/${FILENAME}"
@@ -51,15 +54,17 @@ test_wr() {
   done
 }
 
-mount -t tmpfs -o size="$RAMDISK_SIZE"g tmpfs /mnt/ramdisk
-umount /mnt/ssd
 
-wipefs --all -t btrfs /dev/$BLOCK_DEVICE_NAME
-mkfs.btrfs /dev/$BLOCK_DEVICE_NAME -f
+mkdir $RAMDISK_PATH || true
+mount -t tmpfs -o size="$RAMDISK_SIZE"g tmpfs $RAMDISK_PATH
+umount $POOL_PATH || true
+
+wipefs --all "$BLOCK_DEVICES"
+mkfs.btrfs -m raid10 -d "$BLOCK_DEVICES" -f
 partprobe
 btrfs filesystem show
-mount -o $BTRFS_MOUNT_OPTIONS /dev/$BLOCK_DEVICE_NAME /mnt/ssd
-printf "\n\nTesting: disks=%s | %s\n" "$BLOCK_DEVICE_NAME" "$BTRFS_MOUNT_OPTIONS"
+mount -o $BTRFS_MOUNT_OPTIONS "${BLOCK_DEVICES// */}" $DISK_MOUNT_PATH
+printf "\n\nTesting: RAID10 with disks: %s | %s\n" "$BLOCK_DEVICES" "$BTRFS_MOUNT_OPTIONS"
 test_wr
 sync
-umount /mnt/ssd
+umount $POOL_PATH
