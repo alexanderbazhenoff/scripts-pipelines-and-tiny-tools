@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-### btrfs raid10 performance testing. Performs several iterations of write and read using ramdisk.
+### ZFS pool performance testing. Performs several iterations of write and read using ramdisk.
 ### -----------------------------------------------------------------------------------------------
 ### Warning! Running this file you accept that you know what you're doing. All actions with this
 ###          script at your own risk.
@@ -11,14 +11,18 @@
 ### https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
 
 
-POOL_PATH="/mnt/ssd"
 FILENAME="vm_image.qcow2"
 RAMDISK_PATH="/mnt/ramdisk"
-DISK_MOUNT_PATH="/mnt/ssd"
-SOURCE_FILE_PATH="/var/lib/libvirt/images"
-BLOCK_DEVICES="/dev/sdc1 /dev/sde1 /dev/sdg1 /dev/sdi1"
-BTRFS_MOUNT_OPTIONS="autodefrag,space_cache=v2,ssd,ssd_spread"
-RAMDISK_SIZE=62  # in gigabytes
+SOURCEFILE_PATH="/var/lib/libvirt/images"
+RAMDISK_SIZE=62                # in gigabytes
+
+ZFS_POOL_NAME="ssd"
+POOL_PATH="/mnt/$POOL_PATH"
+BLOCK_DEVICES="/dev/sdc /dev/sde /dev/sdg /dev/sdi"
+ZFS_POOL_TOPOLOGY="mirror sdc sde mirror sdg sdi"
+ZFS_ATIME_OPTION="off"         # off or on
+ZFS_DEDUP_OPTION="off"         # off or on
+ZFS_COMPRESSION_OPTION="off"   # on | off | lzjb | gzip | gzip-[1-9] | zle | lz4
 
 
 # perform write-read with rsync
@@ -32,24 +36,15 @@ test_wr() {
 
   # write performance testing
   rm -fv "${RAMDISK_PATH}/*"
-  cp "${SOURCE_FILE_PATH}/${FILENAME}" "${RAMDISK_PATH}/${FILENAME}"
+  cp "${SOURCEFILE_PATH}/${FILENAME}" "${RAMDISK_PATH}/${FILENAME}"
   echo "write 3 copies:"
 
   for i in {1..3}
   do
-    rsync --info=progress2 "${RAMDISK_PATH}/${FILENAME}" "${POOL_PATH}/${FILENAME}-${i}"
-    uptime | printf "\e[1A\t\t\t\t\t\t\t\t  load %s\n" "$(uptime | sed 's/^.*average:/average:/')"
-    sync; echo 3 > /proc/sys/vm/drop_caches
-  done
-
-  # read performance testing
-  rm -f "${RAMDISK_PATH}/${FILENAME}"
-  echo "read 3 copies:"
-  for i in {1..3}
-  do
     rsync --info=progress2 "${POOL_PATH}/${FILENAME}-${i}" "${RAMDISK_PATH}/${FILENAME}"
     uptime | printf "\e[1A\t\t\t\t\t\t\t\t  load %s\n" "$(uptime | sed 's/^.*average:/average:/')"
-    sync; echo 3 > /proc/sys/vm/drop_caches
+    sync
+    echo 3 > /proc/sys/vm/drop_caches
     rm -f "${RAMDISK_PATH}/${FILENAME}"
   done
 }
@@ -57,15 +52,16 @@ test_wr() {
 
 mkdir $RAMDISK_PATH || true
 mount -t tmpfs -o size="$RAMDISK_SIZE"g tmpfs $RAMDISK_PATH
-umount $POOL_PATH || true
+umount "$POOL_PATH" || true
 mkdir "$POOL_PATH" || true
 
-wipefs --all "$BLOCK_DEVICES"
-mkfs.btrfs -m raid10 -d "$BLOCK_DEVICES" -f
-partprobe
-btrfs filesystem show
-mount -o $BTRFS_MOUNT_OPTIONS "${BLOCK_DEVICES// */}" $DISK_MOUNT_PATH
-printf "\n\nTesting: RAID10 with disks: %s | %s\n" "$BLOCK_DEVICES" "$BTRFS_MOUNT_OPTIONS"
+wipefs --all "$BLOCK_DEVICES" > /dev/zero
+zpool create $ZFS_POOL_NAME "$ZFS_POOL_TOPOLOGY" -f
+zfs set mountpoint="$POOL_PATH" $ZFS_POOL_NAME
+zfs set atime=$ZFS_ATIME_OPTION $ZFS_POOL_NAME
+zfs set dedup=$ZFS_DEDUP_OPTION $ZFS_POOL_NAME
+zfs set compression=$ZFS_COMPRESSION_OPTION $ZFS_POOL_NAME
+printf "\n\nTesting zfs: dedup=%s, compress=%s, atime=%s | %s\n" "$ZFS_DEDUP_OPTION" "$ZFS_COMPRESSION_OPTION" \
+  "$ZFS_ATIME_OPTION" "$ZFS_POOL_TOPOLOGY"
 test_wr
-sync
-umount $POOL_PATH
+zpool destroy $ZFS_POOL_NAME

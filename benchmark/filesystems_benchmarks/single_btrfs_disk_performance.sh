@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-### Single btrfs disk performance testing. Performs several iterations of write read using ramdisk.
+### Single btrfs disk performance testing. Performs several iterations of write/read using ramdisk.
 ### -----------------------------------------------------------------------------------------------
 ### Warning! Running this file you accept that you know what you're doing. All actions with this
 ###          script at your own risk.
@@ -57,6 +57,7 @@ test_wr() {
 mkdir $RAMDISK_PATH || true
 mount -t tmpfs -o size="$RAMDISK_SIZE"g tmpfs $RAMDISK_PATH
 umount "$POOL_PATH" || true
+mkdir "$POOL_PATH" || true
 
 wipefs --all -t btrfs /dev/$BLOCK_DEVICE_NAME
 mkfs.btrfs /dev/$BLOCK_DEVICE_NAME -f
