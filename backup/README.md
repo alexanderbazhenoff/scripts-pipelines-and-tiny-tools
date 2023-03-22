@@ -10,3 +10,4 @@ filesystem path to remote drives with UID/GUI storing (especially for containers
 - [**calculate_and_check_md5**](calculate_and_check_md5) - calculate and check md5 of required folder.
 - [**kvm_vm_backup**](kvm_vm_backup/README.md) - backup running or stopped
 [Kernel Virtual Machine (KVM)](https://www.linux-kvm.org/page/Main_Page) instance(s) on Linux systems.
+- [**mysql_dump**](mysql_dump/README.md) - bash and batch command file examples of MySQL dump.

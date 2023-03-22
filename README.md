@@ -11,6 +11,7 @@ restore filesystem path to remote drives with UID/GUI storing (especially for co
 a dump.
 - [**kvm_vm_backup**](backup/kvm_vm_backup/README.md) - backup running or stopped
 [Kernel Virtual Machine (KVM)](https://www.linux-kvm.org/page/Main_Page) instance(s) on Linux systems.
+- [**mysql_dump**](backup/mysql_dump/README.md) - bash and batch command file examples of MySQL dump.
 
 ## Benchmark scripts
 
