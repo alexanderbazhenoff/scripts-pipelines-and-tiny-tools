@@ -2,7 +2,37 @@
 
 A set of scripts for filesystem benchmark and comparison performance with different options enabled.
 
-## variables and usage:
+## usage:
+
+1. Most of the scripts requires rsync to be installed.
+2. Parallel testing scripts requires gnu parallel: `apt-get install parallel`.
+3. Set your variables inside the script (for your disk topology, mount points, file to test on, etc...) as shown in
+[variable](#variables-) section.
+4. Run and get something like:
+```
+Testing: disks=sdc1/sdd1 in parrallel | autodefrag,space_cache=v2,ssd,ssd_spread
+write 3 copies:
+ 21,478,375,424 100%  513.93MB/s    0:00:39 (xfr#1, to-chk=0/1)
+ 21,478,375,424 100%  497.14MB/s    0:00:41 (xfr#1, to-chk=0/1)   load average: 2,77, 1,54, 1,50
+
+ 21,478,375,424 100%  498.00MB/s    0:00:41 (xfr#1, to-chk=0/1)
+ 21,478,375,424 100%  490.62MB/s    0:00:41 (xfr#1, to-chk=0/1)   load average: 3,70, 2,14, 1,72
+
+ 21,478,375,424 100%  507.54MB/s    0:00:40 (xfr#1, to-chk=0/1)
+ 21,478,375,424 100%  495.04MB/s    0:00:41 (xfr#1, to-chk=0/1)   load average: 3,48, 2,53, 1,92
+
+read 3 copies:
+ 21,478,375,424 100%  437.98MB/s    0:00:46 (xfr#1, to-chk=0/1)
+ 21,478,375,424 100%  436.84MB/s    0:00:46 (xfr#1, to-chk=0/1)   load average: 3,17, 2,72, 2,08
+
+ 21,478,375,424 100%  446.55MB/s    0:00:45 (xfr#1, to-chk=0/1)          
+ 21,478,375,424 100%  445.75MB/s    0:00:45 (xfr#1, to-chk=0/1)   load average: 3,41, 2,86, 2,16 
+
+ 21,478,375,424 100%  446.55MB/s    0:00:45 (xfr#1, to-chk=0/1)          
+ 21,478,375,424 100%  445.75MB/s    0:00:45 (xfr#1, to-chk=0/1)   load average: 3,41, 2,86, 2,16 
+```
+
+## variables:
 
 Edit script variables to set-up script(s):
 
@@ -32,3 +62,9 @@ compression algorythm for ZFS pool filesystem compression option.
 
 - [**btrfs_raid10_performance**](btrfs_raid10_performance.sh) - test performance of btrfs radi10.
 - [**README.md**](README.md) - this file.
+- [**single_btrfs_disk_performance**](single_btrfs_disk_performance.sh) - test performance of btrfs filesystem placed on
+single disk (e.g. if you wish to test SSD performance of the disk).
+- [**single_btrfs_disks_with_parallel_streams_performance**](single_btrfs_disks_with_parallel_streams_performance.sh) -
+test several single disks in parallel (e.g. if you wish to test your hardware disk controller speed).
+- [**zfs_mirrors_performance**](zfs_mirrors_performance.sh) - test performance of ZFS mirror pools (e.g. if you wish to
+test RADI1, RAID10, etc...)
