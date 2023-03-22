@@ -14,7 +14,6 @@
 POOL_PATH="/mnt/ssd"
 FILENAME="vm_image.qcow2"
 RAMDISK_PATH="/mnt/ramdisk"
-DISK_MOUNT_PATH="/mnt/ssd"
 SOURCE_FILE_PATH="/var/lib/libvirt/images"
 BLOCK_DEVICES="/dev/sdc1 /dev/sde1 /dev/sdg1 /dev/sdi1"
 BTRFS_MOUNT_OPTIONS="autodefrag,space_cache=v2,ssd,ssd_spread"
@@ -64,7 +63,7 @@ wipefs --all "$BLOCK_DEVICES"
 mkfs.btrfs -m raid10 -d "$BLOCK_DEVICES" -f
 partprobe
 btrfs filesystem show
-mount -o $BTRFS_MOUNT_OPTIONS "${BLOCK_DEVICES// */}" $DISK_MOUNT_PATH
+mount -o $BTRFS_MOUNT_OPTIONS "${BLOCK_DEVICES// */}" $POOL_PATH
 printf "\n\nTesting: RAID10 with disks: %s | %s\n" "$BLOCK_DEVICES" "$BTRFS_MOUNT_OPTIONS"
 test_wr
 sync
