@@ -17,7 +17,7 @@ SOURCEFILE_PATH="/var/lib/libvirt/images"
 RAMDISK_SIZE=62                # in gigabytes
 
 ZFS_POOL_NAME="ssd"
-POOL_PATH="/mnt/$POOL_PATH"
+POOL_PATH="/mnt/$ZFS_POOL_NAME"
 BLOCK_DEVICES="/dev/sdc /dev/sde /dev/sdg /dev/sdi"
 ZFS_POOL_TOPOLOGY="mirror sdc sde mirror sdg sdi"
 ZFS_ATIME_OPTION="off"         # off or on
