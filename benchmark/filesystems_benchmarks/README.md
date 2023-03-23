@@ -57,14 +57,19 @@ with.
 - **ZFS_DEDUP_OPTION** (`off` or `on`): Disable/enable deduplication option on ZFS pool.
 - **ZFS_COMPRESSION_OPTION** (`on`, `off`, `lzjb`, `gzip`, `gzip-[1-9]`, `zle` or `lz4`): Enable, disable or specify
 compression algorythm for ZFS pool filesystem compression option.
+- **RAID1_BLOCK_DEVICES** (e.g. `"/dev/sda /dev/sdb"`): Block devices of RAID1.
+- **ZFS_MIRROR1_TOPOLOGY** (e.g. `"mirror sda sdb"`): ZFS pool mirror 1 devices.
+- **ZFS_MIRROR2_TOPOLOGY** (e.g. `"mirror sdc sde"`): ZFS pool mirror 2 devices.
 
 ## contents:
 
-- [**btrfs_raid10_performance**](btrfs_raid10_performance.sh) - test performance of btrfs radi10.
+- [**btrfs_raid10_performance.sh**](btrfs_raid10_performance.sh) - test performance of btrfs radi10.
+- [**btrfs_vs_zfs_raid1_vs_raid10_options_performance.sh**](btrfs_vs_zfs_raid1_vs_raid10_options_performance.sh) -
+Comparison of two or four disks btrfs raid10 with different data layout vs one or two mirrored ZFS pools performance.
 - [**README.md**](README.md) - this file.
-- [**single_btrfs_disk_performance**](single_btrfs_disk_performance.sh) - test performance of btrfs filesystem placed on
+- [**single_btrfs_disk_performance.sh**](single_btrfs_disk_performance.sh) - test performance of btrfs filesystem placed on
 single disk (e.g. if you wish to test SSD performance of the disk).
-- [**single_btrfs_disks_with_parallel_streams_performance**](single_btrfs_disks_with_parallel_streams_performance.sh) -
+- [**single_btrfs_disks_with_parallel_streams_performance.sh**](single_btrfs_disks_with_parallel_streams_performance.sh) -
 test several single disks in parallel (e.g. if you wish to test your hardware disk controller speed).
-- [**zfs_mirrors_performance**](zfs_mirrors_performance.sh) - test performance of ZFS mirror pools (e.g. if you wish to
+- [**zfs_mirrors_performance.sh**](zfs_mirrors_performance.sh) - test performance of ZFS mirror pools (e.g. if you wish to
 test RADI1, RAID10, etc...)
