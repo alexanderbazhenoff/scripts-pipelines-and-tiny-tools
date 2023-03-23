@@ -30,7 +30,7 @@ Configure and collect network settings on linux systems.
 expiration and client vendor.
 - [**inner_vps_bridge**](network/inner_vps_bridge/README.md) - example how to organize the network inside your VPS by
 linux bridge.
-- [ixnetwork_related_sripts](network/ixnetwork_related_sripts/README.md) - 
+- [**ixnetwork_related_scripts**](network/ixnetwork_related_scripts/README.md) - 
 [IxNetwork server](https://support.ixiacom.com/version/ixnetwork-916) related scripts: automation, interaction, etc..
 - [**vlan_filtered_bridges**](network/vlan_filtered_bridges/README.md) - systemd unit and script to create bridge with
 VLAN filtering to prevent MAC-table overflow on the host. Actually this is an example how to organize linux bridges by
