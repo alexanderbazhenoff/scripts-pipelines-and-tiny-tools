@@ -18,38 +18,39 @@ SOURCE_FILE_PATH="/var/lib/libvirt/images"
 BLOCK_DEVICE_NAME="sdg1"
 BTRFS_MOUNT_OPTIONS="autodefrag,space_cache=v2,ssd,ssd_spread"
 RAMDISK_SIZE=62  # in gigabytes
+NUMBER_OF_ITERATIONS=3
 
 
 # perform write-read with rsync
 test_wr() {
 
   # clean files from pool
-  for i in {1..3}
+  for ((i=1; i <= NUMBER_OF_ITERATIONS; i++))
   do
     rm -f "${POOL_PATH}/${FILENAME}-${i}"
   done
 
   # write performance testing
   rm -fv "${RAMDISK_PATH}/*"
-  cp "${SOURCE_FILE_PATH}/${FILENAME}" "${RAMDISK_PATH}/${FILENAME}"
+  cp "${SOURCE_FILE_PATH}/$FILENAME" "${RAMDISK_PATH}/$FILENAME"
   echo "write 3 copies:"
 
-  for i in {1..3}
+  for ((i=1; i <= NUMBER_OF_ITERATIONS; i++))
   do
-    rsync --info=progress2 "${RAMDISK_PATH}/${FILENAME}" "${POOL_PATH}/${FILENAME}-${i}"
+    rsync --info=progress2 "${RAMDISK_PATH}/$FILENAME" "${POOL_PATH}/${FILENAME}-${i}"
     uptime | printf "\e[1A\t\t\t\t\t\t\t\t  load %s\n" "$(uptime | sed 's/^.*average:/average:/')"
     sync; echo 3 > /proc/sys/vm/drop_caches
   done
 
   # read performance testing
-  rm -f "${RAMDISK_PATH}/${FILENAME}"
+  rm -f "${RAMDISK_PATH}/$FILENAME"
   echo "read 3 copies:"
-  for i in {1..3}
+  for ((i=1; i <= NUMBER_OF_ITERATIONS; i++))
   do
-    rsync --info=progress2 "${POOL_PATH}/${FILENAME}-${i}" "${RAMDISK_PATH}/${FILENAME}"
+    rsync --info=progress2 "${POOL_PATH}/${FILENAME}-${i}" "${RAMDISK_PATH}/$FILENAME"
     uptime | printf "\e[1A\t\t\t\t\t\t\t\t  load %s\n" "$(uptime | sed 's/^.*average:/average:/')"
     sync; echo 3 > /proc/sys/vm/drop_caches
-    rm -f "${RAMDISK_PATH}/${FILENAME}"
+    rm -f "${RAMDISK_PATH}/$FILENAME"
   done
 }
 

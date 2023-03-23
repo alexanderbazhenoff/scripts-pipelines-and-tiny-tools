@@ -23,37 +23,38 @@ ZFS_POOL_TOPOLOGY="mirror sdc sde mirror sdg sdi"
 ZFS_ATIME_OPTION="off"         # off or on
 ZFS_DEDUP_OPTION="off"         # off or on
 ZFS_COMPRESSION_OPTION="off"   # on | off | lzjb | gzip | gzip-[1-9] | zle | lz4
+NUMBER_OF_ITERATIONS=3            # total number of write/read iterations
 
 
 # perform write-read with rsync
 test_wr() {
 
   # clean files from pool
-  for i in {1..3}
+  for ((i=1; i <= NUMBER_OF_ITERATIONS; i++))
   do
     rm -f "${POOL_PATH}/${FILENAME}-${i}"
   done
 
   # write performance testing
   rm -fv "${RAMDISK_PATH}/*"
-  cp "${SOURCEFILE_PATH}/${FILENAME}" "${RAMDISK_PATH}/${FILENAME}"
+  cp "${SOURCEFILE_PATH}/$FILENAME" "${RAMDISK_PATH}/$FILENAME"
   echo "write 3 copies:"
 
-  for i in {1..3}
+  for ((i=1; i <= NUMBER_OF_ITERATIONS; i++))
   do
-    rsync --info=progress2 "${POOL_PATH}/${FILENAME}-${i}" "${RAMDISK_PATH}/${FILENAME}"
+    rsync --info=progress2 "${POOL_PATH}/${FILENAME}-${i}" "${RAMDISK_PATH}/$FILENAME"
     uptime | printf "\e[1A\t\t\t\t\t\t\t\t  load %s\n" "$(uptime | sed 's/^.*average:/average:/')"
     sync
     echo 3 > /proc/sys/vm/drop_caches
-    rm -f "${RAMDISK_PATH}/${FILENAME}"
+    rm -f "${RAMDISK_PATH}/$FILENAME"
   done
 }
 
 
 mkdir $RAMDISK_PATH || true
 mount -t tmpfs -o size="$RAMDISK_SIZE"g tmpfs $RAMDISK_PATH
-umount "$POOL_PATH" || true
-mkdir "$POOL_PATH" || true
+umount $POOL_PATH || true
+mkdir $POOL_PATH || true
 
 wipefs --all "$BLOCK_DEVICES" > /dev/zero
 zpool create $ZFS_POOL_NAME "$ZFS_POOL_TOPOLOGY" -f

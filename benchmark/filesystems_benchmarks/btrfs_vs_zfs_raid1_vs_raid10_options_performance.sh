@@ -40,9 +40,9 @@ testWR() {
 
   # write performance testing
   rm -fv "${RAMDISK_PATH}/*"
-  unzip -j "${SOURCE_FILE_PATH}/${FILENAME}.zip" -d "${RAMDISK_PATH}/${FILENAME}"
+  unzip -j "${SOURCE_FILE_PATH}/${FILENAME}.zip" -d "${RAMDISK_PATH}/$FILENAME"
   mv "${RAMDISK_PATH}/${FILENAME}" "${RAMDISK_PATH}/${FILENAME}-dir"
-  mv "${RAMDISK_PATH}/${FILENAME}-dir/${FILENAME}" "${RAMDISK_PATH}/${FILENAME}"
+  mv "${RAMDISK_PATH}/${FILENAME}-dir/${FILENAME}" "${RAMDISK_PATH}/$FILENAME"
   rm -rf "${RAMDISK_PATH}/${FILENAME}-dir"
   echo "write copies:"
 
@@ -54,22 +54,22 @@ testWR() {
   done
 
   # read performance testing
-  rm -f "${RAMDISK_PATH}/${FILENAME}"
+  rm -f "${RAMDISK_PATH}/$FILENAME"
   echo "read copies:"
   for ((i=1; i <= NUMBER_OF_ITERATIONS; i++))
   do
-    rsync --info=progress2 "${POOL_PATH}/${FILENAME}-${i}" "${RAMDISK_PATH}/${FILENAME}"
+    rsync --info=progress2 "${POOL_PATH}/${FILENAME}-${i}" "${RAMDISK_PATH}/$FILENAME"
     uptime | printf "\e[1A\t\t\t\t\t\t\t\t  load %s\n" "$(uptime | sed 's/^.*average:/average:/')"
     sync; echo 3 > /proc/sys/vm/drop_caches
-    rm -f "${RAMDISK_PATH}/${FILENAME}"
+    rm -f "${RAMDISK_PATH}/$FILENAME"
   done
 }
 
 
 # prepare
-mkdir "${RAMDISK_PATH}" || true
-mount -t tmpfs -o size="${RAMDISK_SIZE}"g tmpfs "${RAMDISK_PATH}"
-umount "${POOL_PATH}" || true
+mkdir $RAMDISK_PATH || true
+mount -t tmpfs -o size="${RAMDISK_SIZE}"g tmpfs "$RAMDISK_PATH"
+umount $POOL_PATH || true
 set -e
 
 
