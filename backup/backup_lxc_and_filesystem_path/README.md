@@ -1,16 +1,16 @@
 Backup LXC and filesystem path
-------------------------------
+==============================
 
-These scripts perform backing up of filesystem path with UID/GID saving using tar and gpg. Possible to save
-and upload the whole containers.
+These scripts perform backing up filesystem path with UID/GID saving using tar and gpg. Possible to save and upload the
+whole containers.
 
 Usage
 -----
 
 1. Upload this folder content to your Linux system, e.g. inside of `/opt/scripts` folder.
-2. (Optional) Set-up your [rclone](https://rclone.org/drive/) to mount destination drive, e.g. Google Drive, Dropbox,
+2. (Optional) Set up your [rclone](https://rclone.org/drive/) to mount destination drive, e.g. Google Drive, Dropbox,
 Amazon Drive, Amazon S3 Compliant Storage Providers (including AWS, Alibaba, Ceph, Digital Ocean, Dreamhost, IBM COS,
-Minio, SeaweedFS, and Tencent COS), Google Cloud Storage, Hadoop distributed file syste, Mail.ru Cloud, Mega,
+Minio, SeaweedFS, and Tencent COS), Google Cloud Storage, Hadoop distributed file system, Mail.Ru Cloud, Mega,
 Microsoft Azure Blob Storage, Microsoft OneDrive, OpenStack Swift, QingCloud Object Storage, Yandex Disk, Uptobox, Zoho 
 or another connection method(s) like ftp, ssh, sftp, http. Or mount your backup path manually, e.g. `/mnt/backup`.
 3. Fill your `empty_password.txt` with gpg key if you wish to encrypt your files or leave them empty.
