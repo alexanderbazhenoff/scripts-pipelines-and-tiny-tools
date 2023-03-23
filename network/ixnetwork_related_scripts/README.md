@@ -1,5 +1,17 @@
-traffic item stat and graph
-===========================
+IxNetwork related scripts
+=========================
+
+A set of various scripts to maintain, automate and interact with 
+[IxNetwork server](https://support.ixiacom.com/version/ixnetwork-916).
+
+
+### clean_ixnetwork_logs_and_stats.bat
+
+A script to place on [IxNetwork server](https://support.ixiacom.com/version/ixnetwork-916) to perform logs, stats and
+error dumps clean-up to decrease disk space usage. No parameters required, just edit days expire days for files 
+clean-up inside the [bat](clean_ixnetwork_logs_and_stats.bat) script. Then create a new task in a Task scheduler with
+'Run whether user is logged on or not' and 'Run with the highest privileges' options.
+
 
 ### traffic_item_statistics.py
 

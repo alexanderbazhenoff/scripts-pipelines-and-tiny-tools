@@ -24,7 +24,7 @@ performance comparison scripts.
 
 ## Network scripts
 
-Configure and collect network settings on linux systems.
+Configure and collect network settings and software on operating systems.
 
 - [**get_dhcp_leases**](network/get_dhcpd_leases/README.md) - get leases info from isc-dhcp server including client, 
 expiration and client vendor.
