@@ -26,8 +26,21 @@ The same as [ixnetwork_server_at_7999_10999_default_user.bat](ixnetwork_server_a
 specific user (`jenkins` in this case). Actually this is workaround of autostart IxNetwork server which can't be run 
 without user login. Connect via RDP by specific user (`jenkins`) to run IxNetwork server, e.g:
 ```bash
-sudo xfreerdp /v:ixnetwork_server.domain /u:jenkins /p:your_password /cert-ignore &
+sudo xfreerdp /v:ixnetwork-server.domain /u:jenkins /p:your_password /cert-ignore &
 ```
+
+
+### --- [**ixnetwork_server_rdp_start_jenkins_pipeline.groovy**](ixnetwork_server_rdp_start_jenkins_pipeline.groovy) ---
+
+A scripted jenkins pipeline which you can optionally add to run IxNetwork via RDP connect by schedule:
+
+1. Add this pipeline code by copy/paste to your jenkins pipeline or create them from gitSCM.
+2. Edit pipeline variables to set your RDP login creation:
+
+   - **IxNetworkRdpHost** (e.g. `'ixnetwork.domain'`) - RDP host to connect.
+   - **IxNetworkRdpPass** (e.g. `'some_password'` - RDP password. The same for all users.
+   - **UserList** (e.g. `['jenkins', 'jenkins2']` - a list of RDP users to iterate on RDP connection.
+3. Run this pipeline.
 
 
 ### --- [traffic_item_statistics.py](traffic_item_statistics.py) ---
