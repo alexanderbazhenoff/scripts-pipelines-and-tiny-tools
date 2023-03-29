@@ -16,6 +16,8 @@ import datetime
 
 
 NEVER = 'never'
+VENDORS_FILE_PATH = '/usr/local/etc/oui.txt'
+DHCP_LEASES_PATH = '/var/lib/dhcp/dhcpd.leases'
 
 
 class ParseError(Exception):
@@ -300,11 +302,11 @@ def get_value_for_ends(ends) -> str:
 ##############################################################################
 
 
-my_lease_file = open('/var/lib/dhcp/dhcpd.leases', 'r')
+my_lease_file = open(DHCP_LEASES_PATH, 'r')
 leases = parse_leases_file(my_lease_file)
 my_lease_file.close()
 
-vendors_file = open('/usr/local/etc/oui.txt', 'r')
+vendors_file = open(VENDORS_FILE_PATH, 'r')
 vendors = parse_vendors_file(vendors_file)
 vendors_file.close()
 
