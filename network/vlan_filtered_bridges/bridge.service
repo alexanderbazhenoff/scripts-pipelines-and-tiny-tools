@@ -1,6 +1,6 @@
-# /etc/systemd/system/cloud-bridge.service
+# /etc/systemd/system/bridge.service
 [Unit]
-Description=Cloud bridge systemd unit
+Description=Bridge systemd unit
 After=network.target
 
 [Service]

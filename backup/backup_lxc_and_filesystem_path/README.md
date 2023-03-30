@@ -4,6 +4,9 @@ Backup LXC and filesystem path
 These scripts perform backing up filesystem path with UID/GID saving using tar and gpg. Possible to save and upload the
 whole containers.
 
+**WARNING! Running this file you accept that you know what you're doing. All actions with this script are at your own
+risk.**
+
 Usage
 -----
 

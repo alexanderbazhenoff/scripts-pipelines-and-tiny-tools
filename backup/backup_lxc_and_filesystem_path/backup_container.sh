@@ -10,10 +10,10 @@
 ###
 ### -----------------------------------------------------------------------------------------------
 ### Warning! Running this file you accept that you know what you're doing. All actions with this
-###          script at your own risk.
+###          script are at your own risk.
 ### -----------------------------------------------------------------------------------------------
-### This Source Code Form is subject to the terms of the MIT License. If a copy of the MPL was not
-### distributed with this file, You can obtain one at:
+### This Source Code Form is subject to the terms of the BSD 3-Clause License. If a copy of the
+### source(s) distributed with this file, You can obtain one at:
 ### https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
 
 

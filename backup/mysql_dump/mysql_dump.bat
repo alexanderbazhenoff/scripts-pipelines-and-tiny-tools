@@ -3,10 +3,9 @@ title MySQL Dump batch file
 
 :: Dump MySQL for Windows operation systems.
 :: Written by Bazhenov Alexander. August, 2014.
-:: -----------------------------------------------------------------------------------------------
+:: -------------------------------------------------------------------------------------------------
 
-:: This Source Code Form is subject to the terms of the MIT License. If a copy of the MPL was not
-:: distributed with this file, You can obtain one at:
+:: This Source Code Form is subject to the terms of the BSD 3-Clause License. You can obtain one at:
 :: https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
 
 
@@ -17,7 +16,7 @@ set TIME_FMT=%CURRENT_TIME%
 set DATE_FMT=%DATE%
 
 
-:: -----------------------------------------------------------------------------------------------
+:: -------------------------------------------------------------------------------------------------
 :: DB_PASS=database password
 :: DB_NAME=database schema name
 :: DB_HOST=host or ip
@@ -31,7 +30,7 @@ set DB_PORT=3306
 set DB_LOGIN=root
 set BACKUP_PATH=D:\backup\db\
 set BACKUP_COPY_PATH=Y:\backup\
-:: ---------------------------------------------------------------------------------------------------
+:: -------------------------------------------------------------------------------------------------
 
 
 (

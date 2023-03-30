@@ -7,5 +7,5 @@ to organize linux bridges by script.
 
 - [`bridge.sh`](bridge.sh) - non-master bridge. Copy them to `/opt`.
 - [`bridge-master.sh`](bridge-master.sh) - master bridge. Copy to `/opt`.
-- [`cloud-bridge.service`](cloud-bridge.service) - systemd unit. Copy to `/etc/systemd/system/cloud-bridge.service`.
+- [`bridge.service`](bridge.service) - systemd unit. Copy to `/etc/systemd/system/cloud-bridge.service`.
 - [`README.md`](README.md) - this file.

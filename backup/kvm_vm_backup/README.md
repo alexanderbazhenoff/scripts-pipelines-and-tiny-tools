@@ -108,7 +108,7 @@ to your channel device section of VM config, e.g.:
 ```
 
 - Please avoid the name included to another names of virtual machines in `--stoped` mode, e.g "test" and "test-24". 
-  Otherwise the time of creating backups will be increased on every include.
+  Otherwise, the time of creating backups will be increased on every include.
 - There is no power-on detection in `--active` mode. Anyway the backup up of powered-off machine in `--active` mode will
   work and the machine boots up.
 

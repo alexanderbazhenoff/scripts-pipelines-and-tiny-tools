@@ -1,6 +1,9 @@
 backup btrfs filesystem using snapshot
 ======================================
 
+**WARNING! Running this file you accept that you know what you're doing. All actions with this script are at your own 
+risk.**
+
 Example of how to 
 [perform backup of btrfs filesystem using snapshot(s)](https://archive.kernel.org/oldwiki/btrfs.wiki.kernel.org/index.php/Incremental_Backup.html).
 Before you begin check your kernel version,

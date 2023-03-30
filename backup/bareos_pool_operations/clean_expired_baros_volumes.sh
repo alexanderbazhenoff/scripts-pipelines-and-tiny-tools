@@ -4,12 +4,15 @@
 # ----------------------------------------------------------------------------------- #
 #                Clean expired volumes from Bareos storage pool script                #
 # ----------------------------------------------------------------------------------- #
-#
-# This Source Code Form is subject to the terms of the MIT License. If a copy of the
-# MPL was not distributed with this file, You can obtain one at:
+
+# WARNING! Running this script may cause a potential data loss in your backup
+# pools. All actions are at your own risk, otherwise you know what you're doing.
+
+
+# This Source Code Form is subject to the terms of the BSD 3-Clause License. If a copy of the
+# source(s) distributed with this file, You can obtain one at:
 # https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
-#
-#
+
 # Requirements:
 #    * permissions to run 'bconsole' command and access to $pool_path
 #      (don't mind if you run this script from bareos Admin Job, otherwise - you should
@@ -17,8 +20,7 @@
 #    * git pacakge (apt or yum install git)
 #    * shflags library: https://code.google.com/archive/p/shflags/
 #      or: git clone https://github.com/kward/shflags.git
-#
-#
+
 # Usage:
 #    # ./clean_expired_baros_volumes.sh --name Full- --action delete --expire 10 --filter Pruned
 # or

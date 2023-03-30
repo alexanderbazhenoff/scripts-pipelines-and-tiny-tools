@@ -6,8 +6,11 @@
 #     Written by Alexander Bazhenov. December, 2018. Updated December, 2021    #
 # ---------------------------------------------------------------------------- #
 
-# This Source Code Form is subject to the terms of the MIT License. If a copy of
-# the MPL was not distributed with this file, You can obtain one at:
+# WARNING! Running this script may cause a potential data loss in your backup
+# pools. All actions are at your own risk, otherwise you know what you're doing.
+
+# This Source Code Form is subject to the terms of the BSD 3-Clause License.
+# If a copy of the source(s) distributed with this file, You can obtain one at:
 # https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
 
 

@@ -2,12 +2,15 @@
 
 A set of scripts for filesystem benchmark and comparison performance with different options enabled.
 
+**WARNING! Running this file may cause a potential data loss and assumes you accept that you know what you're doing. All
+actions with this script at your own risk.**
+
 ## usage:
 
 1. Most of the scripts requires rsync to be installed.
 2. Parallel testing scripts requires gnu parallel: `apt-get install parallel`.
 3. Set your variables inside the script (for your disk topology, mount points, file to test on, etc...) as shown in
-[variable](#variables-) section.
+[variable](#variables) section.
 4. Run and get something like:
 ```
 Testing: disks=sdc1/sdd1 in parrallel | autodefrag,space_cache=v2,ssd,ssd_spread
