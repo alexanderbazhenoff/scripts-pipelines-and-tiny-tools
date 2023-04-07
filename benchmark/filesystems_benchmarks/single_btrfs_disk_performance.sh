@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
 
-### Single btrfs disk performance testing. Performs several iterations of write/read using ramdisk.
-### -------------------------------------------------------------------------------------------------
-### Running this file may cause a potential data loss and assumes you accept that you know what
-### you're doing. All actions with this script at your own risk.
+# Single btrfs disk performance testing. Performs several iterations of write/read using ramdisk.
+# -------------------------------------------------------------------------------------------------
+# Running this file may cause a potential data loss and assumes you accept that you know what
+# you're doing. All actions with this script at your own risk.
 
-### -------------------------------------------------------------------------------------------------
-### This Source Code Form is subject to the terms of the BSD 3-Clause License. You can obtain one at:
-### https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
+# -------------------------------------------------------------------------------------------------
+# This Source Code Form is subject to the terms of the BSD 3-Clause License. You can obtain one at:
+# https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
 
 
 POOL_PATH="/mnt/ssd"
@@ -17,7 +17,7 @@ RAMDISK_PATH="/mnt/ramdisk"
 SOURCE_FILE_PATH="/var/lib/libvirt/images"
 BLOCK_DEVICE_NAME="sdg1"
 BTRFS_MOUNT_OPTIONS="autodefrag,space_cache=v2,ssd,ssd_spread"
-RAMDISK_SIZE=62  # in gigabytes
+RAMDISK_SIZE=62           # in gigabytes
 NUMBER_OF_ITERATIONS=3
 
 

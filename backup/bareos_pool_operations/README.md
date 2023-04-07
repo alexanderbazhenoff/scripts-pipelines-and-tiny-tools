@@ -48,26 +48,31 @@ Job {
     }
 }
 ```
-# Other bareos troubleshooting examples:
-
-Examples how to troubleshoot volume and pool problems in bareos.
 
 ### batch_process_bareos_volumes.sh
+
+Common-usage and the most multifunctional script for Bareos pool and volumes troubleshooting.
+
 Apply action for a range of volumes:
 ```bash
 ./batch_process_bareos_volumes.sh <action> <name_mask> <start> <end> <force|print>
 ```
 Action for the range of volumes in the pool with 'name_mask' (something like 'Incremental-' or 'Full-') to apply from
-'start' to 'end' volume sequence. Action should be 'prune', 'purge' or 'delete'. Also you need to set 'force' to 
+'start' to 'end' volume sequence. Action should be 'prune', 'purge' or 'delete'. Also, you need to set 'force' to 
 skip confirmation request or 'print' to get the info about selected range of volumes. '--print' will not perform changes
 in volume status, just output an info.
+
+# Other Bareos troubleshooting examples:
+
+Examples how to troubleshoot volume and pool problems in Bareos. Most versions of the scripts are for PostgreSQL and
+MySQL Bareos installation (the last is for an old versions of Bareos, MySQL support dropped).
 
 ### clean_missing_volumes.sh
 This script physically delete non-existent volumes from Pool in the Bareos database. Just set up your `$POOLPATH` inside
 the script and run.
 
 ### delete_all_volumes_from_pool_mysql.sh / delete_all_volumes_from_pool_pgsql.sh
-Delete all volumes from the pool for an old MySQL Bareos installations, or newner PostgreSQL. Set your `$POOL_NAME` 
+Delete all volumes from the pool for an old MySQL Bareos installations, or newer PostgreSQL. Set your `$POOL_NAME` 
 inside the script and run.
 
 ### purge_all_volumes_from_pool_mysql.sh / purge_all_volumes_from_pool_pgsql.sh
@@ -77,7 +82,7 @@ Set all volumes in defined pool to "purged" state. Set your `$POOL_NAME` inside 
 Same as the previous scripts, but sets to 'pruned' state.
 
 ### remove_purged_volumes.sh
-Removes all voluems physically from the disk which are in 'purged' state.
+Removes all volumes physically from the disk which are in 'purged' state.
 
 ## URLs:
 

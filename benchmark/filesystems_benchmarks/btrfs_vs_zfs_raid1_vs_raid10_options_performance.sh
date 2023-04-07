@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
 
-### Comparison of two or four disks btrfs raid10 with different data layout vs one or two mirrored
-### ZFS pools performance. Performs several iterations of write/read using ramdisk.
-### -------------------------------------------------------------------------------------------------
-### Running this file may cause a potential data loss and assumes you accept that you know what
-### you're doing. All actions with this script at your own risk.
+# Comparison of two or four disks btrfs raid10 with different data layout vs one or two mirrored
+# ZFS pools performance. Performs several iterations of write/read using ramdisk.
+# -------------------------------------------------------------------------------------------------
+# Running this file may cause a potential data loss and assumes you accept that you know what
+# you're doing. All actions with this script at your own risk.
 
-### -------------------------------------------------------------------------------------------------
-### This Source Code Form is subject to the terms of the BSD 3-Clause License. You can obtain one at:
-### https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
+# -------------------------------------------------------------------------------------------------
+# This Source Code Form is subject to the terms of the BSD 3-Clause License. You can obtain one at:
+# https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
 
 
 NUMBER_OF_ITERATIONS=5

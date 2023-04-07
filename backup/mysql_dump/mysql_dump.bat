@@ -2,7 +2,7 @@ title MySQL Dump batch file
 
 
 :: Dump MySQL for Windows operation systems.
-:: Written by Bazhenov Alexander. August, 2014.
+:: Written by Bazhenov Aleksandr. August, 2014.
 :: -------------------------------------------------------------------------------------------------
 
 :: This Source Code Form is subject to the terms of the BSD 3-Clause License. You can obtain one at:

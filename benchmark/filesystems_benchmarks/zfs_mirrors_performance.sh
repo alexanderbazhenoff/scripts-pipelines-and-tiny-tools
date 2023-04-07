@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
 
-### ZFS pool performance testing. Performs several iterations of write and read using ramdisk.
-### -------------------------------------------------------------------------------------------------
-### Running this file may cause a potential data loss and assumes you accept that you know what
-### you're doing. All actions with this script at your own risk.
+# ZFS pool performance testing. Performs several iterations of write and read using ramdisk.
+# -------------------------------------------------------------------------------------------------
+# Running this file may cause a potential data loss and assumes you accept that you know what
+# you're doing. All actions with this script at your own risk.
 
-### -------------------------------------------------------------------------------------------------
-### This Source Code Form is subject to the terms of the BSD 3-Clause License. You can obtain one at:
-### https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
+# -------------------------------------------------------------------------------------------------
+# This Source Code Form is subject to the terms of the BSD 3-Clause License. You can obtain one at:
+# https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
 
 
 FILENAME="vm_image.qcow2"
@@ -23,7 +23,7 @@ ZFS_POOL_TOPOLOGY="mirror sdc sde mirror sdg sdi"
 ZFS_ATIME_OPTION="off"         # off or on
 ZFS_DEDUP_OPTION="off"         # off or on
 ZFS_COMPRESSION_OPTION="off"   # on | off | lzjb | gzip | gzip-[1-9] | zle | lz4
-NUMBER_OF_ITERATIONS=3            # total number of write/read iterations
+NUMBER_OF_ITERATIONS=3         # total number of write/read iterations
 
 
 # perform write-read with rsync

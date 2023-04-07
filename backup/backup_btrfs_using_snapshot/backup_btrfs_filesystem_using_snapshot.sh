@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
 
-### Example how to backups btrfs filesystems using snapshots.
-### -----------------------------------------------------------------------------------------------
-### Warning! Running this file you accept that you know what you're doing. All actions with this
-###          script are at your own risk.
-### -----------------------------------------------------------------------------------------------
-### This Source Code Form is subject to the terms of the BSD 3-Clause License. If a copy of the
-### source(s) distributed with this file, You can obtain one at:
-### https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
+# Example how to backups btrfs filesystems using snapshots.
+# --------------------------------------------------------------------------------------------
+# Warning! Running this file you accept that you know what you're doing. All actions with this
+#          script are at your own risk.
+# --------------------------------------------------------------------------------------------
+# This Source Code Form is subject to the terms of the BSD 3-Clause License. If a copy of the
+# source(s) distributed with this file, You can obtain one at:
+# https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
 
 
 # Source mounted filesystem path, copy backups and subvolume creation path. All filesystems should be btrfs.
