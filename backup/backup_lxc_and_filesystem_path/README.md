@@ -86,3 +86,8 @@ Advanced usage
 
 You can use `backup_path_tar_gpg.sh` directly by separate call of each backup path. Run 
 `./backup_path_tar_gpg.sh --help` for the help.
+
+License
+-------
+
+[BSD 3-Clause License](../../LICENSE)

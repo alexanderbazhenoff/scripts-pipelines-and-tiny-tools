@@ -1,7 +1,14 @@
-# Bareos scripts.
+# Bareos scripts
 
 **WARNING!** Running all these script may cause potential data loss. Do on your own risk, otherwise you know what 
 you're doing.
+
+These scripts are for troubleshooting and a little help when you need to clean up, prune or prune Bareos pool after 
+unsuccessful or made by mistake task. Basically two scripts 
+([clean_expired_baros_volumes.sh](clean_expired_baros_volumes.sh) and
+[batch_process_bareos_volumes.sh](batch_process_bareos_volumes.sh)) is more that enough, but here is some deprecated
+scripts (see [Other Bareos troubleshooting examples](#other-bareos-troubleshooting-examples)) without pass of arguments
+from command line.
 
 ### clean_expired_baros_volumes.sh
 
@@ -62,7 +69,7 @@ Action for the range of volumes in the pool with 'name_mask' (something like 'In
 skip confirmation request or 'print' to get the info about selected range of volumes. '--print' will not perform changes
 in volume status, just output an info.
 
-# Other Bareos troubleshooting examples:
+# Other Bareos troubleshooting examples
 
 Examples how to troubleshoot volume and pool problems in Bareos. Most versions of the scripts are for PostgreSQL and
 MySQL Bareos installation (the last is for an old versions of Bareos, MySQL support dropped).
@@ -84,8 +91,12 @@ Same as the previous scripts, but sets to 'pruned' state.
 ### remove_purged_volumes.sh
 Removes all volumes physically from the disk which are in 'purged' state.
 
-## URLs:
+## License
+
+[BSD 3-Clause License](../../LICENSE)
+
+## URLs
 
 - [bareos.org](https://www.bareos.com/)
-- [my medium article](https://medium.com/@alexander.bazhenov/bareos-%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D0%BE%D0%B5-%D1%80%D0%B5%D0%B7%D0%B5%D1%80%D0%B2%D0%BD%D0%BE%D0%B5-%D0%BA%D0%BE%D0%BF%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5-%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%82%D0%B0-enterprise-d84b90a4415a)
+- [article on medium.com](https://medium.com/@alexander.bazhenov/bareos-%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D0%BE%D0%B5-%D1%80%D0%B5%D0%B7%D0%B5%D1%80%D0%B2%D0%BD%D0%BE%D0%B5-%D0%BA%D0%BE%D0%BF%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5-%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%82%D0%B0-enterprise-d84b90a4415a)
 - [docs.bareos.org](https://docs.bareos.org/)

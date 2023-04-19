@@ -37,7 +37,7 @@
 #        Usage:
 #        kvm_backup.sh [command] <vm_name1 vm_name2 vm_name3 ... vm_nameN>
 #
-#        Commands:
+#        Commands (or actions):
 #         --active           Create backup of running VM(s). Required
 #                            qemu-guest-agent installed on virtual machine
 #                            and qemu-channel device created

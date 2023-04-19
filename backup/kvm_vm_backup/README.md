@@ -3,25 +3,24 @@
 *Running this script may cause potential data loss. Do on your own risk, otherwise you know what you're doing.*
 
 This scripts allows you to perform backups of selected KVM virtual machines in various modes: active (live backup) or
-stopped (every VM will be off before making a backup). Backing up of running machines based on block commit libvirt 
-technology.
+stopped (every VM will be off before making a backup). Backing up of running machines based on 
+[block commit](https://libvirt.org/kbase/internals/incremental-backup.html) libvirt technology.
 
-## License:
-
-[MIT](https://github.com/aws/mit-0)
-
-## Usage:
+## Usage
 ```bash
 kvm_backup.sh [command] <vmname1 vmname2 vmname3 ... vmnameN>
 ```
 
-### Commands:
+### Commands
+
+Available the next commands (or scripts actions):
+
 - `--active` - Create backup of running VM(s). Requierd: qemu-guest-agent installed on virtual machine and qemu-channel
   device created.
 - `--stoped` - Stop, create backup and run virtual machine.
 - `--clean` - Clean previous packups from backup folder.
 
-### Examples:
+### Examples
 
 ```bash
 kvm_backup.sh --active vmname1 vmname2
@@ -29,7 +28,7 @@ kvm_backup.sh --stoped vmname3
 kvm_backup.sh --clean vmname1 vmname2 vmname3
 ```
 
-### Using with bareos:
+### Using with Bareos
 
 It's possible to use this script to back up your KVM images with [Bareos](https://www.bareos.com/): use 'before' and
 'after scripts'. The example bellows shows you how to back up virtual machine named 'my_machine' from 'my_server.domain'
@@ -83,7 +82,7 @@ FileSet {
 }
 ```
 
-## Requirements:
+## Requirements
 - Backing up in `--active` mode required channel device (rg.qemu.guest_agent.0) and qemu-guest-agent to be installed on 
   the guest system. `apt install qemu-guest-agent` or `yum install qemu-guest-agent`. To check qemu-quest-agent 
   connection run the next command from the virtualization host:
@@ -112,7 +111,11 @@ to your channel device section of VM config, e.g.:
 - There is no power-on detection in `--active` mode. Anyway the backup up of powered-off machine in `--active` mode will
   work and the machine boots up.
 
-## URLs:
+## License
+
+[BSD 3-Clause License](../../LICENSE)
+
+## URLs
 
 1. https://wiki.libvirt.org/page/Qemu_guest_agent
 2. https://access.redhat.com/solutions/732773
