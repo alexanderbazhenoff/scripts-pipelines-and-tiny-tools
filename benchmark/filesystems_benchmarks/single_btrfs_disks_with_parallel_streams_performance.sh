@@ -73,15 +73,15 @@ do
   mkfs.btrfs /dev/sd"$LETTER"1 -f
   partprobe
   btrfs fiesystem show
-  mkdir /mnt/"$POOL_PATH$DISK_NUMBER"
-  mount -o "$BTRFS_MOUNT_OPTIONS" /dev/sd"$LETTER"1 /mnt/"$POOL_PATH$DISK_NUMBER"
+  mkdir "$POOL_PATH$DISK_NUMBER"
+  mount -o "$BTRFS_MOUNT_OPTIONS" /dev/sd"$LETTER"1 "$POOL_PATH$DISK_NUMBER"
   (( DISK_NUMBER++ )) || true
-  mkdir /mnt/"$POOL_PATH$DISK_NUMBER" || true
-  mount -o "${BTRFS_MOUNT_OPTIONS}" /dev/sd"$LETTER"1 /mnt/"$POOL_PATH$DISK_NUMBER"
+  mkdir "$POOL_PATH$DISK_NUMBER" || true
+  mount -o "${BTRFS_MOUNT_OPTIONS}" /dev/sd"$LETTER"1 "$POOL_PATH$DISK_NUMBER"
   (( DISK_NUMBER++ )) || true
 done
 printf "Testing: %s disks in %s streams | %s" "$BLOCK_DEVICES_NUMBER" "$((BLOCK_DEVICES_NUMBER*2))" \
   "$BTRFS_MOUNT_OPTIONS"
 test_wr
 sync
-seq $BLOCK_DEVICES_NUMBER | parallel -j 2 umount /mnt/"$POOL_PATH"{}
+seq $BLOCK_DEVICES_NUMBER | parallel -j 2 umount "$POOL_PATH"{}
