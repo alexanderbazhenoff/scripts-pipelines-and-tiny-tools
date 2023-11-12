@@ -181,8 +181,7 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
       done
 
       # perform force power-off if VM is still running
-      if (virsh list | grep "$ACTIVEVM " > /dev/null)
-      then
+      if (virsh list | grep "$ACTIVEVM " > /dev/null); then
         echo "$(date +'%Y-%m-%d %H:%M:%S') Unable to shutdown $ACTIVEVM. Performing force power-off... $(virsh destroy \
           "$ACTIVEVM" 2>&1 | sed -z "s/\n//g")" 2>&1 | tee -a $LOGFILE
 
