@@ -5,14 +5,14 @@ you're doing.
 
 These scripts are for troubleshooting and a little help when you need to clean up, prune or prune Bareos pool after 
 unsuccessful or made by mistake task. Basically two scripts 
-([clean_expired_bareos_volumes.sh](clean_expired_baros_volumes.sh) and
+([clean_expired_bareos_volumes.sh](clean_expired_bareos_volumes.sh) and
 [batch_process_bareos_volumes.sh](batch_process_bareos_volumes.sh)) is more that enough, but here is some deprecated
 scripts (see [Other Bareos troubleshooting examples](#other-bareos-troubleshooting-examples)) without a pass of arguments
 from command line.
 
 Some scripts are only for file storage devices on SSF/HDD only (`Media Type = File`), e.g.: 
 [batch_process_bareos_volumes.sh](batch_process_bareos_volumes.sh),
-[clean_expired_baros_volumes.sh](clean_expired_baros_volumes.sh) or
+[clean_expired_baros_volumes.sh](clean_expired_bareos_volumes.sh) or
 [clean_missing_volumes.sh](clean_missing_volumes.sh) because of direct operations on files in storage pool. This has
 never been tested on other types of pools (e.g. tapes).
 

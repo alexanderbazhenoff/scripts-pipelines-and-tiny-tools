@@ -42,9 +42,9 @@
 #      edit /etc/sudoers or run from root)
 
 # Usage:
-#    # ./clean_expired_baros_volumes.sh --name Full- --action delete --expire 10 --filter Pruned
+#    # ./clean_expired_bareos_volumes.sh --name Full- --action delete --expire 10 --filter Pruned
 # or
-#   # ./clean_expired_baros_volumes.sh --help
+#   # ./clean_expired_bareos_volumes.sh --help
 #
 # Use "--test yes" key for testmode (only output, no actions).
 # For more information about volume status read Bareos manual:
