@@ -99,13 +99,17 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
       vm_disks_get
 
       # making a snapshot
-      echo "$(date +'%Y-%m-%d %H:%M:%S') Creating snapshot of $ACTIVEVM" | tee -a $LOGFILE
-      echo "$(date +'%Y-%m-%d %H:%M:%S') $(virsh snapshot-create-as --domain "$ACTIVEVM" snapshot --disk-only \
-        --atomic --quiesce --no-metadata 2>&1)" 2>&1 | tee -a $LOGFILE
-      if [[ ! -f "$ACTIVEVM".snapshot ]]; then
-        echo "$(date +'%Y-%m-%d %H:%M:%S') WARNING! Snapshot wasn't created." | tee -a $LOGFILE
-        echo "$(date +'%Y-%m-%d %H:%M:%S') There's no guaranty that resulting copy of VM may have consistent data." | \
-          tee -a $LOGFILE
+      (
+        echo "$(date +'%Y-%m-%d %H:%M:%S') Creating snapshot of $ACTIVEVM"
+        echo "$(date +'%Y-%m-%d %H:%M:%S') $(virsh snapshot-create-as --domain "$ACTIVEVM" snapshot --disk-only \
+        --atomic --quiesce --no-metadata 2>&1)" 2>&1
+      ) | tee -a $LOGFILE
+      if [[ ! -f "$(virsh domblklist unit-tester-linux.tmispb | grep ".snapshot" | awk '{print $2}' |
+        sed 's|\(.*\)/.*|\1|')/$ACTIVEVM.snapshot" ]]; then
+          (
+            echo "$(date +'%Y-%m-%d %H:%M:%S') WARNING! Snapshot wasn't created." | tee -a $LOGFILE
+            echo "$(date +'%Y-%m-%d %H:%M:%S') There's no guaranty that resulting copy of VM may have consistent data."
+          ) | tee -a $LOGFILE
       fi
 
       for PATH_ITEM in $DISK_PATH
@@ -127,8 +131,10 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
         # getting a path to a snapshot
         SNAPSHOT_PATH=$(virsh domblklist "$ACTIVEVM" | grep "$DISK_ITEM" | awk '{print $2}')
         if [[ $SNAPSHOT_PATH == "-" ]] || [[ $SNAPSHOT_PATH =~ \.iso$ ]] || [[ $SNAPSHOT_PATH == \.ISO$ ]]; then
-          echo "$(date +'%Y-%m-%d %H:%M:%S') Device path is $SNAPSHOT_PATH." | tee -a $LOGFILE
-          echo "$(date +'%Y-%m-%d %H:%M:%S') Looks like removable media device, skipping" | tee -a $LOGFILE
+          (
+            echo "$(date +'%Y-%m-%d %H:%M:%S') Device path is $SNAPSHOT_PATH."
+            echo "$(date +'%Y-%m-%d %H:%M:%S') Looks like removable media device, skipping"
+          ) | tee -a $LOGFILE
         else
           echo "$(date +'%Y-%m-%d %H:%M:%S') Commit $SNAPSHOT_PATH of $ACTIVEVM to $DISK_ITEM image" | tee -a $LOGFILE
 
@@ -141,9 +147,11 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
               2>&1 | tee -a $LOGFILE
 
           else
-            echo "$(date +'%Y-%m-%d %H:%M:%S') $SNAPSHOT_PATH is not snapshot, skipping." | tee -a $LOGFILE
-            echo "$(date +'%Y-%m-%d %H:%M:%S') Looks like you have copied images from running machine or no snapshot" \
-              "created" | tee -a $LOGFILE
+            (
+              echo "$(date +'%Y-%m-%d %H:%M:%S') $SNAPSHOT_PATH is not snapshot, skipping."
+              echo "$(date +'%Y-%m-%d %H:%M:%S') Looks like you have copied images from running machine or no" \
+                "snapshot created"
+            ) | tee -a $LOGFILE
           fi
         fi
       done
@@ -163,13 +171,15 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
       backup_vm_config
       vm_disks_get
 
-      # creating backup subdirectory
-      echo "$(date +'%Y-%m-%d %H:%M:%S') Creating backup subdirectory... $(mkdir "$BACKUP_DIR/$ACTIVEVM" 2>&1 && \
-        echo "OK.")" 2>&1 | tee -a $LOGFILE
+      (
+        # creating backup subdirectory
+        echo "$(date +'%Y-%m-%d %H:%M:%S') Creating backup subdirectory... $(mkdir "$BACKUP_DIR/$ACTIVEVM" 2>&1 && \
+          echo "OK.")" 2>&1
 
-      # shutdown VM
-      echo "$(date +'%Y-%m-%d %H:%M:%S') Shutting down $ACTIVEVM... $(virsh shutdown "$ACTIVEVM" 2>&1 | \
-        sed -z "s/\n//g")" 2>&1 | tee -a $LOGFILE
+        # shutdown VM
+        echo "$(date +'%Y-%m-%d %H:%M:%S') Shutting down $ACTIVEVM... $(virsh shutdown "$ACTIVEVM" 2>&1 | \
+          sed -z "s/\n//g")" 2>&1
+      ) | tee -a $LOGFILE
 
       # wait while VM is not running
       COUNTER=100
@@ -181,8 +191,7 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
       done
 
       # perform force power-off if VM is still running
-      if (virsh list | grep "$ACTIVEVM " > /dev/null)
-      then
+      if (virsh list | grep "$ACTIVEVM " > /dev/null); then
         echo "$(date +'%Y-%m-%d %H:%M:%S') Unable to shutdown $ACTIVEVM. Performing force power-off... $(virsh destroy \
           "$ACTIVEVM" 2>&1 | sed -z "s/\n//g")" 2>&1 | tee -a $LOGFILE
 
@@ -202,8 +211,10 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
         FILENAME=$(basename "$PATH_ITEM")
         if [[ $PATH_ITEM == "-" ]] || [[ $PATH_ITEM =~ \.iso$ ]] || [[ $PATH_ITEM == \.ISO$ ]]; then
           # skip "-" (not mounted) and ".iso"/".ISO" (CD-ROM image)
-          echo "$(date +'%Y-%m-%d %H:%M:%S') Device image name is: $FILENAME" | tee -a $LOGFILE
-          echo "$(date +'%Y-%m-%d %H:%M:%S') Looks like removable media device, skipping" | tee -a $LOGFILE
+          (
+            echo "$(date +'%Y-%m-%d %H:%M:%S') Device image name is: $FILENAME"
+            echo "$(date +'%Y-%m-%d %H:%M:%S') Looks like removable media device, skipping"
+          ) | tee -a $LOGFILE
         else
           # backup disk
           echo "$(date +'%Y-%m-%d %H:%M:%S') Copying $ACTIVEVM $PATH_ITEM image... $(cp -rf \
