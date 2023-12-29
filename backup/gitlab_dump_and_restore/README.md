@@ -9,4 +9,4 @@ actions with this script at your own risk.**
 ### Contents:
 
 - [**gitlab_dump.sh**](gitlab_dump.sh) - create GitLab dump in `/var/opt/gitlab/backups`.
-- [**gitlab_restore.sh**](gitlab_restore.sh) - resotre GitLab from a dump placed in `/var/opt/gitlab/backups`.
+- [**gitlab_restore.sh**](gitlab_restore.sh) - restore GitLab from a dump placed in `/var/opt/gitlab/backups`.

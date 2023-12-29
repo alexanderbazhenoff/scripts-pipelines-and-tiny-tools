@@ -10,7 +10,7 @@ risk.**
 Usage
 -----
 
-1. Upload this folder content to your Linux system, e.g. inside of `/opt/scripts` folder.
+1. Upload this folder content to your Linux system, e.g., inside of `/opt/scripts` folder.
 2. (Optional) Set up your [rclone](https://rclone.org/drive/) to mount destination drive, e.g. Google Drive, Dropbox,
 Amazon Drive, Amazon S3 Compliant Storage Providers (including AWS, Alibaba, Ceph, Digital Ocean, Dreamhost, IBM COS,
 Minio, SeaweedFS, and Tencent COS), Google Cloud Storage, Hadoop distributed file system, Mail.Ru Cloud, Mega,

@@ -3,7 +3,7 @@ MD5 checksum calculate and check
 
 Scripts for calculating and checking md5 checksum for specified folder.
 
-**WARNING! Running this file you accept that you know what you're doing. All actions with this script are at your own
+**WARNING! Running this file, you accept that you know what you're doing. All actions with this script are at your own
 risk.**
 
 Usage:

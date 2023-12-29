@@ -77,6 +77,11 @@ vm_disks_get() {
     tee -a $LOGFILE
 }
 
+# Getting a block device which is a snapshot
+get_vm_shapshots() {
+  virsh domblklist "$1" | grep '.snapshot' | awk '{print $2}'
+}
+
 
 # entry
 COMMAND_USE=$1; shift
@@ -100,65 +105,60 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
 
       # making a snapshot
       (
-        echo "$(date +'%Y-%m-%d %H:%M:%S') Creating snapshot of $ACTIVEVM"
-        echo "$(date +'%Y-%m-%d %H:%M:%S') $(virsh snapshot-create-as --domain "$ACTIVEVM" snapshot --disk-only \
-        --atomic --quiesce --no-metadata 2>&1)" 2>&1
-      ) | tee -a $LOGFILE
-      if [[ ! -f "$(virsh domblklist unit-tester-linux.tmispb | grep ".snapshot" | awk '{print $2}' |
-        sed 's|\(.*\)/.*|\1|')/$ACTIVEVM.snapshot" ]]; then
-          (
-            echo "$(date +'%Y-%m-%d %H:%M:%S') WARNING! Snapshot wasn't created." | tee -a $LOGFILE
-            echo "$(date +'%Y-%m-%d %H:%M:%S') There's no guaranty that resulting copy of VM may have consistent data."
-          ) | tee -a $LOGFILE
-      fi
-
-      for PATH_ITEM in $DISK_PATH
-      do
-        # getting filename from the path
-        FILENAME=$(basename "$PATH_ITEM")
-        echo "$(date +'%Y-%m-%d %H:%M:%S') Device image name is: $FILENAME" | tee -a $LOGFILE
-
-        if [[ $PATH_ITEM == "-" ]] || [[ $PATH_ITEM =~ \.iso$ ]] || [[ $PATH_ITEM == \.ISO$ ]]; then
-          echo "$(date +'%Y-%m-%d %H:%M:%S') Looks like removable media device slot, skipping" | tee -a $LOGFILE
+        VM_SNAPSHOT_CHECK="$(get_vm_shapshots "$ACTIVEVM")"
+        if [[ -z "$VM_SNAPSHOT_CHECK" ]]; then
+          echo "$(date +'%Y-%m-%d %H:%M:%S') Creating snapshot of $ACTIVEVM"
+          echo "$(date +'%Y-%m-%d %H:%M:%S') $(virsh snapshot-create-as --domain "$ACTIVEVM" snapshot --disk-only \
+            --atomic --quiesce --no-metadata 2>&1)"
         else
-          # backup disk
-          echo "$(date +'%Y-%m-%d %H:%M:%S') Creating backup of $ACTIVEVM $PATH_ITEM \
-            $(cp "$PATH_ITEM" "$BACKUP_DIR/$ACTIVEVM/$FILENAME" 2>&1)" 2>&1 | tee -a $LOGFILE
+          echo "$ACTIVEVM already contains a snapshot: $VM_SNAPSHOT_CHECK, skipping creation."
+          echo "Perhaps a previous backup job was interrupted."
         fi
-      done
-      for DISK_ITEM in $DISK_LIST
-      do
-        # getting a path to a snapshot
-        SNAPSHOT_PATH=$(virsh domblklist "$ACTIVEVM" | grep "$DISK_ITEM" | awk '{print $2}')
-        if [[ $SNAPSHOT_PATH == "-" ]] || [[ $SNAPSHOT_PATH =~ \.iso$ ]] || [[ $SNAPSHOT_PATH == \.ISO$ ]]; then
-          (
+        if [[ ! -f "$(get_vm_shapshots "$ACTIVEVM" | sed 's|\(.*\)/.*|\1|')/$ACTIVEVM.snapshot" ]]; then
+          echo "$(date +'%Y-%m-%d %H:%M:%S') WARNING! Snapshot wasn't created."
+          echo "$(date +'%Y-%m-%d %H:%M:%S') There's no guaranty that resulting copy of VM may have consistent data."
+        fi
+
+        for PATH_ITEM in $DISK_PATH
+        do
+          # getting filename from the path
+          FILENAME=$(basename "$PATH_ITEM")
+          echo "$(date +'%Y-%m-%d %H:%M:%S') Device image name is: $FILENAME" | tee -a $LOGFILE
+          if [[ $PATH_ITEM == "-" ]] || [[ $PATH_ITEM =~ \.iso$ ]] || [[ $PATH_ITEM == \.ISO$ ]]; then
+            echo "$(date +'%Y-%m-%d %H:%M:%S') Looks like removable media device slot, skipping"
+          else
+            # backup disk
+            echo "$(date +'%Y-%m-%d %H:%M:%S') Creating backup of $ACTIVEVM $PATH_ITEM \
+              $(cp "$PATH_ITEM" "$BACKUP_DIR/$ACTIVEVM/$FILENAME" 2>&1)"
+          fi
+        done
+
+        for DISK_ITEM in $DISK_LIST
+        do
+          # getting a path to a snapshot
+          SNAPSHOT_PATH=$(virsh domblklist "$ACTIVEVM" | grep "$DISK_ITEM" | awk '{print $2}')
+          if [[ $SNAPSHOT_PATH == "-" ]] || [[ $SNAPSHOT_PATH =~ \.iso$ ]] || [[ $SNAPSHOT_PATH == \.ISO$ ]]; then
             echo "$(date +'%Y-%m-%d %H:%M:%S') Device path is $SNAPSHOT_PATH."
             echo "$(date +'%Y-%m-%d %H:%M:%S') Looks like removable media device, skipping"
-          ) | tee -a $LOGFILE
-        else
-          echo "$(date +'%Y-%m-%d %H:%M:%S') Commit $SNAPSHOT_PATH of $ACTIVEVM to $DISK_ITEM image" | tee -a $LOGFILE
-
-          # block-commit snapshot to disk image
-          RESULT_CMD=$(virsh blockcommit "$ACTIVEVM" "$DISK_ITEM" --active --verbose --pivot 2> /dev/null || \
-            echo "Nothing to commit with $DISK_ITEM or just failed.")
-          echo "$(date +'%Y-%m-%d %H:%M:%S')${RESULT_CMD//$'\n'/ }" | tee -a $LOGFILE
-          if [[ $SNAPSHOT_PATH =~ \.snapshot$ ]]; then
-            echo "$(date +'%Y-%m-%d %H:%M:%S') Removing snapshot $SNAPSHOT_PATH. $(rm -f "$SNAPSHOT_PATH")" \
-              2>&1 | tee -a $LOGFILE
-
           else
-            (
+            echo "$(date +'%Y-%m-%d %H:%M:%S') Commit $SNAPSHOT_PATH of $ACTIVEVM to $DISK_ITEM image"
+
+            # block-commit snapshot to disk image
+            RESULT_CMD=$(virsh blockcommit "$ACTIVEVM" "$DISK_ITEM" --active --verbose --pivot 2> /dev/null || \
+              echo "Nothing to commit with $DISK_ITEM or just failed.")
+            echo "$(date +'%Y-%m-%d %H:%M:%S')${RESULT_CMD//$'\n'/ }"
+            if [[ $SNAPSHOT_PATH =~ \.snapshot$ ]]; then
+              echo "$(date +'%Y-%m-%d %H:%M:%S') Removing snapshot $SNAPSHOT_PATH. $(rm -f "$SNAPSHOT_PATH")" 2>&1
+            else
               echo "$(date +'%Y-%m-%d %H:%M:%S') $SNAPSHOT_PATH is not snapshot, skipping."
               echo "$(date +'%Y-%m-%d %H:%M:%S') Looks like you have copied images from running machine or no" \
                 "snapshot created"
-            ) | tee -a $LOGFILE
+            fi
           fi
-        fi
-      done
-
-      echo "$(date +'%Y-%m-%d %H:%M:%S') Backup of $ACTIVEVM finished" | tee -a $LOGFILE
+        done
+        echo "$(date +'%Y-%m-%d %H:%M:%S') Backup of $ACTIVEVM finished" | tee -a $LOGFILE
+      ) 2>&1 | tee -a $LOGFILE
     done
-  # exit 0
   fi
 
   #
@@ -171,62 +171,56 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
       backup_vm_config
       vm_disks_get
 
+      COUNTER=100
       (
         # creating backup subdirectory
         echo "$(date +'%Y-%m-%d %H:%M:%S') Creating backup subdirectory... $(mkdir "$BACKUP_DIR/$ACTIVEVM" 2>&1 && \
-          echo "OK.")" 2>&1
-
+          echo "OK.")"
         # shutdown VM
         echo "$(date +'%Y-%m-%d %H:%M:%S') Shutting down $ACTIVEVM... $(virsh shutdown "$ACTIVEVM" 2>&1 | \
-          sed -z "s/\n//g")" 2>&1
-      ) | tee -a $LOGFILE
-
-      # wait while VM is not running
-      COUNTER=100
-      while (virsh list | grep "$ACTIVEVM " > /dev/null) && [[ $COUNTER -gt 0 ]]
-      do
-        sleep 3
-        (( COUNTER-- )) || true
-        echo "$(date +'%Y-%m-%d %H:%M:%S') Waiting $ACTIVEVM becomes down." | tee -a $LOGFILE
-      done
-
-      # perform force power-off if VM is still running
-      if (virsh list | grep "$ACTIVEVM " > /dev/null); then
-        echo "$(date +'%Y-%m-%d %H:%M:%S') Unable to shutdown $ACTIVEVM. Performing force power-off... $(virsh destroy \
-          "$ACTIVEVM" 2>&1 | sed -z "s/\n//g")" 2>&1 | tee -a $LOGFILE
-
+          sed -z "s/\n//g")"
+        # wait while VM is not running
         while (virsh list | grep "$ACTIVEVM " > /dev/null) && [[ $COUNTER -gt 0 ]]
         do
-          sleep 1
-          (( COUNTER++ )) || true
+          sleep 3
+          (( COUNTER-- )) || true
+          echo "$(date +'%Y-%m-%d %H:%M:%S') Waiting $ACTIVEVM becomes down."
         done
 
-      else
-        echo "$(date +'%Y-%m-%d %H:%M:%S') $ACTIVEVM stopped." | tee -a $LOGFILE
-      fi
+        # perform force power-off if VM is still running
+        if (virsh list | grep "$ACTIVEVM " > /dev/null); then
+          echo "$(date +'%Y-%m-%d %H:%M:%S') Unable to shutdown $ACTIVEVM. Performing force power-off... $(virsh \
+            destroy "$ACTIVEVM" 2>&1 | sed -z "s/\n//g")" 2>&1
 
-      for PATH_ITEM in $DISK_PATH
-      do
-        # getting filename from the path
-        FILENAME=$(basename "$PATH_ITEM")
-        if [[ $PATH_ITEM == "-" ]] || [[ $PATH_ITEM =~ \.iso$ ]] || [[ $PATH_ITEM == \.ISO$ ]]; then
-          # skip "-" (not mounted) and ".iso"/".ISO" (CD-ROM image)
-          (
+          while (virsh list | grep "$ACTIVEVM " > /dev/null) && [[ $COUNTER -gt 0 ]]
+          do
+            sleep 1
+            (( COUNTER++ )) || true
+          done
+
+        else
+          echo "$(date +'%Y-%m-%d %H:%M:%S') $ACTIVEVM stopped."
+        fi
+
+        for PATH_ITEM in $DISK_PATH
+        do
+          # getting filename from the path
+          FILENAME=$(basename "$PATH_ITEM")
+          if [[ $PATH_ITEM == "-" ]] || [[ $PATH_ITEM =~ \.iso$ ]] || [[ $PATH_ITEM == \.ISO$ ]]; then
+            # skip "-" (not mounted) and ".iso"/".ISO" (CD-ROM image)
             echo "$(date +'%Y-%m-%d %H:%M:%S') Device image name is: $FILENAME"
             echo "$(date +'%Y-%m-%d %H:%M:%S') Looks like removable media device, skipping"
-          ) | tee -a $LOGFILE
-        else
-          # backup disk
-          echo "$(date +'%Y-%m-%d %H:%M:%S') Copying $ACTIVEVM $PATH_ITEM image... $(cp -rf \
-            "$PATH_ITEM" "$BACKUP_DIR/$ACTIVEVM/$FILENAME" 2>&1)" 2>&1 | tee -a $LOGFILE
-        fi
-      done
+          else
+            # backup disk
+            echo "$(date +'%Y-%m-%d %H:%M:%S') Copying $ACTIVEVM $PATH_ITEM image... $(cp -rf "$PATH_ITEM" \
+              "$BACKUP_DIR/$ACTIVEVM/$FILENAME" 2>&1)"
+          fi
+        done
 
-      # run VM
-      echo "$(date +'%Y-%m-%d %H:%M:%S') Starting $ACTIVEVM $(virsh start "$ACTIVEVM" 2>&1 | sed -z "s/\n//g")" 2>&1 | \
-        tee -a $LOGFILE
+        # run VM
+        echo "$(date +'%Y-%m-%d %H:%M:%S') Starting $ACTIVEVM $(virsh start "$ACTIVEVM" 2>&1 | sed -z "s/\n//g")"
+      ) 2>&1 | tee -a $LOGFILE
     done
-  # exit 0
   fi
 
   #
@@ -239,7 +233,6 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
       echo "$(date +'%Y-%m-%d %H:%M:%S') Performing clean-up of $ACTIVEVM in $BACKUP_DIR... $(rm \
         -rfv "${BACKUP_DIR:?}/$ACTIVEVM" 2>&1 && echo "OK")" 2>&1 | tee -a $LOGFILE
     done
-  # exit 0
   fi
 else
   #
