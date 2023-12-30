@@ -42,7 +42,7 @@ So you can use Admin Job with this script.
 
 **Bareos Admin Job Example:**
 
-```bash
+```text
 Job {
     Name = "Autoclean Pool"
     JobDefs = "DefaultJob"
@@ -56,10 +56,23 @@ Job {
         Runs On Client = no
         # We don't need to run on the client until your storage daemon is not on the client
         Fail Job On Error = yes
-        Command = "/etc/bareos/bareos-dir.d/clean_expired_baros_volumes.sh --action delete --expire 60 --name Full-"
+        Command = "/etc/bareos/bareos-dir.d/clean_expired_bareos_volumes.sh --action delete --expire 60 --name Full-"
         # Place this script in bareos director configs repository and chmod +x
     }
 }
+```
+For the latest versions (e.g., Bareos director 23.0.1) you can't pass script parameters directly, you should create
+an additional bash script. Create `/etc/bareos/bareos-dir.d/my_wrapper_script.sh`:
+
+```bash
+#!/usr/bin/env bash
+
+/etc/bareos/bareos-dir.d/clean_expired_bareos_volumes.sh --action delete --expire 60 --name Full-
+```
+and run them via a Bareos Admin job without parameters pass:
+
+```text
+       Command = "/etc/bareos/bareos-dir.d/my_wrapper_script.sh"
 ```
 
 ### batch_process_bareos_volumes.sh
