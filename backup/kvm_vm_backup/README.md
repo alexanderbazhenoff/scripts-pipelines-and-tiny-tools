@@ -35,7 +35,7 @@ It's possible to use this script to back up your KVM images with [Bareos](https:
 in active mode then clean up on finish:
 
 **/etc/bareos/bareos-dir.d/job/my_machine.conf**
-```bash
+```text
 Job {
   Name = "my_machine"
   Description = "Backup my_machine VM at my_server.domain"
@@ -53,7 +53,7 @@ Job {
 }  
 ```
 **/etc/bareos/bareos-dir.d/jobdefs/my_jobdef.conf**
-```bash
+```text
 JobDefs {
   Name = "my_jobdef"
   Type = Backup
@@ -68,7 +68,7 @@ JobDefs {
 }
 ```
 **/etc/bareos/bareos-dir.d/fileset/kvm_vm_fileset.conf**
-```bash
+```text
 FileSet {
   Name = "kvm-vm-fileset"
   Include {
@@ -82,10 +82,23 @@ FileSet {
 }
 ```
 
+For latest versions of Bareos (e.g., 23.0.1) you can't pass script arguments like `--action`, use 
+[backup_vm_wrapper.sh](backup_vm_wrapper.sh) instead:
+
+```bash
+/var/lib/libvirt/images/backup_vm_wrapper.sh active %n
+```
+while job config should look like:
+
+```text
+  ClientRunBeforeJob = "/var/lib/libvirt/images/backup_vm_wrapper.sh active %n"
+  ClientRunAfterJob  = "/var/lib/libvirt/images/backup_vm_wrapper.sh clean %n"
+```
+
 ## Requirements
 - Backing up in `--active` mode required channel device (rg.qemu.guest_agent.0) and qemu-guest-agent to be installed on 
   the guest system. `apt install qemu-guest-agent` or `yum install qemu-guest-agent`. To check qemu-quest-agent 
-  connection run the next command from the virtualization host:
+  connection, run the next command from the virtualization host:
 
 ```bash
 virsh qemu-agent-command <virtual-machine-name> '{"execute":"guest-info"}'
