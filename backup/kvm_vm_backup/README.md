@@ -82,26 +82,6 @@ FileSet {
 }
 ```
 
-For latest versions of Bareos (e.g., 23.0.1) you can't pass script arguments like `--action`, use 
-[backup_vm_wrapper.sh](backup_vm_wrapper.sh) instead:
-
-```bash
-/var/lib/libvirt/images/backup_vm_wrapper.sh active %n
-```
-while job config should look like:
-
-```text
-  ClientRunBeforeJob = "/var/lib/libvirt/images/backup_vm_wrapper.sh active %n"
-  ClientRunAfterJob  = "/var/lib/libvirt/images/backup_vm_wrapper.sh clean %n"
-```
-
-But please set up a full path to the [kvm_backup.sh](kvm_backup.sh) inside a script:
-
-```bash
-KVM_BACKUP_SCRIPT_PATH="/var/lib/libvirt/images"
-```
-if you put them in the same directory.
-
 ## Requirements
 - Backing up in `--active` mode required channel device (rg.qemu.guest_agent.0) and qemu-guest-agent to be installed on 
   the guest system. `apt install qemu-guest-agent` or `yum install qemu-guest-agent`. To check qemu-quest-agent 
