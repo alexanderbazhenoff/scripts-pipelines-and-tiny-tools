@@ -1,7 +1,7 @@
 mysql_dump
 ==========
 
-Bash (Unux systems) and batch command file (Windows) examples of MySQL dump.
+Bash (Unix systems) and batch command file (Windows) examples of MySQL dump.
 
 ### Usage:
 

@@ -40,14 +40,11 @@
 #    * permissions to run 'bconsole' command and access to $pool_path
 #      (don't mind if you run this script from bareos Admin Job, otherwise - you should
 #      edit /etc/sudoers or run from root)
-#    * git pacakge (apt or yum install git)
-#    * shflags library: https://code.google.com/archive/p/shflags/
-#      or: git clone https://github.com/kward/shflags.git
 
 # Usage:
-#    # ./clean_expired_baros_volumes.sh --name Full- --action delete --expire 10 --filter Pruned
+#    # ./clean_expired_bareos_volumes.sh --name Full- --action delete --expire 10 --filter Pruned
 # or
-#   # ./clean_expired_baros_volumes.sh --help
+#   # ./clean_expired_bareos_volumes.sh --help
 #
 # Use "--test yes" key for testmode (only output, no actions).
 # For more information about volume status read Bareos manual:
@@ -134,8 +131,8 @@ while [[ $# -gt 0 ]]; do
     shift
     shift
     ;;
-  *)                   # unknown option
-    POSITIONAL+=("$1") # save it in an array for later
+  *)                     # unknown option
+    POSITIONAL+=("$1")   # save it in an array for later
     shift
     ;;
   esac

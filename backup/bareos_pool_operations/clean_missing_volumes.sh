@@ -36,7 +36,7 @@
 
 
 # Set Pool path
-POOL_PATH=/mnt/pool_path
+POOL_PATH="/mnt/pool_path"
 
 cd $POOL_PATH || exit
 FILELIST=$(find . -maxdepth 1 -type f -printf "%f\n")

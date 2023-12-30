@@ -1,27 +1,33 @@
 # Bareos scripts
 
-**WARNING!** Running all these script may cause potential data loss. Do on your own risk, otherwise you know what 
+**WARNING!** Running all these scripts may cause potential data loss. Do on your own risk; otherwise you know what 
 you're doing.
 
 These scripts are for troubleshooting and a little help when you need to clean up, prune or prune Bareos pool after 
 unsuccessful or made by mistake task. Basically two scripts 
-([clean_expired_baros_volumes.sh](clean_expired_baros_volumes.sh) and
+([clean_expired_bareos_volumes.sh](clean_expired_bareos_volumes.sh) and
 [batch_process_bareos_volumes.sh](batch_process_bareos_volumes.sh)) is more that enough, but here is some deprecated
-scripts (see [Other Bareos troubleshooting examples](#other-bareos-troubleshooting-examples)) without pass of arguments
+scripts (see [Other Bareos troubleshooting examples](#other-bareos-troubleshooting-examples)) without a pass of arguments
 from command line.
 
-### clean_expired_baros_volumes.sh
+Some scripts are only for file storage devices on SSF/HDD only (`Media Type = File`), e.g.: 
+[batch_process_bareos_volumes.sh](batch_process_bareos_volumes.sh),
+[clean_expired_baros_volumes.sh](clean_expired_bareos_volumes.sh) or
+[clean_missing_volumes.sh](clean_missing_volumes.sh) because of direct operations on files in storage pool. This has
+never been tested on other types of pools (e.g. tapes).
+
+### clean_expired_bareos_volumes.sh
 
 This script is useful if you need to delete a few volumes in the pool chosen by expiration date, pool name and(or)
-volume status. Basically this script is for autoclean of Bareos storage pool. But you can also gather expiration volumes
-statistics, running with `--test yes` option.
+volume status. Basically, this script is for autoclean of Bareos storage pool. But you can also gather expiration 
+volumes statistics, running with `--test yes` option.
 
-**Requirments:**
+**Requirements:**
 
-- permissions to run `bconsole` command and acess to **$poolpath** (don't mind if you run this script from Bareos Admin 
+- permissions to run `bconsole` command and access to **$poolpath** (don't mind if you run this script from Bareos Admin 
   Job you're, otherwise you should edit `/etc/sudoers` or run from root).
 - git pacakge (`apt` or `yum install git` depending on your linux distro).
-- **shflags** library: https://code.google.com/archive/p/shflags/ This script automatically clone this to current
+- **shflags** library: https://code.google.com/archive/p/shflags/ This script automatically clones this to the current 
   directory.
 
 **Usage:**
@@ -31,12 +37,12 @@ statistics, running with `--test yes` option.
 - Use `--test yes` key for test mode.
 - Or run: `# ./clean_expired_baros_volumes.sh --help` for the help.
 
-On large installations it takes a long time to purge or shift data. May be you also want to force delete some volumes.
+On large installations, it takes a long time to purge or shift data. Maybe you also want to delete force some volumes.
 So you can use Admin Job with this script.
 
 **Bareos Admin Job Example:**
 
-```bash
+```text
 Job {
     Name = "Autoclean Pool"
     JobDefs = "DefaultJob"
@@ -50,10 +56,23 @@ Job {
         Runs On Client = no
         # We don't need to run on the client until your storage daemon is not on the client
         Fail Job On Error = yes
-        Command = "/etc/bareos/bareos-dir.d/clean_expired_baros_volumes.sh --action delete --expire 60 --name Full-"
+        Command = "/etc/bareos/bareos-dir.d/clean_expired_bareos_volumes.sh --action delete --expire 60 --name Full-"
         # Place this script in bareos director configs repository and chmod +x
     }
 }
+```
+For the latest versions (e.g., Bareos director 23.0.1) you can't pass script parameters directly, you should create
+an additional bash script. Create `/etc/bareos/bareos-dir.d/my_wrapper_script.sh`:
+
+```bash
+#!/usr/bin/env bash
+
+/etc/bareos/bareos-dir.d/clean_expired_bareos_volumes.sh --action delete --expire 60 --name Full-
+```
+and run them via a Bareos Admin job without parameters pass:
+
+```text
+       Command = "/etc/bareos/bareos-dir.d/my_wrapper_script.sh"
 ```
 
 ### batch_process_bareos_volumes.sh
@@ -66,8 +85,8 @@ Apply action for a range of volumes:
 ```
 Action for the range of volumes in the pool with 'name_mask' (something like 'Incremental-' or 'Full-') to apply from
 'start' to 'end' volume sequence. Action should be 'prune', 'purge' or 'delete'. Also, you need to set 'force' to 
-skip confirmation request or 'print' to get the info about selected range of volumes. '--print' will not perform changes
-in volume status, just output an info.
+skip confirmation request or 'print' to get the info about the selected range of volumes. '--print' will not perform
+changes in volume status, just output info.
 
 # Other Bareos troubleshooting examples
 
@@ -75,8 +94,8 @@ Examples how to troubleshoot volume and pool problems in Bareos. Most versions o
 MySQL Bareos installation (the last is for an old versions of Bareos, MySQL support dropped).
 
 ### clean_missing_volumes.sh
-This script physically delete non-existent volumes from Pool in the Bareos database. Just set up your `$POOLPATH` inside
-the script and run.
+This script physically deletes non-existent volumes from Pool in the Bareos database. Just set up your `$POOLPATH` 
+inside the script and run.
 
 ### delete_all_volumes_from_pool_mysql.sh / delete_all_volumes_from_pool_pgsql.sh
 Delete all volumes from the pool for an old MySQL Bareos installations, or newer PostgreSQL. Set your `$POOL_NAME` 

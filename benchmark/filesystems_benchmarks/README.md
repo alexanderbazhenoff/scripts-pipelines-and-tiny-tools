@@ -7,7 +7,7 @@ actions with this script at your own risk.**
 
 ## usage:
 
-1. Most of the scripts requires rsync to be installed.
+1. Most of the scripts require rsync to be installed.
 2. Parallel testing scripts requires gnu parallel: `apt-get install parallel`.
 3. Set your variables inside the script (for your disk topology, mount points, file to test on, etc...) as shown in
 [variable](#variables) section.
