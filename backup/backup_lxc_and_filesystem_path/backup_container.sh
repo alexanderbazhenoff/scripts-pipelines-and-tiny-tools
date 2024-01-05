@@ -111,7 +111,7 @@ process_path(){
     ARGS+="--debug"
   fi
   # set your params for chrt command to change process priority.
-  chrt -i 0 "/.$BACKUP_SCRIPT_PATH" $ARGS && return 0 || return 34
+  chrt -i 0 "/.$BACKUP_SCRIPT_PATH" "$ARGS" && return 0 || return 34
 }
 
 BACKUP_MODE=false
