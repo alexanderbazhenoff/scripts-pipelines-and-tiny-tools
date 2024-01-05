@@ -1,3 +1,7 @@
+# Various scripts and tools
+
+![lint](https://github.com/alexanderbazhenoff/jenkins-pipelines/actions/workflows/lint.yml/badge.svg?branch=main)
+
 ## Backup scripts
 
 A tiny infrastructure-ready tools for backup, restore and maintenance your data.
@@ -26,12 +30,11 @@ performance comparison scripts.
 
 Configure and collect network settings and software on operating systems.
 
-- [**get_dhcp_leases**](network/get_dhcpd_leases/README.md) - get leases info from isc-dhcp server including client, 
-expiration and client vendor.
+- [**get_dhcp_leases**](network/get_dhcpd_leases/README.md) - get leases info from isc-dhcp server including client expiration and vendor.
 - [**inner_vps_bridge**](network/inner_vps_bridge/README.md) - example how to organize the network inside your VPS by
 linux bridge.
 - [**ixnetwork_related_scripts**](network/ixnetwork_related_scripts/README.md) - 
-[IxNetwork server](https://support.ixiacom.com/version/ixnetwork-916) related scripts: automation, interaction, etc..
+[IxNetwork server](https://support.ixiacom.com/version/ixnetwork-916) related scripts: automation, interaction, etc.
 - [**vlan_filtered_bridges**](network/vlan_filtered_bridges/README.md) - systemd unit and script to create bridge with
 VLAN filtering to prevent MAC-table overflow on the host. Actually this is an example how to organize linux bridges by
 script.
