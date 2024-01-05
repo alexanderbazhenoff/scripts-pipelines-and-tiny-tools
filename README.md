@@ -1,6 +1,6 @@
 # Various scripts and tools
 
-![lint](https://github.com/alexanderbazhenoff/jenkins-pipelines/actions/workflows/lint.yml/badge.svg?branch=main)
+![lint](https://github.com/alexanderbazhenoff/various-scripts/actions/workflows/lint.yml/badge.svg?branch=main)
 
 ## Backup scripts
 
