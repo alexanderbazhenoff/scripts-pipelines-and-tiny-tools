@@ -17,7 +17,7 @@ or another connection method(s) like ftp, ssh, sftp, http. Or mount your backup 
 3. Fill your `empty_password.txt` with gpg key if you wish to encrypt your files or leave them empty.
 4. Edit `lxc_exclude` list of an excluded path.
 5. (Optional) Put your error notification commands to `error_notification.sh` if you would like to receive error
-messages. 
+messages.
 6. Edit your `backup_container.sh` with appropriate params of rclone mount (optional) and `backup_path_tar_gpg.sh` with
 appropriate backup and path params.
 7. Run:
@@ -84,7 +84,7 @@ fusermount -uz /mnt/backup
 
 ## Advanced usage
 
-You can use `backup_path_tar_gpg.sh` directly by separate call of each backup path. Run 
+You can use `backup_path_tar_gpg.sh` directly by separate call of each backup path. Run
 `./backup_path_tar_gpg.sh --help` for the help.
 
 ## License

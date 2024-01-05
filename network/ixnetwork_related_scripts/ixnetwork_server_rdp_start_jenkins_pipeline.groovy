@@ -11,16 +11,16 @@
  */
 
 
-def IxNetworkRdpHost = 'ixnetwork.domain' as String
-def IxNetworkRdpPass = 'some_password' as String
-def UserList = ['jenkins', 'jenkins2'] as List
+final String IxNetworkRdpHost = 'ixnetwork.domain'
+final String IxNetworkRdpPass = 'some_password'
+final List UserList = ['jenkins', 'jenkins2']
 
 
 /**
  * Kill any Xorg processes.
  */
 def killXorgPorcesses() {
-    outMsg("Kill Xorg processes")
+    outMsg('Kill Xorg processes')
     sh '''!/usr/bin/env bash
 
         listProc () {
@@ -60,6 +60,6 @@ node('iaac.emzior') {
         }
 
         killXorgPorcesses()
-        outMsg("All done.")
+        outMsg('All done.')
     }
 }
