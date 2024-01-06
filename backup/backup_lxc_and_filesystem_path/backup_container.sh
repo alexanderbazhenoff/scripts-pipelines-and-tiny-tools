@@ -111,7 +111,7 @@ process_path(){
     ARGS+="--debug"
   fi
   # set your params for chrt command to change process priority.
-  chrt -i 0 "/.$BACKUP_SCRIPT_PATH" $ARGS && return 0 || return 34
+  chrt -i 0 "/.$BACKUP_SCRIPT_PATH" "$ARGS" && return 0 || return 34
 }
 
 BACKUP_MODE=false
@@ -214,12 +214,12 @@ sleep 5
 
 # Backup all these scripts from /opt/script
 process_path "/opt" "$BACKUP_DESTINATION" "$ACTION" \
-"server3_scripts_$(date +%y%m%d).tar.gz" "$PASSWORD" false true true ""
+  "server3_scripts_$(date +%y%m%d).tar.gz" "$PASSWORD" false true true ""
 task_error $? '/opt/scripts'
 
 # Backup LXC container from /var/lib/lxc/lxc_container_name
 process_path "/var/lib/lxc/bareos.emzior" "$BACKUP_DESTINATION" "$ACTION" \
-"bareos_lxc_$(date +%y%m%d).tar.gz" "$PASSWORD" false true true "/opt/scripts/lxc_exclude"
-echo $?; task_error $? '/var/lib/lxc/lxc_container_name'
+  "bareos_lxc_$(date +%y%m%d).tar.gz" "$PASSWORD" false true true "/opt/scripts/lxc_exclude"
+task_error $? '/var/lib/lxc/lxc_container_name'
 
 sync; echo 3 > /proc/sys/vm/drop_caches; sync

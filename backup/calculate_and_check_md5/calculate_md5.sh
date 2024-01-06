@@ -70,7 +70,6 @@ while [[ $# -gt 0 ]]; do
   *)                   # unknown option
     POSITIONAL+=("$1")
     usage_error
-    shift
     ;;
   esac
 done

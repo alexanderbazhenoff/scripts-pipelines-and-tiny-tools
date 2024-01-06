@@ -1,4 +1,4 @@
-## Benchmark scripts
+# Benchmark scripts
 
 A set of scripts to benchmarks and performance stats.
 

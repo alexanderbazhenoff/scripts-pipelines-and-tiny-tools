@@ -1,0 +1,53 @@
+{
+  "extends": "recommended",
+  "rules": {
+    "comments.ClassJavadoc": "off",
+    "formatting.Indentation": {
+      "spacesPerIndentLevel": 4,
+      "severity": "info"
+    },
+    "braces.ElseBlockBraces": {
+      "enabled": false
+    },
+    "braces.ForStatementBraces": {
+      "enabled": false
+    },
+    "braces.IfStatementBraces": {
+      "enabled": false
+    },
+    "braces.WhileStatementBraces": {
+      "enabled": false
+    },
+    "unused.UnusedVariable": {
+      "ignoreVariableNames": "__"
+    },
+    "size.NestedBlockDepth": {
+      "maxNestedBlockDepth": 10
+    },
+    "size.ParameterCount": {
+      "enabled": false
+    },
+    "naming.VariableName": {
+      "enabled": false
+    },
+    "ConsecutiveBlankLines": {
+      "enabled": false
+    },
+    "CatchException": {
+      "enabled": false
+    },
+    "convention.CompileStatic": {
+      "enabled": false
+    },
+    "BlockStartsWithBlankLine": {
+      "enabled": false
+    },
+    "BlockEndsWithBlankLine": {
+      "enabled": false
+    },
+    "DuplicateStringLiteral": {
+      "enabled": false
+    },
+    "UnnecessaryReturnKeyword": "error"
+  }
+}

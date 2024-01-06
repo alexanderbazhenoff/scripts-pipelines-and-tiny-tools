@@ -11,23 +11,26 @@
  */
 
 
-def IxNetworkRdpHost = 'ixnetwork.domain' as String
-def IxNetworkRdpPass = 'some_password' as String
-def UserList = ['jenkins', 'jenkins2'] as List
+final String IxNetworkRdpHost = 'ixnetwork.domain'
+final String IxNetworkRdpPass = 'some_password'
+final String XfreerdpNode = 'node.domain'
+final List UserList = ['jenkins', 'jenkins2']
 
 
 /**
  * Kill any Xorg processes.
  */
-def killXorgPorcesses() {
-    outMsg("Kill Xorg processes")
+def killXorgProcesses() {
+    outMsg('Kill Xorg processes')
     sh '''!/usr/bin/env bash
 
-        listProc () {
-            ps aux | grep "/usr/lib/xorg/Xorg" | grep -v "grep" | awk -F ' ' '{print $2}'
+        listProc() {
+          (ps aux | grep "/usr/lib/xorg/Xorg" | grep -v "grep" | awk -F ' ' '{print $2}') || true
         }
 
-        if [[ $(listProc) ]]; then sudo kill -8 $(listProc); fi
+        if [[ -n "$(listProc)" ]]; then 
+          sudo kill -8 $(listProc)
+        fi
         '''
 }
 
@@ -37,13 +40,13 @@ def killXorgPorcesses() {
  * @param msg - message to output
  */
 def outMsg(String msg) {
-    println String.format("%s | %s...", env.JOB_NAME, msg)
+    println String.format('%s | %s...', env.JOB_NAME, msg)
 }
 
 
-node('iaac.emzior') {
+node(XfreerdpNode) {
     wrap([$class: 'TimestamperBuildWrapper']) {
-        killXorgPorcesses()
+        killXorgProcesses()
         sh 'set -e; sudo startx &'
 
         UserList.each {
@@ -55,11 +58,11 @@ node('iaac.emzior') {
                 sudo xfreerdp /v:$%s /u:%s /p:$RDP_PASS /cert-ignore &
                 set +e
                 sleep 10
-                sudo kill -8 $(ps aux | grep xfreerdp | grep $RDP_HOST | awk -F ' ' '{print $2}')
-                ''', IxNetworkRdpHost, it)
+                sudo kill -8 $(ps aux | grep xfreerdp | grep "%s" | awk -F ' ' '{print $2}')
+                ''', IxNetworkRdpHost, it, IxNetworkRdpHost)
         }
 
-        killXorgPorcesses()
-        outMsg("All done.")
+        killXorgProcesses()
+        outMsg('All done.')
     }
 }
