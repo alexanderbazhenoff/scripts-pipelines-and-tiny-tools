@@ -53,7 +53,7 @@ ramdisk.
 - **BLOCK_DEVICES** (e.g. `"/dev/sdc /dev/sde /dev/sdg /dev/sdi"`): Space separated block devices list to perform tests
 with.
 - **ZFS_POOL_TOPOLOGY** (e.g. `"mirror sdc sde mirror sdg sdi"`): ZFS pool topology to create and perform tests with.
-- **BLOCK_DEVICES_START_LETTER** (e.g. `"a"`): First letter of block devices sequence to benchmark (`a` will be an 
+- **BLOCK_DEVICES_START_LETTER** (e.g. `"a"`): First letter of block devices sequence to benchmark (`a` will be an
 `sda`).
 - **BLOCK_DEVICES_END_LETTER** (e.g. `"j"`): Last letter of block devices sequence to benchmark.
 - **NUMBER_OF_ITERATIONS** (e.g. `3`): Number of write/read iterations.
@@ -71,9 +71,9 @@ compression algorythm for ZFS pool filesystem compression option.
 - [**btrfs_vs_zfs_raid1_vs_raid10_options_performance.sh**](btrfs_vs_zfs_raid1_vs_raid10_options_performance.sh) -
 Comparison of two or four disks btrfs raid10 with different data layout vs one or two mirrored ZFS pools performance.
 - [**README.md**](README.md) - this file.
-- [**single_btrfs_disk_performance.sh**](single_btrfs_disk_performance.sh) - test performance of btrfs filesystem placed on
-single disk (e.g. if you wish to test SSD performance of the disk).
-- [**single_btrfs_disks_with_parallel_streams_performance.sh**](single_btrfs_disks_with_parallel_streams_performance.sh) -
-test several single disks in parallel (e.g. if you wish to test your hardware disk controller speed).
+- [**single_btrfs_disk_performance.sh**](single_btrfs_disk_performance.sh) - test performance of btrfs filesystem placed
+on single disk (e.g. if you wish to test SSD performance of the disk).
+- [**single_btrfs_disks_parallel_streams_performance.sh**](single_btrfs_disks_parallel_streams_performance.sh)- test
+several single disks in parallel (e.g. if you wish to test your hardware disk controller speed).
 - [**zfs_mirrors_performance.sh**](zfs_mirrors_performance.sh) - test performance of ZFS mirror pools (e.g. if you wish to
 test RADI1, RAID10, etc...)

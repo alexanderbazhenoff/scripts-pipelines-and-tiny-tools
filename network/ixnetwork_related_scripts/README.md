@@ -7,7 +7,7 @@ A set of various scripts to maintain, automate and interact with
 ## [clean_ixnetwork_logs_and_stats.bat](clean_ixnetwork_logs_and_stats.bat)
 
 A script to place on [IxNetwork server](https://support.ixiacom.com/version/ixnetwork-916) to perform logs, stats and
-error dumps clean-up to decrease disk space usage. No parameters required, just edit days expire days for files 
+error dumps clean-up to decrease disk space usage. No parameters required, just edit days expire days for files
 clean-up inside the [bat](clean_ixnetwork_logs_and_stats.bat) script. Then create a new task in a Task scheduler with
 'Run whether user is logged on or not' and 'Run with the highest privileges' options.
 
@@ -22,8 +22,9 @@ and/or on
 ## [ixnetwork_server_at_7999_10999.bat](ixnetwork_server_at_7999_10999.bat)
 
 The same as [ixnetwork_server_at_7999_10999_default_user.bat](ixnetwork_server_at_7999_10999_default_user.bat), but for
-specific user (`jenkins` in this case). Actually, this is workaround of IxNetwork server autostart which can't be run 
+specific user (`jenkins` in this case). Actually, this is workaround of IxNetwork server autostart which can't be run
 without a user login. Connect via RDP by specific user (`jenkins`) to run IxNetwork server, e.g.:
+
 ```bash
 sudo xfreerdp /v:ixnetwork-server.domain /u:jenkins /p:your_password /cert-ignore &
 ```
@@ -44,7 +45,7 @@ A scripted jenkins pipeline which you can optionally add to run IxNetwork via RD
 
 ## [traffic_item_statistics.py](traffic_item_statistics.py)
 
-Script that build traffic item statistics on the graph from 
+Script that build traffic item statistics on the graph from
 [IxNetwork server](https://support.ixiacom.com/version/ixnetwork-916) CSV results file.
 
 ## Usage

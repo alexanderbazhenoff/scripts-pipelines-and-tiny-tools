@@ -1,5 +1,4 @@
-backup btrfs filesystem using snapshot
-======================================
+# backup btrfs filesystem using snapshot
 
 **WARNING! Running this file, you accept that you know what you're doing. All actions with this script are at your own
 risk.**

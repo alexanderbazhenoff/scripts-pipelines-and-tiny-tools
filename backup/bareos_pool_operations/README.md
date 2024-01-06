@@ -29,8 +29,6 @@ volumes statistics, running with `--test yes` option.
 - permissions to run `bconsole` command and access to **$poolpath** (don't mind if you run this script from Bareos Admin
   Job you're, otherwise you should edit `/etc/sudoers` or run from root).
 - git package (`apt` or `yum install git` depending on your linux distro).
-- **shflags** library: https://code.google.com/archive/p/shflags/ This script automatically clones this to the current
-  directory.
 
 **Usage:**
 

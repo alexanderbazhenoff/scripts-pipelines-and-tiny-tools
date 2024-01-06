@@ -35,7 +35,7 @@ It's possible to use this script to back up your KVM images with [Bareos](https:
 'after scripts'. The example bellows shows you how to back up virtual machine named 'my_machine' from 'my_server.domain'
 in active mode then clean up on finish:
 
-**/etc/bareos/bareos-dir.d/job/my_machine.conf**
+*/etc/bareos/bareos-dir.d/job/my_machine.conf:*
 
 ```text
 Job {
@@ -55,7 +55,7 @@ Job {
 }  
 ```
 
-**/etc/bareos/bareos-dir.d/jobdefs/my_jobdef.conf**
+*/etc/bareos/bareos-dir.d/jobdefs/my_jobdef.conf:*
 
 ```text
 JobDefs {
@@ -72,7 +72,7 @@ JobDefs {
 }
 ```
 
-**/etc/bareos/bareos-dir.d/fileset/kvm_vm_fileset.conf**
+*/etc/bareos/bareos-dir.d/fileset/kvm_vm_fileset.conf:*
 
 ```text
 FileSet {
@@ -90,8 +90,8 @@ FileSet {
 
 ## Requirements
 
-- Backing up in `--active` mode required channel device (rg.qemu.guest_agent.0) and qemu-guest-agent to be installed on 
-  the guest system. `apt install qemu-guest-agent` or `yum install qemu-guest-agent`. To check qemu-quest-agent 
+- Backing up in `--active` mode required channel device (rg.qemu.guest_agent.0) and qemu-guest-agent to be installed on
+  the guest system. `apt install qemu-guest-agent` or `yum install qemu-guest-agent`. To check qemu-quest-agent
   connection, run the next command from the virtualization host:
 
 ```bash
