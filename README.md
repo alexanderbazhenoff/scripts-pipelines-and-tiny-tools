@@ -1,10 +1,12 @@
-# Various scripts and tools
+# Scripts and tools
 
-![lint](https://github.com/alexanderbazhenoff/various-scripts/actions/workflows/lint.yml/badge.svg?branch=main)
+![lint](https://github.com/alexanderbazhenoff/scripts-and-tools/actions/workflows/lint.yml/badge.svg?branch=master)
+
+System administration and engineering scripts and tiny tools.
 
 ## Backup scripts
 
-A tiny infrastructure-ready tools for backup, restore and maintenance your data.
+An infrastructure-ready scripts for backup, restore and maintenance your data.
 
 - [**backup_btrfs_filesystem_using_snapshots**](backup/backup_btrfs_using_snapshot/README.md) - example how to backups
 btrfs filesystems using snapshots.
