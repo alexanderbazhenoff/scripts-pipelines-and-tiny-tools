@@ -38,7 +38,8 @@ A scripted jenkins pipeline which you can optionally add to run IxNetwork via RD
 2. Edit pipeline variables to set your RDP login creation:
 
    - **IxNetworkRdpHost** (e.g. `'ixnetwork.domain'`) - RDP host to connect.
-   - **IxNetworkRdpPass** (e.g. `'some_password'` - RDP password. The same for all users.
+   - **XfreerdpNode** (e.g. `'node.domain'`) - jenkins node with xfreerdp installed.
+   - **IxNetworkRdpPass** (e.g. `'some_password'`) - RDP password. The same for all users.
    - **UserList** (e.g. `['jenkins', 'jenkins2']`) - a list of RDP users to iterate on RDP connection.
 3. Run this pipeline.
 
