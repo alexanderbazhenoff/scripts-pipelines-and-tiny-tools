@@ -25,10 +25,12 @@ def killXorgProcesses() {
     sh '''!/usr/bin/env bash
 
         listProc() {
-            (ps aux | grep "/usr/lib/xorg/Xorg" | grep -v "grep" | awk -F ' ' '{print $2}') || true
+          (ps aux | grep "/usr/lib/xorg/Xorg" | grep -v "grep" | awk -F ' ' '{print $2}') || true
         }
 
-        if [[ $(listProc) ]]; then sudo kill -8 $(listProc); fi
+        if [[ -n "$(listProc)" ]]; then 
+          sudo kill -8 $(listProc)
+        fi
         '''
 }
 
