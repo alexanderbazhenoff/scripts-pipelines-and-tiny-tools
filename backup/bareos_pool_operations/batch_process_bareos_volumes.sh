@@ -105,8 +105,8 @@ if [[ $VOL_ACTION == "dumb" ]]; then
   for RANGE_ITEM in $(seq -w "$VOL_START" "$VOL_END")
     do
       RANGE_FILE="$VOL_MASK-$RANGE_ITEM"
-      echo "Touch $VOL_MASK-$RANGE_FILE"
-      touch "$VOL_PATH$RANGE_FILE"
+      echo "Creating an empty '$RANGE_FILE'..."
+      touch "$VOL_PATH/$RANGE_FILE"
     done
 else
   for RANGE_ITEM in $(eval "echo {$VOL_START..$VOL_END}")
