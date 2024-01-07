@@ -91,7 +91,7 @@ print_usage_help() {
   echo "          Pool name ('Full-', etc)."
   echo "   -a | --action [delete|purge|prune]"
   echo "          Action after expiration days."
-  echo "   -e | --expiration"
+  echo "   -e | --expire"
   echo "          Filter by time expiration (days)."
   echo "   -f | --filter [none|Purged|Pruned]"
   echo "          Filter by status of volume."
@@ -121,7 +121,7 @@ while [[ $# -gt 0 ]]; do
     shift
     shift
     ;;
-  -e | --expiration )
+  -e | --expire )
     POOL_EXPIRE="$2"
     shift
     shift
