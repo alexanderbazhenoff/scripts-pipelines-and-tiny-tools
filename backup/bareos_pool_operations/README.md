@@ -106,8 +106,11 @@ Apply action for a range of volumes:
 Action for the range of volumes in the pool with 'name_mask' (something like 'Incremental-' or 'Full-') to apply from
 'start' to 'end' volume sequence. Action should be 'prune', 'purge' 'delete' or 'dumb'. Also, you need to set 'force' to
 skip confirmation request or 'print' to get the info about the selected range of volumes. 'print' will not perform
-changes in volume status, just output info. Action 'dumb' will create a range of an empty volume files (via `touch`
-command). Specifying `<pool_path_for_dumb>` will affects only for 'dumb' action.
+changes in volume status, just output info. Specifying `<pool_path_for_dumb>` will affect only for 'dumb' action.
+
+Action 'dumb' will create a range of an empty volume files (via `touch`
+command). Creating 'dumb' volumes required when you have removed existing volume by mistake, but it still exists in a
+Bareos database.
 
 ## Other Bareos troubleshooting examples
 
