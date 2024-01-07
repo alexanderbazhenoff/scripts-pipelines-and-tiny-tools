@@ -104,7 +104,7 @@ sleep 30
 if [[ $VOL_ACTION == "dumb" ]]; then
   for RANGE_ITEM in $(seq -w "$VOL_START" "$VOL_END")
     do
-      RANGE_FILE=file_$RANGE_ITEM.txt
+      RANGE_FILE="$VOL_MASK-$RANGE_ITEM"
       echo "Touch $VOL_MASK-$RANGE_FILE"
       touch "$VOL_PATH$RANGE_FILE"
     done
