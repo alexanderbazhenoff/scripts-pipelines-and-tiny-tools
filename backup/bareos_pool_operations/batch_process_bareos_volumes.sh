@@ -2,7 +2,7 @@
 
 
 # Batch process range of Bareos volumes script.
-# Copyright (c) December, 2018. Aleksandr Bazhenov. Updated December, 2021.
+# Copyright (c) 2018-2024, Aleksandr Bazhenov
 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -37,14 +37,21 @@
 
 # Usage:
 #
-#        # batch_process_bareos_volumes.sh <action> <name_mask> <start> <end> <--force/print>
+# ./batch_process_bareos_volumes.sh <action> <name_mask> <start> <end> <force/print> <pool_path_for_dumb>
 #
-#   where: action should be 'prune', 'purge' or 'delete'. Optional you can use: '--force'
-#          to skip confirmation request or '--print' to get the info about selected range
-#          of volumes. '--print' will not perform changes in volume status, just output an
-#          info.
-#   e.g:
-#        # batch_process_bareos_volumes.sh delete Incremental- 0032 1200
+# where: action should be 'prune', 'purge', 'delete' or 'dumb. Optional you can use: 'force'
+#        to skip confirmation request or 'print' to get the info about selected range
+#        of volumes. 'print' will not perform changes in volume status, just output an
+#        info.
+# e.g:
+# ./batch_process_bareos_volumes.sh delete Incremental- 0032 1200
+#
+# when you set 'dumb' action <pool_name_for_dumb> <pool_path_for_dumb> may be specified, e.g.:
+# /batch_process_bareos_volumes.sh delete Incremental- 0032 1200 /mnt/backup
+
+
+# Set up default pool path, e.g.: "/mnt/backup"
+DEFAULT_POOL_PATH="/mnt/backup"
 
 
 VOL_ACTION=$1
@@ -52,13 +59,14 @@ VOL_MASK=$2
 VOL_START=$3
 VOL_END=$4
 VOL_OPT=$5
+VOL_PATH=$6
 OPTIONS_ERROR=0
-
 
 [[ -z "$VOL_MASK" ]] && echo "Error! <name_mask> is undefined." && OPTIONS_ERROR=1
 [[ -z "$VOL_ACTION" ]] && echo "Error! <action> is undefined." && OPTIONS_ERROR=1
 [[ -z "$VOL_START" ]] && echo "Error! <start> is undefined." && OPTIONS_ERROR=1
 [[ -z "$VOL_END" ]] && echo "Error! <end> is undefined." && OPTIONS_ERROR=1
+[[ -z "$VOL_PATH" ]] && VOL_PATH=$DEFAULT_POOL_PATH
 
 case $VOL_START in
 	''|*[!0-9]*) echo "Error! <start> is not a number." && OPTIONS_ERROR=1
@@ -67,19 +75,24 @@ case $VOL_END in
   ''|*[!0-9]*) echo "Error! <end> is not a number." && OPTIONS_ERROR=1
 esac
 
-if [[ -n "$VOL_OPT" ]]; then
-	if [[ $VOL_OPT != "force" ]] && [[ $VOL_OPT != "print" ]]; then
-		echo "Syntax error in additional options: $VOL_OPT" && OPTIONS_ERROR=1
-	fi
+if [[ -n "$VOL_OPT" ]] && [[ $VOL_OPT != "force" ]] && [[ $VOL_OPT != "print" ]]; then
+  echo "Syntax error in additional options: $VOL_OPT" && OPTIONS_ERROR=1
 fi
 
-if [[ $VOL_ACTION != "prune" ]] && [[ $VOL_ACTION != "purge" ]] && [[ $VOL_ACTION != "delete" ]]; then
-	echo "Syntax error in action option: $VOL_ACTION" && OPTIONS_ERROR=1
+
+if [[ $VOL_ACTION != "prune" ]] && [[ $VOL_ACTION != "purge" ]] && [[ $VOL_ACTION != "delete" ]] && \
+  [[ $VOL_ACTION != "dumb" ]]; then
+	  echo "Syntax error in action option: $VOL_ACTION" && OPTIONS_ERROR=1
 fi
 
 if [[ $OPTIONS_ERROR -gt 0 ]]; then
-	echo "Usage:"
-  echo "# ./batch_process_bareos_volumes.sh <action> <name_mask> <start> <end> <force|print>"
+  printf "Error: unrecognized option(s): %s" "$POSITIONAL"
+	printf "Usage:\n\n"
+  printf "%s %s\n" "# ./batch_process_bareos_volumes.sh <action> <name_mask> <start> <end> <force|print>" \
+    "<pool_name_for_dumb> <pool_path_for_dumb>"
+  printf "where action: prune|purge|delete|dumb.\n\n"
+  printf "For dumb action you can also specify pool path (e.g. '/mnt/backup'):\n"
+  printf "# ./batch_process_bareos_volumes.sh <action> <name_mask> <start> <end> <force|print> /mnt/backup\n"
 	exit 1
 fi
 
@@ -88,10 +101,19 @@ echo "${VOL_ACTION} from ${VOL_START} to ${VOL_END} by mask ${VOL_MASK}"
 echo "Sleep 30 for sure."
 sleep 30
 
-for RANGE_ITEM in $(eval "echo {$VOL_START..$VOL_END}")
-do
-  echo "${VOL_ACTION} volume: ${VOL_MASK}${RANGE_ITEM} $VOL_OPT"
-  if [[ $VOL_OPT != 'print' ]]; then
-    echo "${VOL_ACTION} volume=${VOL_MASK}${RANGE_ITEM} $([[ $VOL_OPT == 'force' ]] && echo 'yes')" | bconsole
-  fi
-done
+if [[ $VOL_ACTION == "dumb" ]]; then
+  for RANGE_ITEM in $(seq -w "$VOL_START" "$VOL_END")
+    do
+      RANGE_FILE="$VOL_MASK$RANGE_ITEM"
+      echo "Creating an empty '$RANGE_FILE'..."
+      touch "$VOL_PATH/$RANGE_FILE"
+    done
+else
+  for RANGE_ITEM in $(eval "echo {$VOL_START..$VOL_END}")
+  do
+    echo "${VOL_ACTION} volume: ${VOL_MASK}${RANGE_ITEM} $VOL_OPT"
+    if [[ $VOL_OPT != 'print' ]]; then
+      echo "${VOL_ACTION} volume=${VOL_MASK}${RANGE_ITEM} $([[ $VOL_OPT == 'force' ]] && echo 'yes')" | bconsole
+    fi
+  done
+fi

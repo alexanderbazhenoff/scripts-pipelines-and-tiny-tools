@@ -2,7 +2,7 @@
 
 
 # Clean expired volumes from Bareos storage pool script.
-# Copyright (c) December, 2018. Aleksandr Bazhenov. Updated December, 2021.
+# Copyright (c) 2018-2024, Aleksandr Bazhenov.
 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -38,7 +38,7 @@
 
 # Requirements:
 #    * permissions to run 'bconsole' command and access to $pool_path
-#      (don't mind if you run this script from bareos Admin Job, otherwise - you should
+#      (don't mind if you run this script from Bareos Admin Job, otherwise - you should
 #      edit /etc/sudoers or run from root)
 
 # Usage:
@@ -46,7 +46,7 @@
 # or
 #   # ./clean_expired_bareos_volumes.sh --help
 #
-# Use "--test yes" key for testmode (only output, no actions).
+# Use "--test yes" key for test mode (only output, no actions).
 # For more information about volume status read Bareos manual:
 #   * http://doc.bareos.org/master/html/bareos-manual-main-reference.html
 
@@ -55,8 +55,8 @@
 # Leave empty if you don't wish additional log file
 LOG_PATH=""
 
-# Path of the pool
-POOL_PATH="/mnt/pool_path"
+# Path of the pool, e.g.: /mnt/pool_path
+POOL_PATH="/mnt/backup"
 
 
 # Process volume function. In test mode prints only command (use for debug).
@@ -72,7 +72,7 @@ process_volume() {
   if [[ $MODE == "no" ]]; then
     echo "$POOL_ACTION volume=$POOL_PATH$F_NAME yes" | bconsole
     # Perform physical delete of file from $POOL_PATH when "--action delete".
-    # Doesn't matter if this volume is absent in bareos database, this will be removed.
+    # Doesn't matter if this volume is absent in Bareos database, this will be removed.
     if [[ $POOL_ACTION = "delete" ]]; then
       echo "Performing physical delete of ${F_NAME} from ${POOL_PATH}..."
       rm -f "$POOL_PATH/$F_NAME" && echo "Removed." || echo "${F_NAME} not found."
@@ -87,11 +87,11 @@ print_usage_help() {
   echo ""
   echo "Usage:"
   echo ""
-  echo "   -n | --pool-name"
+  echo "   -n | --name"
   echo "          Pool name ('Full-', etc)."
   echo "   -a | --action [delete|purge|prune]"
   echo "          Action after expiration days."
-  echo "   -e | --expiration"
+  echo "   -e | --expire"
   echo "          Filter by time expiration (days)."
   echo "   -f | --filter [none|Purged|Pruned]"
   echo "          Filter by status of volume."
@@ -111,12 +111,17 @@ while [[ $# -gt 0 ]]; do
   KEY="$1"
 
   case $KEY in
-  -n | --pool-name )
+  -n | --name )
     POOL_NAME="$2"
     shift
     shift
     ;;
-  -e | --expiration )
+  -a | --action )
+    POOL_ACTION="$2"
+    shift
+    shift
+    ;;
+  -e | --expire )
     POOL_EXPIRE="$2"
     shift
     shift
@@ -152,17 +157,20 @@ done
 
 
 
-echo "Performing ${POOL_ACTION} \"${POOL_NAME}\" volumes after ${POOL_EXPIRE} days,"
-echo "filtered by \"${POOL_FILTER}\" status... Test mode: ${DRY_RUN}"
+printf "%s %s\n" "Performing '${POOL_ACTION}' '${POOL_NAME}' volumes after '${POOL_EXPIRE}' days, filtered by" \
+  "'${POOL_FILTER}' status... Test mode: '${DRY_RUN}'."
 if [[ $POOL_ACTION = "delete" ]] || [[ $POOL_ACTION = "prune" ]] || [[ $POOL_ACTION = "purge" ]]; then
   cd $POOL_PATH || exit 1
-  filelist=$(find . -mtime +"$POOL_EXPIRE" -print | grep "$POOL_NAME" | sed 's/[./]//g')
-  for FILENAME in $filelist
+  FILELIST=$(find . -mtime +"$POOL_EXPIRE" -print | grep "$POOL_NAME" | sed 's/[./]//g')
+  if [[ -z $FILELIST ]]; then
+    printf "%s %s\n" "No expired by volumes in '$POOL_NAME' pool by specified criteria ('$POOL_EXPIRE' days), nothing" \
+      "to '$POOL_ACTION'."
+  fi
+  for FILENAME in $FILELIST
   do
     # shellcheck disable=SC2012
     FILEDATE=$(ls -lh "$FILENAME" | awk '{print $7" "$6" "$8}')
     if [[ $POOL_FILTER == "none" ]]; then
-      echo "filter is none"
       process_volume "$FILENAME" "$FILEDATE" "$DRY_RUN"
     else
       # filter by volume status if $POOL_FILTER is not 'none'
@@ -171,7 +179,6 @@ if [[ $POOL_ACTION = "delete" ]] || [[ $POOL_ACTION = "prune" ]] || [[ $POOL_ACT
     fi
   done
 else
-  echo "Error! Uknown action: $POOL_ACTION"
-  echo "Use \"prune\", \"purge\" or \"delete\"."
+  echo "Error! Uknown action: '$POOL_ACTION'. Use 'prune', 'purge' or 'delete'."
   exit 1
 fi

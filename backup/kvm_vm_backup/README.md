@@ -16,10 +16,10 @@ kvm_backup.sh [command] <vmname1 vmname2 vmname3 ... vmnameN>
 
 Available the next commands (or scripts actions):
 
-- `--active` - Create backup of running VM(s). Requierd: qemu-guest-agent installed on virtual machine and qemu-channel
+- `--active` - Create backup of running VM(s). Required: qemu-guest-agent installed on virtual machine and qemu-channel
   device created.
 - `--stoped` - Stop, create backup and run virtual machine.
-- `--clean` - Clean previous packups from backup folder.
+- `--clean` - Clean previous backups from backup folder.
 
 ### Examples
 
@@ -83,7 +83,7 @@ FileSet {
       noatime = yes
       Verify = pin5
     }
-   File = "/var/lib/libvirt/images/backup/"%n     # here is a path for your virtual machine backup with jobname %n
+   File = "/var/lib/libvirt/images/backup/"%n     # here is a path for your virtual machine backup with job name %n
   }
 }
 ```

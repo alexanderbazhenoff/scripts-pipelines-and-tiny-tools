@@ -2,7 +2,7 @@
 
 
 # Physically delete non-existent volumes from Pool in the Bareos database.
-# Copyright (c) December, 2018. Aleksandr Bazhenov. Updated December, 2021.
+# Copyright (c) 2018-2024, Aleksandr Bazhenov.
 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -35,14 +35,19 @@
 # that you know what you're doing. All actions with this script at your own risk.
 
 
-# Set Pool path
-POOL_PATH="/mnt/pool_path"
+# Set Pool path, e.g.: /mnt/pool_path
+POOL_PATH="/mnt/backup"
+# Temporary log of removed files, e.g.: /tmp/removed.log
+FILES_LOG="/tmp/removed.log"
 
-cd $POOL_PATH || exit
+cd $POOL_PATH || exit 1
 FILELIST=$(find . -maxdepth 1 -type f -printf "%f\n")
+[[ -z $FILELIST ]] && echo "Nothing to process."
+echo "" > $FILES_LOG
 for I in $FILELIST; do
   echo "list volume=$I" | bconsole | if grep --quiet "No results to list"; then
-    echo "$I is ready to be deleted"
+    echo "$I is ready to be deleted" | tee $FILES_LOG
     rm -f $POOL_PATH/"$I"
   fi
 done
+[[ -z $(cat $FILES_LOG) ]] && echo "No missing at Bareos database volumes found in '$POOL_PATH', nothing to delete."

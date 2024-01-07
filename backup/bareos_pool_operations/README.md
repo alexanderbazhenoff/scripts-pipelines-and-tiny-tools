@@ -77,6 +77,21 @@ and run them via a Bareos Admin job without parameters pass:
        Command = "/etc/bareos/bareos-dir.d/my_wrapper_script.sh"
 ```
 
+### autoclean_job_script_wrapper.sh
+
+Latest versions of Bareos [can't parse arguments](https://bugs.bareos.org/view.php?id=1587) in the job config `Command`
+like `--arg1 param1 --arg2 param2`. So you can put all required arguments inside the script and use them as a wrapper:
+
+```text
+Job {
+    ...
+    RunScript {
+        ...
+        Command = "/etc/bareos/bareos-dir.d/autoclean_job_script_wrapper.sh"
+    }
+}
+```
+
 ### batch_process_bareos_volumes.sh
 
 Common-usage and the most multifunctional script for Bareos pool and volumes troubleshooting.
@@ -84,13 +99,17 @@ Common-usage and the most multifunctional script for Bareos pool and volumes tro
 Apply action for a range of volumes:
 
 ```bash
-./batch_process_bareos_volumes.sh <action> <name_mask> <start> <end> <force|print>
+./batch_process_bareos_volumes.sh <action> <name_mask> <start> <end> <force|print> <pool_path_for_dumb>
 ```
 
 Action for the range of volumes in the pool with 'name_mask' (something like 'Incremental-' or 'Full-') to apply from
-'start' to 'end' volume sequence. Action should be 'prune', 'purge' or 'delete'. Also, you need to set 'force' to
-skip confirmation request or 'print' to get the info about the selected range of volumes. '--print' will not perform
-changes in volume status, just output info.
+'start' to 'end' volume sequence. Action should be 'prune', 'purge' 'delete' or 'dumb'. Also, you need to set 'force' to
+skip confirmation request or 'print' to get the info about the selected range of volumes. 'print' will not perform
+changes in volume status, just output info. Specifying `<pool_path_for_dumb>` will affect only for 'dumb' action.
+
+Action 'dumb' will create a range of an empty volume files (via `touch`
+command). Creating 'dumb' volumes required when you have removed existing volume by mistake, but it still exists in a
+Bareos database.
 
 ## Other Bareos troubleshooting examples
 
