@@ -157,8 +157,8 @@ done
 
 
 
-echo "Performing ${POOL_ACTION} \"${POOL_NAME}\" volumes after ${POOL_EXPIRE} days,"
-echo "filtered by \"${POOL_FILTER}\" status... Test mode: ${DRY_RUN}"
+printf "%s %s\n" "Performing '${POOL_ACTION}' '${POOL_NAME}' volumes after '${POOL_EXPIRE}' days, filtered by" \
+  "'${POOL_FILTER}' status... Test mode: '${DRY_RUN}'"
 if [[ $POOL_ACTION = "delete" ]] || [[ $POOL_ACTION = "prune" ]] || [[ $POOL_ACTION = "purge" ]]; then
   cd $POOL_PATH || exit 1
   FILELIST=$(find . -mtime +"$POOL_EXPIRE" -print | grep "$POOL_NAME" | sed 's/[./]//g')
