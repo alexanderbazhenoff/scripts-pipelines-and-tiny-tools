@@ -35,10 +35,12 @@
 # that you know what you're doing. All actions with this script at your own risk.
 
 
+VOLUME_NAME="Full-"
+
+
 echo "WARNING! This will remove selected range of volumes in pool."
 echo "Sleep 10 for sure."
 sleep 10
-VOLUME_NAME="Full-"
 
 for I in {8702..8771}
 do

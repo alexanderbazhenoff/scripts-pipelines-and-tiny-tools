@@ -2,7 +2,7 @@
 
 
 # Clean expired volumes from Bareos storage pool script.
-# Copyright (c) December, 2018. Aleksandr Bazhenov. Updated December, 2021.
+# Copyright (c) 2018-2024, Aleksandr Bazhenov.
 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -38,7 +38,7 @@
 
 # Requirements:
 #    * permissions to run 'bconsole' command and access to $pool_path
-#      (don't mind if you run this script from bareos Admin Job, otherwise - you should
+#      (don't mind if you run this script from Bareos Admin Job, otherwise - you should
 #      edit /etc/sudoers or run from root)
 
 # Usage:
@@ -46,7 +46,7 @@
 # or
 #   # ./clean_expired_bareos_volumes.sh --help
 #
-# Use "--test yes" key for testmode (only output, no actions).
+# Use "--test yes" key for test mode (only output, no actions).
 # For more information about volume status read Bareos manual:
 #   * http://doc.bareos.org/master/html/bareos-manual-main-reference.html
 
@@ -55,8 +55,8 @@
 # Leave empty if you don't wish additional log file
 LOG_PATH=""
 
-# Path of the pool
-POOL_PATH="/mnt/pool_path"
+# Path of the pool, e.g.: /mnt/pool_path
+POOL_PATH="/mnt/backup"
 
 
 # Process volume function. In test mode prints only command (use for debug).
@@ -113,6 +113,11 @@ while [[ $# -gt 0 ]]; do
   case $KEY in
   -n | --pool-name )
     POOL_NAME="$2"
+    shift
+    shift
+    ;;
+  -a | --action )
+    POOL_ACTION="$2"
     shift
     shift
     ;;

@@ -77,6 +77,22 @@ and run them via a Bareos Admin job without parameters pass:
        Command = "/etc/bareos/bareos-dir.d/my_wrapper_script.sh"
 ```
 
+### autoclean_job_script_wrapper.sh
+
+Latest versions of Bareos [can't parse arguments](https://bugs.bareos.org/view.php?id=1587) in the job config `Command`
+like `--arg1 param1 --arg2 param2`. So you can put all required arguments inside the script and use them as a 
+wrapper:
+
+```text
+Job {
+    ...
+    RunScript {
+        ...
+        Command = "/etc/bareos/bareos-dir.d/autoclean_job_script_wrapper.sh"
+    }
+}
+```
+
 ### batch_process_bareos_volumes.sh
 
 Common-usage and the most multifunctional script for Bareos pool and volumes troubleshooting.
