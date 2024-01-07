@@ -87,7 +87,7 @@ print_usage_help() {
   echo ""
   echo "Usage:"
   echo ""
-  echo "   -n | --pool-name"
+  echo "   -n | --name"
   echo "          Pool name ('Full-', etc)."
   echo "   -a | --action [delete|purge|prune]"
   echo "          Action after expiration days."
@@ -111,7 +111,7 @@ while [[ $# -gt 0 ]]; do
   KEY="$1"
 
   case $KEY in
-  -n | --pool-name )
+  -n | --name )
     POOL_NAME="$2"
     shift
     shift
@@ -161,8 +161,11 @@ echo "Performing ${POOL_ACTION} \"${POOL_NAME}\" volumes after ${POOL_EXPIRE} da
 echo "filtered by \"${POOL_FILTER}\" status... Test mode: ${DRY_RUN}"
 if [[ $POOL_ACTION = "delete" ]] || [[ $POOL_ACTION = "prune" ]] || [[ $POOL_ACTION = "purge" ]]; then
   cd $POOL_PATH || exit 1
-  filelist=$(find . -mtime +"$POOL_EXPIRE" -print | grep "$POOL_NAME" | sed 's/[./]//g')
-  for FILENAME in $filelist
+  FILELIST=$(find . -mtime +"$POOL_EXPIRE" -print | grep "$POOL_NAME" | sed 's/[./]//g')
+  if [[ -z $FILELIST ]]; then
+    echo "No expired by volumes in $POOL_NAME pool by specified criteria ($POOL_EXPIRE days), nothing to $POOL_ACTION."
+  fi
+  for FILENAME in $FILELIST
   do
     # shellcheck disable=SC2012
     FILEDATE=$(ls -lh "$FILENAME" | awk '{print $7" "$6" "$8}')
