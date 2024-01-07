@@ -179,7 +179,6 @@ if [[ $POOL_ACTION = "delete" ]] || [[ $POOL_ACTION = "prune" ]] || [[ $POOL_ACT
     fi
   done
 else
-  echo "Error! Uknown action: $POOL_ACTION"
-  echo "Use \"prune\", \"purge\" or \"delete\"."
+  echo "Error! Uknown action: '$POOL_ACTION'. Use 'prune', 'purge' or 'delete'."
   exit 1
 fi
