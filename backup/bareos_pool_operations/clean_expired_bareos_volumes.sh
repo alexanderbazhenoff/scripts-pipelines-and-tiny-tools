@@ -72,7 +72,7 @@ process_volume() {
   if [[ $MODE == "no" ]]; then
     echo "$POOL_ACTION volume=$POOL_PATH$F_NAME yes" | bconsole
     # Perform physical delete of file from $POOL_PATH when "--action delete".
-    # Doesn't matter if this volume is absent in bareos database, this will be removed.
+    # Doesn't matter if this volume is absent in Bareos database, this will be removed.
     if [[ $POOL_ACTION = "delete" ]]; then
       echo "Performing physical delete of ${F_NAME} from ${POOL_PATH}..."
       rm -f "$POOL_PATH/$F_NAME" && echo "Removed." || echo "${F_NAME} not found."
@@ -158,19 +158,19 @@ done
 
 
 printf "%s %s\n" "Performing '${POOL_ACTION}' '${POOL_NAME}' volumes after '${POOL_EXPIRE}' days, filtered by" \
-  "'${POOL_FILTER}' status... Test mode: '${DRY_RUN}'"
+  "'${POOL_FILTER}' status... Test mode: '${DRY_RUN}'."
 if [[ $POOL_ACTION = "delete" ]] || [[ $POOL_ACTION = "prune" ]] || [[ $POOL_ACTION = "purge" ]]; then
   cd $POOL_PATH || exit 1
   FILELIST=$(find . -mtime +"$POOL_EXPIRE" -print | grep "$POOL_NAME" | sed 's/[./]//g')
   if [[ -z $FILELIST ]]; then
-    echo "No expired by volumes in $POOL_NAME pool by specified criteria ($POOL_EXPIRE days), nothing to $POOL_ACTION."
+    printf "%s %s\n" "No expired by volumes in '$POOL_NAME' pool by specified criteria ('$POOL_EXPIRE' days), nothing" \
+      "to '$POOL_ACTION'."
   fi
   for FILENAME in $FILELIST
   do
     # shellcheck disable=SC2012
     FILEDATE=$(ls -lh "$FILENAME" | awk '{print $7" "$6" "$8}')
     if [[ $POOL_FILTER == "none" ]]; then
-      echo "filter is none"
       process_volume "$FILENAME" "$FILEDATE" "$DRY_RUN"
     else
       # filter by volume status if $POOL_FILTER is not 'none'
