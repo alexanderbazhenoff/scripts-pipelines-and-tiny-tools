@@ -5,7 +5,6 @@
 
 # Usage:
 # Create your loop device on VPS, e.g:
-#
 # $ cat /etc/network/interfaces
 # The loopback network interface
 # auto lo ens192
@@ -19,7 +18,7 @@
 # ----------------------------------------------------------------------------
 # This Source Code Form is subject to the terms of the BSD 3-Clause License.
 # You can obtain one at:
-# https://github.com/alexanderbazhenoff/data-scripts/blob/master/LICENSE
+# https://github.com/alexanderbazhenoff/scripts-and-tools/blob/master/LICENSE
 
 
 # Specify bridge name

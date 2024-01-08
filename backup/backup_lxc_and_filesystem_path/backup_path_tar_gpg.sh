@@ -35,10 +35,9 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# --------------------------------------------------------------------------------------------
-# Warning! Running this file you accept that you know what you're doing. All actions with this
-#          script are at your own risk.
-# --------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Warning! Running this file you accept that you know what you're doing. All
+# actions with this script are at your own risk.
 
 
 usage_error() {
