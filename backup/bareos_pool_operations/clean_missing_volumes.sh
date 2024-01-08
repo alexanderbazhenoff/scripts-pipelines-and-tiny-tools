@@ -37,17 +37,14 @@
 
 # Set Pool path, e.g.: /mnt/pool_path
 POOL_PATH="/mnt/backup"
-# Temporary log of removed files, e.g.: /tmp/removed.log
-FILES_LOG="/tmp/removed.log"
+
 
 cd $POOL_PATH || exit 1
 FILELIST=$(find . -maxdepth 1 -type f -printf "%f\n")
 [[ -z $FILELIST ]] && echo "Nothing to process."
-echo "" > $FILES_LOG
 for I in $FILELIST; do
   echo "list volume=$I" | bconsole | if grep --quiet "No results to list"; then
-    echo "$I is ready to be deleted" | tee $FILES_LOG
+    echo "$I is ready to be deleted"
     rm -f $POOL_PATH/"$I"
   fi
 done
-[[ -z $(cat $FILES_LOG) ]] && echo "No missing at Bareos database volumes found in '$POOL_PATH', nothing to delete."
