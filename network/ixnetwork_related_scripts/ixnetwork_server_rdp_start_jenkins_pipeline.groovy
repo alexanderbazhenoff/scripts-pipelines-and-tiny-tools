@@ -3,7 +3,6 @@
 
 /**
  * Connect RDP sessions to IxNetwork Server VM to run IxNetwork server (API)
- *
  * Writen by Aleksandr Bazhenov, October 2019.
 
  * This Source Code Form is subject to the terms of the BSD 3-Clause License. You can obtain one at:
