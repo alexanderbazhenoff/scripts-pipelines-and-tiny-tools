@@ -2,7 +2,7 @@
 
 Simple scanner for remote openvpn port by specified ports range (or single port) with time options.
 
-# Info
+## Info
 
 - Required [python 3.2 or above](https://docs.python.org/3/library/concurrent.futures.html).
 - These scripts open a socket, send `"\x38\x01\x00\x00\x00\x00\x00\x00\x00"` data and print a reply to console stdout.
@@ -18,7 +18,7 @@ monitoring (with possible authentication).
   ulimit -n 50000
   ```
 
-## Usage:
+## Usage
 
 ```bash
 $ ./openvpn_portscan.py -h
