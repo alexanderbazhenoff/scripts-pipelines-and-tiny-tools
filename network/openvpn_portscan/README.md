@@ -21,7 +21,7 @@ monitoring (with possible authentication).
 ## Usage
 
 ```bash
-$ ./openvpn_portscan.py -h
+./openvpn_portscan.py -h
 usage: ./openvpn_portscan.py [-h] [-t TIMEOUT] [-j TIMEOUT_JITTER] [-p PAUSE_JITTER] [-r] HOST PORT [PORT ...]
 
 positional arguments:
@@ -39,13 +39,13 @@ optional arguments:
   -T THREADS, --threads THREADS
                         Number of parallel threads (default: 1500).
   -r, --random          Random sorted range.
-
+  -q, --quiet           Do not log closed ports.
 ```
 
 For example, you can try to scan port 1194 on 1.2.3.4 server:
 
 ```bash
-$ ./openvpn_portscan.py 1.2.3.4 1194
+./openvpn_portscan.py 1.2.3.4 1194
 ```
 
 On the port that replied to scanner, you'll see something like:
@@ -60,7 +60,7 @@ If you have a good connection and want to scan 1.2.3.4 IP address from 1190 to 1
 have python 3.x, which linked to `python` and no `python3` on the system:
 
 ```bash
-$ python openvpn_portscan.py 1.2.3.4 1190 1194 -t 3 -p 3 -j 0 -T 3000 -r
+python openvpn_portscan.py 1.2.3.4 1190 1194 -t 3 -p 3 -j 0 -T 3000 -r
 ```
 
 If you have noticed that the waiting of socket reply for 1 second is not enough, increase them to 2 or 3 seconds.
@@ -69,7 +69,7 @@ set socket connection timeout jitter (`-j2`) and jitter for pause between connec
 The next example will perform a slow scan of all ports with console output redirection to `logfile`:
 
 ```bash
-$ python openvpn_portscan.py 1.2.3.4 1 65535 -t 5 -p 55 -j 60 -r | tee -a logfile
+python openvpn_portscan.py 1.2.3.4 1 65535 -t 5 -p 55 -j 60 -r | tee -a logfile
 ```
 
 To scan all possible ports on given IP address with specified number of threads use `-T` key. The next example shows how
@@ -77,7 +77,7 @@ to scan all ports on the host with maximum possible speed and threads (but still
 no output on closed port to decrease logs size):
 
 ```bash
-$ python openvpn_portscan.py 1.2.3.4 1 65535 -t 3 -p 3 -j 0 -r -T 3000 -q
+python openvpn_portscan.py 1.2.3.4 1 65535 -t 3 -p 3 -j 0 -r -T 3000 -q
 ```
 
 Further increase the number of threads depends on your CPU and system tuning (max open files, network connections), but
