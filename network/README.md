@@ -8,6 +8,7 @@ Configure and collect network settings on linux systems.
 linux bridge.
 - [**ixnetwork_related_scripts**](ixnetwork_related_scripts/README.md) -
 [IxNetwork server](https://support.ixiacom.com/version/ixnetwork-916) related scripts: automation, interaction, etc.
+- [**openvpn_portscan**](openvpn_portscan/README.md) - scan to find possible openvpn port(s) on remote hosts.
 - [**vlan_filtered_bridges**](vlan_filtered_bridges/README.md) - systemd unit and script to create bridge with
 VLAN filtering to prevent MAC-table overflow on the host. Actually this is an example how to organize linux bridges by
 script.
