@@ -4,6 +4,13 @@
 
 System administration and engineering scripts and tiny tools.
 
+## API
+
+API-related script to interact.
+
+- [**send_message_via_telegram_bot**](api/send_message_via_telegram_bot/README.md) - script to send a message via bot in
+Telegram messenger.
+
 ## Backup scripts
 
 An infrastructure-ready scripts for backup, restore and maintenance your data.
