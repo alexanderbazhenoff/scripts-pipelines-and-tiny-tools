@@ -1,6 +1,6 @@
 # Network scripts
 
-Configure and collect network settings on linux systems.
+Configure and collect network settings on linux systems, scan and analyze tools.
 
 - [**get_dhcp_leases**](get_dhcpd_leases/README.md) - get leases info from isc-dhcp server including client,
  expiration, and client vendor.
