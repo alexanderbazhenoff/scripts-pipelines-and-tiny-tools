@@ -55,7 +55,7 @@ Configure and collect network settings and software on operating systems.
 
 A set of CI-CD pipelines.
 
-- [**golang-app-docker-ci**](pipelines/golang-app-docker-ci/README.md) - Jenkins scripted pipeline to clone golang 
+- [**golang-app-docker-ci**](pipelines/golang-app-docker-ci/README.md) - Jenkins scripted pipeline to clone golang
   sources of the project, run tests inside docker container and archive docker image with application binary as
   artifacts.
 - [**install-bareos**](pipelines/install-bareos/README.md) - Jenkins scripted pipeline for installing and customizing

@@ -2,7 +2,7 @@
 
 Configure and collect network settings on linux systems, scan and analyze tools.
 
-- [**get_dhcp_leases**](get_dhcpd_leases/README.md) - a script and Jenkins pipleine-wrapper to get leases info from 
+- [**get_dhcp_leases**](get_dhcpd_leases/README.md) - a script and Jenkins pipleine-wrapper to get leases info from
   isc-dhcp server including client, expiration, and client vendor.
 - [**inner_vps_bridge**](inner_vps_bridge/README.md) - example how to organize the network inside your VPS by
 linux bridge.
