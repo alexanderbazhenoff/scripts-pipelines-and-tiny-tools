@@ -1,8 +1,9 @@
 # Scripts, pipelines and tiny tools
 
-![lint](https://github.com/alexanderbazhenoff/scripts-and-tools/actions/workflows/lint.yml/badge.svg?branch=master)
+![Super-Linter](
+https://github.com/alexanderbazhenoff/scripts-pipelines-and-tiny-tools/actions/workflows/lint.yml/badge.svg?branch=master)
 
-System administration and engineering scripts and tiny tools.
+A set of system administration, Linux/Unix engineering scripts, CI pipelines and tiny tools.
 
 ## API
 
@@ -39,7 +40,7 @@ A set of scripts to benchmarks and performance stats.
 
 Configure and collect network settings and software on operating systems.
 
-- [**get_dhcp_leases**](network/get_dhcpd_leases/README.md) - a script and Jenkins pipleine-wrapper to get leases info
+- [**get_dhcp_leases**](network/get_dhcpd_leases/README.md) - a script and Jenkins pipeline-wrapper to get leases info
   from isc-dhcp server including client, expiration, and client vendor.
 - [**inner_vps_bridge**](network/inner_vps_bridge/README.md) - example how to organize the network inside your VPS by
   linux bridge.
@@ -49,3 +50,18 @@ Configure and collect network settings and software on operating systems.
 - [**vlan_filtered_bridges**](network/vlan_filtered_bridges/README.md) - systemd unit and script to create bridge with
   VLAN filtering to prevent MAC-table overflow on the host. Actually this is an example how to organize linux bridges by
   script.
+
+## Pipelines
+
+A set of CI-CD pipelines.
+
+- [**golang-app-docker-ci**](pipelines/golang-app-docker-ci/README.md) - Jenkins scripted pipeline to clone golang 
+  sources of the project, run tests inside docker container and archive docker image with application binary as
+  artifacts.
+- [**install-bareos**](pipelines/install-bareos/README.md) - Jenkins scripted pipeline for installing and customizing
+  Bareos components, or a wrapper for
+  [bareos](https://github.com/alexanderbazhenoff/ansible-collection-linux/tree/main/roles/bareos) ansible role.
+- [**install-zabbix-agent**](pipelines/install-zabbix-agent/README.md) - Jenkins scripted pipeline for installing and
+  customizing zabbix agent, or a wrapper for
+  [zabbix_agent](https://github.com/alexanderbazhenoff/ansible-collection-linux/tree/main/roles/zabbix_agent)
+  ansible role.

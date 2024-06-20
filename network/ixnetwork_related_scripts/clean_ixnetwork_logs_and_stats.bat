@@ -4,7 +4,7 @@
 :: Clean-up logs and stats on IxNetwork server.
 :: --------------------------------------------------------------------------------------------------------------------
 :: This Source Code Form is subject to the terms of the BSD 3-Clause License.
-:: You can obtain one at: https://github.com/alexanderbazhenoff/scripts-and-tools/blob/master/LICENSE
+:: You can obtain one at: https://github.com/alexanderbazhenoff/scripts-pipelines-and-tiny-tools/blob/master/LICENSE
 
 
 rem. > del_files.log

@@ -3,11 +3,11 @@
 
 /**
  * Show dhcp leases info from isc-dhcp-sever, or a tiny pipeline-wrapper for python script:
- * https://github.com/alexanderbazhenoff/various-scripts/tree/master/network/get_dhcpd_leases
+ * https://github.com/alexanderbazhenoff/scripts-pipelines-and-tiny-tools/tree/master/network/get_dhcpd_leases
  *
- * This Source Code Form is subject to the terms of the Apache License Version 2.0.
- * If a copy of this source file was not distributed with this file, You can obtain one at:
- * https://github.com/alexanderbazhenoff/jenkins-shared-library/blob/main/LICENSE
+ * This Source Code Form is subject to the terms of the BSD 3-Clause License.
+ * If a copy of the source distributed without this file, you can obtain one at:
+ * https://github.com/alexanderbazhenoff/scripts-pipelines-and-tiny-tools/blob/master/LICENSE
  */
 
 
