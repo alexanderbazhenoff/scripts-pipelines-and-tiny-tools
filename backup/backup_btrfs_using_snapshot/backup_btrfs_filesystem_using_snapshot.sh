@@ -8,7 +8,7 @@
 # --------------------------------------------------------------------------------------------
 # This Source Code Form is subject to the terms of the BSD 3-Clause License. If a copy of the
 # source(s) distributed with this file, You can obtain one at:
-# https://github.com/alexanderbazhenoff/scripts-and-tools/blob/master/LICENSE
+# https://github.com/alexanderbazhenoff/scripts-pipelines-and-tiny-tools/blob/master/LICENSE
 
 
 # Source mounted filesystem path, copy backups and subvolume creation path. All filesystems should be btrfs.
