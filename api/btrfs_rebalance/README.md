@@ -4,7 +4,7 @@ A tiny script to perform btrfs re-balance with a range of `-dusage` values.
 
 ## Technical details
 
-Running btrfs balance start without any filters, would re-write every data and metadata chunk in the filesystem.
+Running btrfs balance start without any filters, would rewrite every data and metadata chunk in the filesystem.
 Usually, this is not what we want. Instead, use balance filters to limit what chunks should be balanced.
 
 Using `-dusage=5` we limit balance to compact data blocks that are less than 5% full. This is a good start, and we can
