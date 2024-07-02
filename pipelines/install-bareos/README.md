@@ -98,8 +98,8 @@ ansible playbooks and running them from terminal.
   **dir** - director, **webui** - Web UI, **dir_webui** - director and Web UI.
 - **BAREOS_RELEASE**: Bareos version.
 - **OVERRIDE_LINUX_DISTRO_VERSION**: Override ansible linux distribution major version. Useful when specified Bareos
-version repository is not available for your Linux distribution version (example: Bareos v21 currently is
-[not available](https://download.bareos.org/bareos/release/21/) for any RedHat v9, so try to set `8` here).
+  version repository is not available for your Linux distribution version (example: Bareos v21 currently is not
+  available for any RedHat v9, so try to set `8` here).
 
 ### Bareos file daemon and Bareos server parameters
 

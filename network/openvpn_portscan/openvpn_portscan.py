@@ -148,7 +148,7 @@ def check_port(port, args):
     """
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.settimeout(args.timeout + random.uniform(0, args.timeout_jitter))
+    sock.settimeout(args.timeout + random.uniform(0, args.timeout_jitter))  # nosec B311
     sock.connect((args.host, port))
     sock.send(SEND_DATA.encode())
     res = 0

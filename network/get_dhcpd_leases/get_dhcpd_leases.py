@@ -57,9 +57,7 @@ def parse_timestamp(raw_str):
     if len(tokens) == 1:
         if tokens[0].lower() == NEVER:
             return NEVER
-
-        else:
-            raise ParseError("timestamp")
+        raise ParseError("timestamp")
 
     elif len(tokens) == 3:
         return datetime.datetime.strptime(" ".join(tokens[1:]), "%Y/%m/%d %H:%M:%S")
