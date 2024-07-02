@@ -1,12 +1,13 @@
 [tool.poetry]
-name = "inxnetwork_related_scripts"
+name = "scripts-pipelines_and_tiny-tools"
 version = "0.0.0"
-description = "Just to resolve linter dependencies"
+description = "Just to resolve dependencies for pytjon linters"
 readme = "README.md"
 license = "BSD 3-Clause License"
 authors = ["Aleksandr Bazhenov <bazhenoff.alexander@gmail.com>"]
 repository = "https://github.com/alexanderbazhenoff"
 
 [tool.poetry.dependencies]
+python = "^3"
 pandas = "*"
 plotly = "*"
