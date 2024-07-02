@@ -31,7 +31,8 @@ Redistribution and use in source and binary forms, with or without
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  Usage:
-    python3 graph/traffic_item_statistics.py -i "$PWD/stats_example/Traffic Item Statistics.csv" \
+    python3 graph/traffic_item_statistics.py \
+        -i "$PWD/stats_example/Traffic Item Statistics.csv" \
         -o "$PWD/" -t test_name -m 'Traffic Item Name'
 """
 

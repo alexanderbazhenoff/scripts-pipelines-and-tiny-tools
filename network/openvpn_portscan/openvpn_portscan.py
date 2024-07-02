@@ -160,7 +160,7 @@ def check_port(port, args):
     except:  # noqa e722 pylint: disable=W0702
         if not args.quiet:
             logging.error("Port %s is not responding", port)
-    time.sleep(random.uniform(0, args.pause_jitter))
+    time.sleep(random.uniform(0, args.pause_jitter))  # nosec B311
     sock.close()
     return res
 

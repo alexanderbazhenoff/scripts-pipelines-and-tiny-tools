@@ -30,7 +30,7 @@ jobs:
           fetch-depth: 0
 
       - name: MegaLinter
-        # kics ignore-line
+# kics ignore-line
         uses: oxsecurity/megalinter@latest
         id: ml
         env:

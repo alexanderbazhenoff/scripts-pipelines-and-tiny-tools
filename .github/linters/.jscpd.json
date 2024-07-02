@@ -9,6 +9,7 @@
     "benchmark/filesystems_benchmarks/single_btrfs_disk_performance.sh",
     "benchmark/filesystems_benchmarks/btrfs_raid10_performance.sh",
     "backup/bareos_pool_operations/prune_all_volumes_from_pool_pgsql.sh",
-    "backup/bareos_pool_operations/purge_all_volumes_from_pool_pgsql.sh"
+    "backup/bareos_pool_operations/purge_all_volumes_from_pool_pgsql.sh",
+    "*.md"
   ]
 }
