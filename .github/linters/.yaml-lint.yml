@@ -1,10 +1,5 @@
 ---
-
 extends: default
-ignore: |
-  README.md
-  LICENSE
-
 rules:
   braces:
     max-spaces-inside: 1

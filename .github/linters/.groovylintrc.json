@@ -22,7 +22,7 @@
       "ignoreVariableNames": "__"
     },
     "size.NestedBlockDepth": {
-      "maxNestedBlockDepth": 10
+      "maxNestedBlockDepth": 8
     },
     "size.ParameterCount": {
       "enabled": false
@@ -36,6 +36,9 @@
     "CatchException": {
       "enabled": false
     },
+    "Instanceof": {
+      "enabled": false
+    },
     "convention.CompileStatic": {
       "enabled": false
     },
@@ -46,6 +49,9 @@
       "enabled": false
     },
     "DuplicateStringLiteral": {
+      "enabled": false
+    },
+    "DuplicateNumberLiteral": {
       "enabled": false
     },
     "UnnecessaryReturnKeyword": "error"
