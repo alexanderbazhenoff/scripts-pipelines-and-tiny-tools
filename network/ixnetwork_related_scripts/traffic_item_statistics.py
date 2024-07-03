@@ -39,7 +39,8 @@ Redistribution and use in source and binary forms, with or without
 
 import argparse
 from os.path import basename, isfile, join
-
+# pylint: disable=E0401
+# pyright: reportMissingImports=false
 import pandas as pd
 import plotly
 import plotly.graph_objs as go
