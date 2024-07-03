@@ -2,5 +2,14 @@
 DISABLE_LINTERS:
   - REPOSITORY_DEVSKIM
   - SPELL_CSPELL
-PYTHON_PYRIGHT_PRE_COMMANDS:
-  - command: poetry install
+PRE_COMMANDS:
+  # Export the Poetry configuration to a `requirements.txt` file that each of the virtual environments can use
+  - command: python3 -m pip install poetry
+    cwd: root
+    continue_if_failed: false
+  - command: python3 -m poetry install --no-root
+    venv: pylint
+    continue_if_failed: false
+  - command: python3 -m poetry install --no-root
+    venv: pyright
+    continue_if_failed: false
