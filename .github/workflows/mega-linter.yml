@@ -51,7 +51,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT || secrets.GH_PERSONAL_TOKEN }}
 
           # If you use VALIDATE_ALL_CODEBASE = true, you can remove this line to
           # improve performance
@@ -88,7 +88,7 @@ jobs:
               contains(fromJSON('["refs/heads/main", "refs/heads/master"]'), github.ref)
             }}
 
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_TOKEN }}
 
           # ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE
           # .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
@@ -157,7 +157,7 @@ jobs:
       # Push new commit if applicable
       # (for now works only on PR from the same repository, not from forks)
       - name: Prepare commit
-        if: ${{  env.APPLY_FIXES_IF_COMMIT == 'true' && ! cancelled() }}
+        if: ${{ env.APPLY_FIXES_IF_COMMIT == 'true' && ! cancelled() }}
         run: sudo chown -Rc $UID .git/
 
       - name: Commit and push applied linter fixes
