@@ -23,7 +23,7 @@ env:
 
   # Decide which event triggers application of fixes in a commit or a PR
   # (pull_request, push, all)
-  APPLY_FIXES_EVENT: all
+  APPLY_FIXES_EVENT: push
 
   # If APPLY_FIXES is used, defines if the fixes are directly committed (commit)
   # or posted in a PR (pull_request)
@@ -120,6 +120,7 @@ jobs:
               github.event.pull_request.head.repo.full_name == github.repository
             )
           }}" >> "${GITHUB_ENV}"
+        if: success() || failure()
 
       # Set APPLY_FIXES_IF_* vars for use in future steps
       - name: Set APPLY_FIXES_IF_* vars
@@ -133,6 +134,7 @@ jobs:
             env.APPLY_FIXES_MODE == 'commit' &&
             (!contains(fromJSON('["refs/heads/main", "refs/heads/master"]'), github.ref))
           }}" >> "${GITHUB_ENV}"
+        if: success() || failure()
 
       # Create pull request if applicable
       # (for now works only on PR from the same repository, not from forks)
