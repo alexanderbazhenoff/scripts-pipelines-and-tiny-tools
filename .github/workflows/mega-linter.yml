@@ -99,7 +99,7 @@ jobs:
       # Upload MegaLinter artifacts
       - name: Archive production artifacts
         uses: actions/upload-artifact@v4
-        if: success() || failure()
+        if: '!cancelled()'
         with:
           name: MegaLinter reports
           path: |
@@ -120,7 +120,7 @@ jobs:
               github.event.pull_request.head.repo.full_name == github.repository
             )
           }}" >> "${GITHUB_ENV}"
-        if: success() || failure()
+        if: '!cancelled()'
 
       # Set APPLY_FIXES_IF_* vars for use in future steps
       - name: Set APPLY_FIXES_IF_* vars
@@ -134,14 +134,14 @@ jobs:
             env.APPLY_FIXES_MODE == 'commit' &&
             (!contains(fromJSON('["refs/heads/main", "refs/heads/master"]'), github.ref))
           }}" >> "${GITHUB_ENV}"
-        if: success() || failure()
+        if: '!cancelled()'
 
       # Create pull request if applicable
       # (for now works only on PR from the same repository, not from forks)
       - name: Create Pull Request with applied fixes
         uses: peter-evans/create-pull-request@v6
         id: cpr
-        if: env.APPLY_FIXES_IF_PR == 'true'
+        if: env.APPLY_FIXES_IF_PR == 'true' && '!cancelled()'
         with:
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
           commit-message: "[MegaLinter] Apply linters automatic fixes"
@@ -149,7 +149,7 @@ jobs:
           labels: bot
 
       - name: Create PR output
-        if: env.APPLY_FIXES_IF_PR == 'true'
+        if: env.APPLY_FIXES_IF_PR == 'true' && '!cancelled()'
         run: |
           echo "PR Number - ${{ steps.cpr.outputs.pull-request-number }}"
           echo "PR URL - ${{ steps.cpr.outputs.pull-request-url }}"
@@ -157,12 +157,12 @@ jobs:
       # Push new commit if applicable
       # (for now works only on PR from the same repository, not from forks)
       - name: Prepare commit
-        if: env.APPLY_FIXES_IF_COMMIT == 'true'
+        if: env.APPLY_FIXES_IF_COMMIT == 'true' && '!cancelled()'
         run: sudo chown -Rc $UID .git/
 
       - name: Commit and push applied linter fixes
         uses: stefanzweifel/git-auto-commit-action@v4
-        if: env.APPLY_FIXES_IF_COMMIT == 'true'
+        if: env.APPLY_FIXES_IF_COMMIT == 'true' && '!cancelled()'
         with:
           branch: >-
             ${{
