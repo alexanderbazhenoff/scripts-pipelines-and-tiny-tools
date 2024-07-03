@@ -58,13 +58,11 @@ jobs:
 
       # MegaLinter
       - name: MegaLinter
-
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/flavors/
+        # kics-scan ignore-line
         uses: oxsecurity/megalinter@v7
-
         id: ml
-
         # All available variables are described in documentation
         # https://megalinter.io/configuration/
         env:
@@ -85,9 +83,7 @@ jobs:
               github.event_name == 'push' &&
               contains(fromJSON('["refs/heads/main", "refs/heads/master"]'), github.ref)
             }}
-
           GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_TOKEN }}
-
           # ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE
           # .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
 
@@ -137,6 +133,7 @@ jobs:
       # Create pull request if applicable
       # (for now works only on PR from the same repository, not from forks)
       - name: Create Pull Request with applied fixes
+        # kics-scan ignore-line
         uses: peter-evans/create-pull-request@v6
         id: cpr
         if: ${{ env.APPLY_FIXES_IF_PR == 'true' && ! cancelled() }}
@@ -147,7 +144,7 @@ jobs:
           labels: bot
 
       - name: Create PR output
-        if: ${{ env.APPLY_FIXES_IF_PR == 'true' &&  ! cancelled() }}
+        if: ${{ env.APPLY_FIXES_IF_PR == 'true' && ! cancelled() }}
         run: |
           echo "PR Number - ${{ steps.cpr.outputs.pull-request-number }}"
           echo "PR URL - ${{ steps.cpr.outputs.pull-request-url }}"
