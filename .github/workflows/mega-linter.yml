@@ -28,8 +28,9 @@ jobs:
         with:
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
           fetch-depth: 0
-      # kics ignore-block
+
       - name: MegaLinter
+# kics-scan ignore-line
         uses: oxsecurity/megalinter@latest
         id: ml
         env:

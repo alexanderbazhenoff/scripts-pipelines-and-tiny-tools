@@ -114,9 +114,8 @@ while [[ $# -gt 0 ]]; do
     shift
     ;;
 
-  \
-    *)                 # unknown option
-    POSITIONAL+=("$1") # save it in an array for later
+  *)                    # unknown option
+    POSITIONAL+=("$1")  # save it in an array for later
     shift
     ;;
   esac
