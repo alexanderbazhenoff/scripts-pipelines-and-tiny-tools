@@ -166,6 +166,7 @@ def check_port(port, args):
 
 
 if __name__ == "__main__":
+    # pylint: disable=duplicate-code
     logging.basicConfig(
         stream=sys.stdout,
         level=logging.INFO,
