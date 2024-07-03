@@ -60,7 +60,7 @@ jobs:
       - name: MegaLinter
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/flavors/
-# kics-scan ignore-line
+# kics ignore-line
         uses: oxsecurity/megalinter@v7
         id: ml
         # All available variables are described in documentation
@@ -133,7 +133,7 @@ jobs:
       # Create pull request if applicable
       # (for now works only on PR from the same repository, not from forks)
       - name: Create Pull Request with applied fixes
-# kics-scan ignore-line
+# kicsn ignore-line
         uses: peter-evans/create-pull-request@v6
         id: cpr
         if: ${{ env.APPLY_FIXES_IF_PR == 'true' && ! cancelled() }}
