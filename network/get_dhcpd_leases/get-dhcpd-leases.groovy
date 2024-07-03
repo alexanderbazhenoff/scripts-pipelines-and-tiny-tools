@@ -15,7 +15,7 @@
 final String StartNode = 'master'
 
 // Jenkins node with isc-dhcp-server to execute on, e.g.: dhcpd-server.domain
-final String ExecutionNode = 'gate'
+final String ExecutionNode = 'gate.tmispb'
 
 // Repo URL of 'get_dhcpd_leases.py' script, e.g: 'git@github.com:alexanderbazhenoff/various-scripts.git'
 final String GitProjectUrlOfTheScript = 'https://github.com/alexanderbazhenoff/scripts-pipelines-and-tiny-tools.git'
