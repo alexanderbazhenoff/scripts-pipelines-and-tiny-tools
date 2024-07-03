@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # Restore GitLab dump data
 # Copyright (c) December, 2018. Aleksandr Bazhenov
 
@@ -8,12 +7,10 @@
 # If a copy of the source distributed without this file, you can obtain one at:
 # https://github.com/alexanderbazhenoff/scripts-pipelines-and-tiny-tools/blob/master/LICENSE
 
-
 # WARNING! Running this file may cause a potential data loss and assumes you accept
 # that you know what you're doing. All actions with this script at your own risk.
 
 # More info: https://docs.gitlab.com/ee/raketasks/backup_restore.html
-
 
 rm -fr /var/opt/gitlab/backups/*
 sudo chown git /var/opt/gitlab/backups

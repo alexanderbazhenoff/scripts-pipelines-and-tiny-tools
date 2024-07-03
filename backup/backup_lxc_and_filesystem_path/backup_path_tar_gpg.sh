@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # Backup and restore script for files, folders and lxc containers
 # with tar.gz and gpg2 encryption.
 #
@@ -38,7 +37,6 @@
 # -----------------------------------------------------------------------------
 # Warning! Running this file you accept that you know what you're doing. All
 # actions with this script are at your own risk.
-
 
 usage_error() {
   echo "Error: unrecognized option(s): $POSITIONAL"
@@ -116,8 +114,8 @@ while [[ $# -gt 0 ]]; do
     shift
     ;;
 
-
-  *)                   # unknown option
+  \
+    *)                 # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift
     ;;
@@ -173,7 +171,7 @@ if [[ $ENCRYPT && -z $PASSWORD ]]; then
   usage_error
 fi
 
-if $DEBUG ; then
+if $DEBUG; then
   set -x
 fi
 
@@ -182,7 +180,6 @@ if [[ ! -d "$DESTINATION_PATH" ]]; then
   echo "No ${DESTINATION_PATH} found, creating..."
   mkdir -p "$DESTINATION_PATH"
 fi
-
 
 set -e
 
@@ -208,7 +205,7 @@ fi
 # backup or restore with compression and encryption
 if $ENCRYPT && $COMPRESS; then
   if [[ $ACTION == "backup" ]]; then
-    if $CLEAN_DESTINATION ; then
+    if $CLEAN_DESTINATION; then
       if [[ -f "$FULL_DESTINATION_PATH.enc" ]]; then
         echo "Removing previous ${FULL_DESTINATION_PATH}.enc file"
         rm -f "$FULL_DESTINATION_PATH".enc
@@ -219,20 +216,20 @@ if $ENCRYPT && $COMPRESS; then
       --passphrase "$PASSWORD" --output "$FULL_DESTINATION_PATH".enc --yes --force-mdc
   fi
   if [[ $ACTION == "restore" ]]; then
-    if $CLEAN_DESTINATION ; then
+    if $CLEAN_DESTINATION; then
       echo "Unable to clean-up path $DESTINATION_PATH in '-a restore --encrypt --compress' mode."
     fi
     cd "$DESTINATION_PATH" || exit 1
     echo "123"
-    gpg2 --decrypt --batch --yes --passphrase "$PASSWORD" "$FULL_SOURCE_PATH".enc | \
+    gpg2 --decrypt --batch --yes --passphrase "$PASSWORD" "$FULL_SOURCE_PATH".enc |
       tar --numeric-owner -xzvf -
   fi
 fi
 
 # backup or restore with encryption and no compression
-if $ENCRYPT && ! $COMPRESS ; then
+if $ENCRYPT && ! $COMPRESS; then
   if [[ $ACTION == "backup" ]]; then
-    if $CLEAN_DESTINATION ; then
+    if $CLEAN_DESTINATION; then
       if [[ -f "$FULL_DESTINATION_PATH.enc" ]]; then
         echo "Removing previous ${FULL_DESTINATION_PATH}.enc file"
         rm -f "$FULL_DESTINATION_PATH".enc
@@ -244,7 +241,7 @@ if $ENCRYPT && ! $COMPRESS ; then
     rm -f "$FULL_DESTINATION_PATH"
   fi
   if [[ $ACTION == "restore" ]]; then
-    if $CLEAN_DESTINATION ; then
+    if $CLEAN_DESTINATION; then
       if [[ -f "$FULL_DESTINATION_PATH" ]]; then
         echo "Removing $FULL_DESTINATION_PATH file"
         rm -f "$FULL_DESTINATION_PATH"
