@@ -168,5 +168,5 @@ if __name__ == "__main__":
 
     else:
         print(
-            "Error, wrong input data: defined path is not a file or not 'Traffic Item Statistics.csv'"
+            "Error, wrong input: defined path is not a file or not 'Traffic Item Statistics.csv'"
         )

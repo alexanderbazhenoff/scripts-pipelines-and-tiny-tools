@@ -30,6 +30,7 @@ Redistribution and use in source and binary forms, with or without
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+# pylint: disable=C0115,C0116
 
 import bisect
 import datetime

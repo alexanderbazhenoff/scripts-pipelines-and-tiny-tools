@@ -2,3 +2,5 @@
 DISABLE_LINTERS:
   - REPOSITORY_DEVSKIM
   - SPELL_CSPELL
+PYTHON_PYRIGHT_PRE_COMMANDS:
+  - command: pip list | grep poetry
