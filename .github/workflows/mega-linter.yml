@@ -1,6 +1,6 @@
 ---
-name: MegaLinter
 # kics-scan ignore-block
+name: MegaLinter
 # Trigger mega-linter at every push. Action will also be visible from Pull
 # Requests to main
 on: # yamllint disable-line rule:truthy
