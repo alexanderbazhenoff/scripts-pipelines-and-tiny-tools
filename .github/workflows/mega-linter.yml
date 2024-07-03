@@ -141,7 +141,7 @@ jobs:
       - name: Create Pull Request with applied fixes
         uses: peter-evans/create-pull-request@v6
         id: cpr
-        if: ${{ env.APPLY_FIXES_IF_PR == 'true' && '!cancelled()' }}
+        if: ${{ env.APPLY_FIXES_IF_PR == 'true' && ! cancelled() }}
         with:
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
           commit-message: "[MegaLinter] Apply linters automatic fixes"
@@ -149,7 +149,7 @@ jobs:
           labels: bot
 
       - name: Create PR output
-        if: ${{ env.APPLY_FIXES_IF_PR == 'true' && '!cancelled()' }}
+        if: ${{ env.APPLY_FIXES_IF_PR == 'true' &&  ! cancelled() }}
         run: |
           echo "PR Number - ${{ steps.cpr.outputs.pull-request-number }}"
           echo "PR URL - ${{ steps.cpr.outputs.pull-request-url }}"
@@ -157,12 +157,12 @@ jobs:
       # Push new commit if applicable
       # (for now works only on PR from the same repository, not from forks)
       - name: Prepare commit
-        if: ${{  env.APPLY_FIXES_IF_COMMIT == 'true' && '!cancelled()' }}
+        if: ${{  env.APPLY_FIXES_IF_COMMIT == 'true' && ! cancelled() }}
         run: sudo chown -Rc $UID .git/
 
       - name: Commit and push applied linter fixes
         uses: stefanzweifel/git-auto-commit-action@v4
-        if: ${{ env.APPLY_FIXES_IF_COMMIT == 'true' && '!cancelled()' }}
+        if: ${{ env.APPLY_FIXES_IF_COMMIT == 'true' && ! cancelled() }}
         with:
           branch: >-
             ${{
