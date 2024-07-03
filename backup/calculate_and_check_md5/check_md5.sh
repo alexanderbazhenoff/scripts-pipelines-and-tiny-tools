@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # md5 checksum check for files in $SOURCE_PATH
 
 # Copyright (c) 2021, Aleksandr Bazhenov
@@ -13,10 +12,8 @@
 # Warning! Running this file you accept that you know what you're doing. All
 # actions with this script are at your own risk.
 
-
 ERROR_NOTIFICATION_SCRIPT_PATH="/opt/scripts/error_notification.sh"
 SOURCE_PATH="/mnt/backup/"
-
 
 usage_error() {
   echo ""
@@ -26,7 +23,7 @@ usage_error() {
   exit 1
 }
 
-task_error(){
+task_error() {
   local RETURN_CODE=$1
   local ERROR_MESSAGE=$2
   if [[ $RETURN_CODE -ne 0 ]]; then
@@ -45,7 +42,7 @@ while [[ $# -gt 0 ]]; do
     shift
     ;;
 
-  *)                   # unknown option
+  *) # unknown option
     POSITIONAL+=("$1")
     shift
     ;;
@@ -59,7 +56,7 @@ echo "Ready to calculate md5 checksum on $HOSTNAME for directory: $SOURCE_PATH"
 cd "$SOURCE_PATH" || exit 1
 
 if ! ls -1 ./*.md5 -I ./*md5.md5; then
-   /./opt/scripts/check_error_notification.sh "no_md5_files_found!"
+  /./opt/scripts/check_error_notification.sh "no_md5_files_found!"
 fi
 
 find . -type f -name '*.md5' ! -name '*.md5.md5' -exec bash -c \

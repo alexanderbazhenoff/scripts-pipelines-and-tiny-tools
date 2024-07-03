@@ -18,7 +18,7 @@ final String StartNode = 'master'
 final String ExecutionNode = 'dhcpd-server.domain'
 
 // Repo URL of 'get_dhcpd_leases.py' script, e.g: 'git@github.com:alexanderbazhenoff/various-scripts.git'
-final String GitProjectUrlOfTheScript = 'https://github.com/alexanderbazhenoff/various-scripts.git'
+final String GitProjectUrlOfTheScript = 'https://github.com/alexanderbazhenoff/scripts-pipelines-and-tiny-tools.git'
 
 // Full path inside the repo to run 'get_dhcpd_leases.py' script
 final String ScriptPathInsideTheRepo = 'network/get_dhcpd_leases/get_dhcpd_leases.py'

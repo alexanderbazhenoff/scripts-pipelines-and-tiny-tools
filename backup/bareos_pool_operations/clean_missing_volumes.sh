@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # Physically delete non-existent volumes from Pool in the Bareos database.
 # Copyright (c) 2018-2024, Aleksandr Bazhenov.
 
@@ -12,10 +11,8 @@
 # WARNING! Running this file may cause a potential data loss and assumes you accept
 # that you know what you're doing. All actions with this script at your own risk.
 
-
 # Set Pool path, e.g.: /mnt/pool_path
 POOL_PATH="/mnt/backup"
-
 
 cd $POOL_PATH || exit 1
 FILELIST=$(find . -maxdepth 1 -type f -printf "%f\n")

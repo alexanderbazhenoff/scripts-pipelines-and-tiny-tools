@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # md5 checksum calculation for $SOURCE_PATH
 
 # Copyright (c) 2021, Aleksandr Bazhenov
@@ -13,9 +12,7 @@
 # Warning! Running this file you accept that you know what you're doing. All
 # actions with this script are at your own risk.
 
-
 SOURCE_PATH="/mnt/backup/"
-
 
 usage_error() {
   echo "Error: unrecognized option: $POSITIONAL"
@@ -29,8 +26,8 @@ usage_error() {
 check_md5() {
   FILENAME="$1"
   echo "Checking exising ${FILENAME#./}'s md5..."
-  md5sum -c "$FILENAME.md5" || \
-    (echo "Re-calculating md5 for $FILENAME..." && \
+  md5sum -c "$FILENAME.md5" ||
+    (echo "Re-calculating md5 for $FILENAME..." &&
       md5sum -b "$FILENAME" | tee "$FILENAME".md5)
 }
 
@@ -44,7 +41,7 @@ while [[ $# -gt 0 ]]; do
     shift
     ;;
 
-  *)                   # unknown option
+  *) # unknown option
     POSITIONAL+=("$1")
     usage_error
     ;;
@@ -58,5 +55,5 @@ HOSTNAME="$(hostname)"
 echo "Ready to calculate md5 checksum on $HOSTNAME for directory: $SOURCE_PATH"
 
 find . ! -name '*.md5' -type f -exec bash -c \
-  'if [[ -f $1.md5 ]]; then check_md5 $1; else md5sum -b $1 | tee $1.md5; fi' -- {} \; || \
+  'if [[ -f $1.md5 ]]; then check_md5 $1; else md5sum -b $1 | tee $1.md5; fi' -- {} \; ||
   /./opt/scripts/check_error_notification.sh "md5" && exit 1

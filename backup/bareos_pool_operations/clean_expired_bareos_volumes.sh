@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # Clean expired volumes from Bareos storage pool script.
 # Copyright (c) 2018-2024, Aleksandr Bazhenov.
 
@@ -29,12 +28,10 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 # -------------------------------------------------------------------------------------
 # WARNING! Running this file may cause a potential data loss and assumes you accept
 # that you know what you're doing. All actions with this script at your own risk.
 # -------------------------------------------------------------------------------------
-
 
 # Requirements:
 #    * permissions to run 'bconsole' command and access to $pool_path
@@ -50,14 +47,12 @@
 # For more information about volume status read Bareos manual:
 #   * http://doc.bareos.org/master/html/bareos-manual-main-reference.html
 
-
 # Logs file path
 # Leave empty if you don't wish additional log file
 LOG_PATH=""
 
 # Path of the pool, e.g.: /mnt/pool_path
 POOL_PATH="/mnt/backup"
-
 
 # Process volume function. In test mode prints only command (use for debug).
 process_volume() {
@@ -99,7 +94,6 @@ print_usage_help() {
   exit 1
 }
 
-
 # entry point
 POOL_NAME="Full-"
 POOL_ACTION="delete"
@@ -111,33 +105,33 @@ while [[ $# -gt 0 ]]; do
   KEY="$1"
 
   case $KEY in
-  -n | --name )
+  -n | --name)
     POOL_NAME="$2"
     shift
     shift
     ;;
-  -a | --action )
+  -a | --action)
     POOL_ACTION="$2"
     shift
     shift
     ;;
-  -e | --expire )
+  -e | --expire)
     POOL_EXPIRE="$2"
     shift
     shift
     ;;
-  -f | --filter )
+  -f | --filter)
     POOL_FILTER="$2"
     shift
     shift
     ;;
-  -d | --dry-run )
+  -d | --dry-run)
     DRY_RUN="$2"
     shift
     shift
     ;;
-  *)                     # unknown option
-    POSITIONAL+=("$1")   # save it in an array for later
+  *)                   # unknown option
+    POSITIONAL+=("$1") # save it in an array for later
     shift
     ;;
   esac
@@ -147,15 +141,12 @@ done
 if [[ $DRY_RUN != "no" ]] && [[ $SELECTION != "yes" ]]; then
   POSITIONAL+=("$SELECTION")
 fi
-for VALUE in "${POSITIONAL[@]}"
-do
+for VALUE in "${POSITIONAL[@]}"; do
   echo "$VALUE"
   if [[ -n $VALUE ]]; then
     print_usage_help
   fi
 done
-
-
 
 printf "%s %s\n" "Performing '${POOL_ACTION}' '${POOL_NAME}' volumes after '${POOL_EXPIRE}' days, filtered by" \
   "'${POOL_FILTER}' status... Test mode: '${DRY_RUN}'."
@@ -166,15 +157,14 @@ if [[ $POOL_ACTION = "delete" ]] || [[ $POOL_ACTION = "prune" ]] || [[ $POOL_ACT
     printf "%s %s\n" "No expired by volumes in '$POOL_NAME' pool by specified criteria ('$POOL_EXPIRE' days), nothing" \
       "to '$POOL_ACTION'."
   fi
-  for FILENAME in $FILELIST
-  do
+  for FILENAME in $FILELIST; do
     # shellcheck disable=SC2012
     FILEDATE=$(ls -lh "$FILENAME" | awk '{print $7" "$6" "$8}')
     if [[ $POOL_FILTER == "none" ]]; then
       process_volume "$FILENAME" "$FILEDATE" "$DRY_RUN"
     else
       # filter by volume status if $POOL_FILTER is not 'none'
-      [[ -n $(echo "list volume" | bconsole | grep "$POOL_FILTER" | grep "$FILENAME" | cut -d ' ' -f6) ]] && \
+      [[ -n $(echo "list volume" | bconsole | grep "$POOL_FILTER" | grep "$FILENAME" | cut -d ' ' -f6) ]] &&
         process_volume "$FILENAME" "$FILEDATE" "$DRY_RUN"
     fi
   done

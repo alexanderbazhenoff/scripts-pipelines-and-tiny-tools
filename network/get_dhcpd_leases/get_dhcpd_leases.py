@@ -30,6 +30,7 @@ Redistribution and use in source and binary forms, with or without
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+# pylint: disable=C0115,C0116,R0912,R0915
 
 import bisect
 import datetime
@@ -57,41 +58,38 @@ def parse_timestamp(raw_str):
     if len(tokens) == 1:
         if tokens[0].lower() == NEVER:
             return NEVER
-
-        else:
-            raise ParseError("timestamp")
-
-    elif len(tokens) == 3:
-        return datetime.datetime.strptime(" ".join(tokens[1:]), "%Y/%m/%d %H:%M:%S")
-
-    else:
         raise ParseError("timestamp")
 
+    if len(tokens) == 3:
+        return datetime.datetime.strptime(" ".join(tokens[1:]), "%Y/%m/%d %H:%M:%S")
 
-def timestamp_is_ge(t1, t2):
-    if t1 == NEVER:
+    raise ParseError("timestamp")
+
+
+def timestamp_is_ge(time1, time2):
+    if time1 == NEVER:
         return True
 
-    elif t2 == NEVER:
+    if time2 == NEVER:
         return False
 
-    else:
-        return t1 >= t2
+    return time1 >= time2
 
 
-def timestamp_is_lt(t1, t2):
-    if t1 == NEVER:
+def timestamp_is_lt(time1, time2):
+    if time1 == NEVER:
         return False
 
-    elif t2 == NEVER:
+    if time2 == NEVER:
         return True
 
-    else:
-        return t1 < t2
+    return time1 < time2
 
 
-def timestamp_is_between(t, t_start, tend):
-    return (not t_start or timestamp_is_ge(t, t_start)) and timestamp_is_lt(t, tend)
+def timestamp_is_between(time, t_start, tend):
+    return (not t_start or timestamp_is_ge(time, t_start)) and timestamp_is_lt(
+        time, tend
+    )
 
 
 def parse_hardware(raw_str):
@@ -100,8 +98,7 @@ def parse_hardware(raw_str):
     if len(tokens) == 2:
         return tokens[1]
 
-    else:
-        raise ParseError("hardware")
+    raise ParseError("hardware")
 
 
 def strip_end_quotes(raw_str):
@@ -118,8 +115,7 @@ def parse_binding_state(raw_str):
     if len(tokens) == 2:
         return tokens[1]
 
-    else:
-        raise ParseError("binding state")
+    raise ParseError("binding state")
 
 
 def parse_next_binding_state(raw_str):
@@ -128,8 +124,7 @@ def parse_next_binding_state(raw_str):
     if len(tokens) == 3:
         return tokens[2]
 
-    else:
-        raise ParseError("next binding state")
+    raise ParseError("next binding state")
 
 
 def parse_rewind_binding_state(raw_str):
@@ -138,8 +133,7 @@ def parse_rewind_binding_state(raw_str):
     if len(tokens) == 3:
         return tokens[2]
 
-    else:
-        raise ParseError("next binding state")
+    raise ParseError("next binding state")
 
 
 def parse_leases_file(leases_file):
@@ -196,8 +190,8 @@ def parse_leases_file(leases_file):
             in_failover = True
         elif key == "}":
             if in_lease:
-                for k in valid_keys:
-                    if callable(valid_keys[k]):
+                for k, item in valid_keys.items():
+                    if callable(item):
                         lease_rec[k] = lease_rec.get(k, "")
                     else:
                         lease_rec[k] = False
@@ -221,7 +215,7 @@ def parse_leases_file(leases_file):
 
         elif key in valid_keys:
             if in_lease:
-                value = line[(line.index(key) + len(key)) :]
+                value = line[(line.index(key) + len(key)) :]  # noqa: E203
                 value = value.strip().rstrip(";").rstrip()
 
                 if callable(valid_keys[key]):
@@ -249,10 +243,12 @@ def round_timedelta(t_delta):
 
 
 def timestamp_now():
-    n = datetime.datetime.utcnow()
-    if n.microsecond >= 500000:
-        n += datetime.timedelta(seconds=1)
-    return datetime.datetime(n.year, n.month, n.day, n.hour, n.minute, n.second)
+    date = datetime.datetime.utcnow()
+    if date.microsecond >= 500000:
+        date += datetime.timedelta(seconds=1)
+    return datetime.datetime(
+        date.year, date.month, date.day, date.hour, date.minute, date.second
+    )
 
 
 def lease_is_active(lease_rec, as_of_ts):
@@ -329,13 +325,13 @@ def get_value_for_ends(ends) -> str:
 ##############################################################################
 
 
-my_lease_file = open(DHCP_LEASES_PATH, "r")
-leases = parse_leases_file(my_lease_file)
-my_lease_file.close()
+with open(DHCP_LEASES_PATH, "r", encoding="utf-8") as my_lease_file:
+    leases = parse_leases_file(my_lease_file)
+    my_lease_file.close()
 
-vendors_file = open(VENDORS_FILE_PATH, "r")
-vendors = parse_vendors_file(vendors_file)
-vendors_file.close()
+with open(VENDORS_FILE_PATH, "r", encoding="utf-8") as vendors_file:
+    vendors = parse_vendors_file(vendors_file)
+    vendors_file.close()
 
 now = timestamp_now()
 report_dataset = select_active_leases(leases, now, vendors)

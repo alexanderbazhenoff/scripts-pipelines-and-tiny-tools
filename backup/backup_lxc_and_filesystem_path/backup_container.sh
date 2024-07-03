@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # Backup, tar.gz and encrypt main script.
 # Keep your files with rclone on remote storages/clouds.
 #
@@ -39,12 +38,10 @@
 # Warning! Running this file you accept that you know what you're doing. All
 # actions with this script are at your own risk.
 
-
 # constants
 BACKUP_DESTINATION="/mnt/backup_drive_path"
 BACKUP_SCRIPT_PATH="/opt/scripts/backup_path_tar_gpg.sh"
 ERROR_NOTIFICATION_SCRIPT_PATH="/opt/scripts/error_notification.sh"
-
 
 usage_error() {
   echo "Error: unrecognized option(s): $POSITIONAL"
@@ -59,7 +56,7 @@ usage_error() {
   exit 1
 }
 
-task_error(){
+task_error() {
   local RETURN_CODE=$1
   local ERROR_MESSAGE=$2
   if [[ $RETURN_CODE -ne 0 ]]; then
@@ -68,7 +65,7 @@ task_error(){
   fi
 }
 
-process_path(){
+process_path() {
   local CURRENT_SOURCE_PATH=$1
   local CURRENT_DESTINATION_PATH=$2
   local CURRENT_ACTION=$3
@@ -92,21 +89,21 @@ process_path(){
     CURRENT_DESTINATION_PATH=$DESTINATION_PATH
     echo "Destination path override: $DESTINATION_PATH"
   fi
-    local ARGS="-a $CURRENT_ACTION -s $CURRENT_SOURCE_PATH -d $CURRENT_DESTINATION_PATH "
-    ARGS+="-f $CURRENT_FILENAME -p $CURRENT_PASSWORD "
+  local ARGS="-a $CURRENT_ACTION -s $CURRENT_SOURCE_PATH -d $CURRENT_DESTINATION_PATH "
+  ARGS+="-f $CURRENT_FILENAME -p $CURRENT_PASSWORD "
   if [[ -n "$CURRENT_EXCLUDE_LIST" ]]; then
     ARGS+="-e $CURRENT_EXCLUDE_LIST "
   fi
-  if $CURRENT_ENCRYPT_FLAG ; then
+  if $CURRENT_ENCRYPT_FLAG; then
     ARGS+="--encrypt "
   fi
-  if $CURRENT_COMPRESS_FLAG ; then
+  if $CURRENT_COMPRESS_FLAG; then
     ARGS+="--compress "
   fi
-  if $CURRENT_CLEAN_DEST_FLAG ; then
+  if $CURRENT_CLEAN_DEST_FLAG; then
     ARGS+="--clean-destination "
   fi
-  if $DEBUG ; then
+  if $DEBUG; then
     ARGS+="--debug"
   fi
   # set your params for chrt command to change process priority.
@@ -151,7 +148,6 @@ while [[ $# -gt 0 ]]; do
     shift
     ;;
 
-
   *)                   # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift
@@ -170,7 +166,7 @@ echo "DEBUG                     = ${DEBUG}"
 echo ""
 
 # error handling
-if $DEBUG ; then
+if $DEBUG; then
   set -x
 fi
 if [[ -n $1 ]]; then
@@ -178,12 +174,12 @@ if [[ -n $1 ]]; then
   usage_error
 fi
 
-if $BACKUP_MODE && $RESTORE_MODE ; then
+if $BACKUP_MODE && $RESTORE_MODE; then
   echo "Error! Only one mode --backup or --restore should be specified."
   usage_error
 fi
 
-if ! $BACKUP_MODE && ! $RESTORE_MODE ; then
+if ! $BACKUP_MODE && ! $RESTORE_MODE; then
   echo "Action wasn't set. Nothing to do."
   usage_error
 fi
@@ -200,15 +196,16 @@ else
   PASSWORD=$(cat "$PASSWORD_FILE_PATH")
 fi
 
-if $BACKUP_MODE ; then
+if $BACKUP_MODE; then
   ACTION="backup"
 else
   ACTION="restore"
 fi
 
-
 # backup
-sync; echo 3 > /proc/sys/vm/drop_caches; sync
+sync
+echo 3 >/proc/sys/vm/drop_caches
+sync
 sleep 5
 
 # Backup all these scripts from /opt/script
@@ -221,4 +218,6 @@ process_path "/var/lib/lxc/bareos.emzior" "$BACKUP_DESTINATION" "$ACTION" \
   "bareos_lxc_$(date +%y%m%d).tar.gz" "$PASSWORD" false true true "/opt/scripts/lxc_exclude"
 task_error $? '/var/lib/lxc/lxc_container_name'
 
-sync; echo 3 > /proc/sys/vm/drop_caches; sync
+sync
+echo 3 >/proc/sys/vm/drop_caches
+sync

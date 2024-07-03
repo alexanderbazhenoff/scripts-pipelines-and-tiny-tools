@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # BACKUP SCRIPT FOR KVM VIRTUAL MACHINES
 
 # Copyright (c) July 2018, Aleksandr Bazhenov
@@ -30,7 +29,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 # WARNING! Running this file may cause a potential data loss and assumes you accept
 # that you know what you're doing. All actions with this script at your own risk.
 
@@ -49,13 +47,11 @@
 #        or
 #         # kvm_backup.sh --clean vm_name1 vm_name2
 
-
 # specify backup folder here:
 BACKUP_DIR="/var/lib/libvirt/images/backup"
 
 # specify log file path here:
 LOGFILE="/var/log/kvm_backup.log"
-
 
 # start new log
 starting_logfile() {
@@ -65,7 +61,7 @@ starting_logfile() {
 
 # backup config of VM
 backup_vm_config() {
-  RESULT_CMD=$(virsh dumpxml "$ACTIVEVM" > "$BACKUP_DIR/$ACTIVEVM/$ACTIVEVM.xml")
+  RESULT_CMD=$(virsh dumpxml "$ACTIVEVM" >"$BACKUP_DIR/$ACTIVEVM/$ACTIVEVM.xml")
   echo "$(date +'%Y-%m-%d %H:%M:%S') Dumping xml... ${RESULT_CMD//\\n/ }" | tee -a $LOGFILE
 }
 
@@ -73,7 +69,7 @@ backup_vm_config() {
 vm_disks_get() {
   DISK_LIST=$(virsh domblklist "$ACTIVEVM" | awk '{if(NR>2)print}' | awk '{print $1}')
   DISK_PATH=$(virsh domblklist "$ACTIVEVM" | awk '{if(NR>2)print}' | awk '{print $2}')
-  echo "$(date +'%Y-%m-%d %H:%M:%S') VM disk(s) / path of disk(s): ${DISK_LIST//$'\n'/, } -> ${DISK_PATH//$'\n'/, }" | \
+  echo "$(date +'%Y-%m-%d %H:%M:%S') VM disk(s) / path of disk(s): ${DISK_LIST//$'\n'/, } -> ${DISK_PATH//$'\n'/, }" |
     tee -a $LOGFILE
 }
 
@@ -82,9 +78,9 @@ get_vm_shapshots() {
   virsh domblklist "$1" | grep '.snapshot' | awk '{print $2}'
 }
 
-
 # entry
-COMMAND_USE=$1; shift
+COMMAND_USE=$1
+shift
 
 if [ "$EUID" -ne 0 ]; then
   echo "Please run as root."
@@ -97,8 +93,7 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
   # making backup of running VMs on (active)
   #
   if [[ $COMMAND_USE == "--active" ]]; then
-    for ACTIVEVM in "${@}"
-    do
+    for ACTIVEVM in "${@}"; do
       starting_logfile
       backup_vm_config
       vm_disks_get
@@ -119,8 +114,7 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
           echo "$(date +'%Y-%m-%d %H:%M:%S') There's no guaranty that resulting copy of VM may have consistent data."
         fi
 
-        for PATH_ITEM in $DISK_PATH
-        do
+        for PATH_ITEM in $DISK_PATH; do
           # getting filename from the path
           FILENAME=$(basename "$PATH_ITEM")
           echo "$(date +'%Y-%m-%d %H:%M:%S') Device image name is: $FILENAME" | tee -a $LOGFILE
@@ -133,8 +127,7 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
           fi
         done
 
-        for DISK_ITEM in $DISK_LIST
-        do
+        for DISK_ITEM in $DISK_LIST; do
           # getting a path to a snapshot
           SNAPSHOT_PATH=$(virsh domblklist "$ACTIVEVM" | grep "$DISK_ITEM" | awk '{print $2}')
           if [[ $SNAPSHOT_PATH == "-" ]] || [[ $SNAPSHOT_PATH =~ \.iso$ ]] || [[ $SNAPSHOT_PATH == \.ISO$ ]]; then
@@ -144,7 +137,7 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
             echo "$(date +'%Y-%m-%d %H:%M:%S') Commit $SNAPSHOT_PATH of $ACTIVEVM to $DISK_ITEM image"
 
             # block-commit snapshot to disk image
-            RESULT_CMD=$(virsh blockcommit "$ACTIVEVM" "$DISK_ITEM" --active --verbose --pivot 2> /dev/null || \
+            RESULT_CMD=$(virsh blockcommit "$ACTIVEVM" "$DISK_ITEM" --active --verbose --pivot 2>/dev/null ||
               echo "Nothing to commit with $DISK_ITEM or just failed.")
             echo "$(date +'%Y-%m-%d %H:%M:%S')${RESULT_CMD//$'\n'/ }"
             if [[ $SNAPSHOT_PATH =~ \.snapshot$ ]]; then
@@ -165,8 +158,7 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
   # making backup of stopped VMs (stop, backup, run)
   #
   if [[ $COMMAND_USE = "--stopped" ]]; then
-    for ACTIVEVM in "${@}"
-    do
+    for ACTIVEVM in "${@}"; do
       starting_logfile
       backup_vm_config
       vm_disks_get
@@ -174,36 +166,33 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
       COUNTER=100
       (
         # creating backup subdirectory
-        echo "$(date +'%Y-%m-%d %H:%M:%S') Creating backup subdirectory... $(mkdir "$BACKUP_DIR/$ACTIVEVM" 2>&1 && \
+        echo "$(date +'%Y-%m-%d %H:%M:%S') Creating backup subdirectory... $(mkdir "$BACKUP_DIR/$ACTIVEVM" 2>&1 &&
           echo "OK.")"
         # shutdown VM
-        echo "$(date +'%Y-%m-%d %H:%M:%S') Shutting down $ACTIVEVM... $(virsh shutdown "$ACTIVEVM" 2>&1 | \
+        echo "$(date +'%Y-%m-%d %H:%M:%S') Shutting down $ACTIVEVM... $(virsh shutdown "$ACTIVEVM" 2>&1 |
           sed -z "s/\n//g")"
         # wait while VM is not running
-        while (virsh list | grep "$ACTIVEVM " > /dev/null) && [[ $COUNTER -gt 0 ]]
-        do
+        while (virsh list | grep "$ACTIVEVM " >/dev/null) && [[ $COUNTER -gt 0 ]]; do
           sleep 3
-          (( COUNTER-- )) || true
+          ((COUNTER--)) || true
           echo "$(date +'%Y-%m-%d %H:%M:%S') Waiting $ACTIVEVM becomes down."
         done
 
         # perform force power-off if VM is still running
-        if (virsh list | grep "$ACTIVEVM " > /dev/null); then
+        if (virsh list | grep "$ACTIVEVM " >/dev/null); then
           echo "$(date +'%Y-%m-%d %H:%M:%S') Unable to shutdown $ACTIVEVM. Performing force power-off... $(virsh \
             destroy "$ACTIVEVM" 2>&1 | sed -z "s/\n//g")" 2>&1
 
-          while (virsh list | grep "$ACTIVEVM " > /dev/null) && [[ $COUNTER -gt 0 ]]
-          do
+          while (virsh list | grep "$ACTIVEVM " >/dev/null) && [[ $COUNTER -gt 0 ]]; do
             sleep 1
-            (( COUNTER++ )) || true
+            ((COUNTER++)) || true
           done
 
         else
           echo "$(date +'%Y-%m-%d %H:%M:%S') $ACTIVEVM stopped."
         fi
 
-        for PATH_ITEM in $DISK_PATH
-        do
+        for PATH_ITEM in $DISK_PATH; do
           # getting filename from the path
           FILENAME=$(basename "$PATH_ITEM")
           if [[ $PATH_ITEM == "-" ]] || [[ $PATH_ITEM =~ \.iso$ ]] || [[ $PATH_ITEM == \.ISO$ ]]; then
@@ -227,8 +216,7 @@ if [[ $COMMAND_USE == "--active" ]] || [[ $COMMAND_USE == "--stopped" ]] || [[ $
   # clean previous backups
   #
   if [[ $COMMAND_USE = "--clean" ]]; then
-    for ACTIVEVM in "${@}"
-    do
+    for ACTIVEVM in "${@}"; do
       # clean content of the folder
       echo "$(date +'%Y-%m-%d %H:%M:%S') Performing clean-up of $ACTIVEVM in $BACKUP_DIR... $(rm \
         -rfv "${BACKUP_DIR:?}/$ACTIVEVM" 2>&1 && echo "OK")" 2>&1 | tee -a $LOGFILE

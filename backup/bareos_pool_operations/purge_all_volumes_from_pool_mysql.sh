@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # Set all volumes in the pool to "purged" state (Bareos MySQL installation).
 # Copyright (c) 2018-2024. Aleksandr Bazhenov.
 
@@ -12,7 +11,6 @@
 # WARNING! Running this file may cause a potential data loss and assumes you accept
 # that you know what you're doing. All actions with this script at your own risk.
 
-
 # Set pool name, e.g.: "Incremental" or "Full"
 POOL_NAME="Full"
 
@@ -22,7 +20,6 @@ VOLUMES=$(mysql -u root -B -e'select VolumeName from Media order by VolumeName;'
 echo "This will purge all volumes in $POOL_NAME. Sleep 30 for sure."
 sleep 30
 
-for VOL_ITEM in $VOLUMES
-do
-   echo "purge volume=$VOL_ITEM yes" | bconsole
+for VOL_ITEM in $VOLUMES; do
+  echo "purge volume=$VOL_ITEM yes" | bconsole
 done
