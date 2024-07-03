@@ -29,7 +29,7 @@ NETWORK="172.16.0.1/24"
 
 echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
 if ! sudo brctl show | grep -q ${BRIDGE_NAME}; then
-	sudo brctl addbr $BRIDGE_NAME
-	ip addr add $NETWORK dev $BRIDGE_NAME
-	ip link set $BRIDGE_NAME up
+  sudo brctl addbr $BRIDGE_NAME
+  ip addr add $NETWORK dev $BRIDGE_NAME
+  ip link set $BRIDGE_NAME up
 fi
