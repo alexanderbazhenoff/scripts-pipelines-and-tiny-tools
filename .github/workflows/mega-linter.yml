@@ -1,6 +1,6 @@
 ---
 name: MegaLinter
-
+# kics-scan disable=555ab8f9-2001-455e-a077-f2d0f41e2fb9
 # Trigger mega-linter at every push. Action will also be visible from Pull
 # Requests to main
 on: # yamllint disable-line rule:truthy
@@ -59,7 +59,6 @@ jobs:
       # MegaLinter
       - name: MegaLinter
         # You can override MegaLinter flavor used to have faster performances
-#kics ignore-line
         uses: oxsecurity/megalinter@v7
         id: ml
         # All available variables are described in documentation
@@ -131,7 +130,6 @@ jobs:
       # Create pull request if applicable
       # (for now works only on PR from the same repository, not from forks)
       - name: Create Pull Request with applied fixes
-#kics ignore-line
         uses: peter-evans/create-pull-request@v6
         id: cpr
         if: ${{ env.APPLY_FIXES_IF_PR == 'true' && ! cancelled() }}
