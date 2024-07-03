@@ -14,4 +14,4 @@ MYSQL_SOCKET_PATH='/var/lib/mysql/mysql.sock'
 
 rm -rf "${DB_BACKUP_PATH:?}/"* || true
 mysqldump -u"$DB_USER" -p"$DB_PASSWORD" --quick --max_allowed_packet=1024M --compress --skip-lock-tables \
-  --verbose $DB_NAME --socket=$MYSQL_SOCKET_PATH --single-transaction > "$DB_BACKUP_PATH$DB_BACKUP_FILENAME"
+  --verbose $DB_NAME --socket=$MYSQL_SOCKET_PATH --single-transaction >"$DB_BACKUP_PATH$DB_BACKUP_FILENAME"

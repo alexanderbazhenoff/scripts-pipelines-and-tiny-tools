@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # Re-balance btrfs filesystem script
 #
 # This Source Code Form is subject to the terms of the BSD 3-Clause License. If a copy of the

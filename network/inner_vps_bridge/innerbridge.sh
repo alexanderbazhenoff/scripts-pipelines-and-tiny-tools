@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # An example how to organize the network inside your VPS by linux bridge:
 
 # Usage:
@@ -20,12 +19,10 @@
 # You can obtain one at:
 # https://github.com/alexanderbazhenoff/scripts-pipelines-and-tiny-tools/blob/master/LICENSE
 
-
 # Specify bridge name
 BRIDGE_NAME="br0"
 # Specify inner-network with CIDR
 NETWORK="172.16.0.1/24"
-
 
 echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
 if ! sudo brctl show | grep -q ${BRIDGE_NAME}; then

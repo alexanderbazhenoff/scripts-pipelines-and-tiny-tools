@@ -1,9 +1,6 @@
 {
   "threshold": 0,
-  "reporters": [
-    "html",
-    "markdown"
-  ],
+  "reporters": ["html", "markdown"],
   "ignore": [
     "benchmark/filesystems_benchmarks/btrfs_vs_zfs_raid1_vs_raid10_options_performance.sh",
     "benchmark/filesystems_benchmarks/single_btrfs_disk_performance.sh",

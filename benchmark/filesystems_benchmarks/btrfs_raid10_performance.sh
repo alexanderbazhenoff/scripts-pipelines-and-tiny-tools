@@ -21,8 +21,7 @@ RAMDISK_SIZE=62 # in gigabytes
 test_wr() {
 
   # clean files from pool
-  for i in {1..3}
-  do
+  for i in {1..3}; do
     rm -f "${POOL_PATH}/${FILENAME}-${i}"
   done
 
@@ -31,25 +30,24 @@ test_wr() {
   cp "${SOURCE_FILE_PATH}/$FILENAME" "${RAMDISK_PATH}/$FILENAME"
   echo "write 3 copies:"
 
-  for i in {1..3}
-  do
+  for i in {1..3}; do
     rsync --info=progress2 "${RAMDISK_PATH}/$FILENAME" "${POOL_PATH}/${FILENAME}-${i}"
     uptime | printf "\e[1A\t\t\t\t\t\t\t\t  load %s\n" "$(uptime | sed 's/^.*average:/average:/')"
-    sync; echo 3 > /proc/sys/vm/drop_caches
+    sync
+    echo 3 >/proc/sys/vm/drop_caches
   done
 
   # read performance testing
   rm -f "${RAMDISK_PATH}/$FILENAME"
   echo "read 3 copies:"
-  for i in {1..3}
-  do
+  for i in {1..3}; do
     rsync --info=progress2 "${POOL_PATH}/${FILENAME}-${i}" "${RAMDISK_PATH}/$FILENAME"
     uptime | printf "\e[1A\t\t\t\t\t\t\t\t  load %s\n" "$(uptime | sed 's/^.*average:/average:/')"
-    sync; echo 3 > /proc/sys/vm/drop_caches
+    sync
+    echo 3 >/proc/sys/vm/drop_caches
     rm -f "${RAMDISK_PATH}/$FILENAME"
   done
 }
-
 
 mkdir $RAMDISK_PATH || true
 mount -t tmpfs -o size="$RAMDISK_SIZE"g tmpfs $RAMDISK_PATH
