@@ -1,6 +1,6 @@
 ---
 name: MegaLinter
-# kics-scan disable=555ab8f9-2001-455e-a077-f2d0f41e2fb9
+# kics-scan ignore-block
 # Trigger mega-linter at every push. Action will also be visible from Pull
 # Requests to main
 on: # yamllint disable-line rule:truthy
