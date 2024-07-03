@@ -35,6 +35,7 @@ import logging
 import os
 import sys
 
+# pylint: disable=E0401
 import requests
 
 API_TOKEN = None
@@ -171,6 +172,7 @@ def send_message(request_url, args):
 
 if __name__ == "__main__":
     ar = parse_arguments()
+    # pylint: disable=duplicate-code
     logging.basicConfig(
         stream=sys.stdout,
         level=logging.INFO,
