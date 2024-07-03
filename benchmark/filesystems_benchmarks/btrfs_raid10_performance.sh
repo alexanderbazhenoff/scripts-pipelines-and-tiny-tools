@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # btrfs raid10 performance testing. Performs several iterations of write and read using ramdisk.
 # -------------------------------------------------------------------------------------------------
 # Running this file may cause a potential data loss and assumes you accept that you know what
@@ -10,15 +9,13 @@
 # This Source Code Form is subject to the terms of the BSD 3-Clause License. You can obtain one at:
 # https://github.com/alexanderbazhenoff/scripts-pipelines-and-tiny-tools/blob/master/LICENSE
 
-
 POOL_PATH="/mnt/ssd"
 FILENAME="vm_image.qcow2"
 RAMDISK_PATH="/mnt/ramdisk"
 SOURCE_FILE_PATH="/var/lib/libvirt/images"
 BLOCK_DEVICES="/dev/sdc1 /dev/sde1 /dev/sdg1 /dev/sdi1"
 BTRFS_MOUNT_OPTIONS="autodefrag,space_cache=v2,ssd,ssd_spread"
-RAMDISK_SIZE=62            # in gigabytes
-
+RAMDISK_SIZE=62 # in gigabytes
 
 # perform write-read with rsync
 test_wr() {

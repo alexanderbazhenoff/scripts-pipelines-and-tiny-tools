@@ -220,7 +220,7 @@ def parse_leases_file(leases_file):
 
         elif key in valid_keys:
             if in_lease:
-                value = line[(line.index(key) + len(key)):]
+                value = line[(line.index(key) + len(key)) :]
                 value = value.strip().rstrip(";").rstrip()
 
                 if callable(valid_keys[key]):

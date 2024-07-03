@@ -148,14 +148,14 @@ while [[ $# -gt 0 ]]; do
     shift
     ;;
 
-  *)                    # unknown option
-    POSITIONAL+=("$1")  # save it in an array for later
+  *)                   # unknown option
+    POSITIONAL+=("$1") # save it in an array for later
     shift
     ;;
   esac
 done
 
-set -- "${POSITIONAL[@]}"  # restore positional parameters
+set -- "${POSITIONAL[@]}" # restore positional parameters
 
 echo "SOURCE PATH (global)      = ${SOURCE_PATH}"
 echo "DESTINATION PATH (global) = ${DESTINATION_PATH}"
