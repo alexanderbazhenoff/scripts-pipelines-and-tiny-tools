@@ -27,7 +27,7 @@ env:
 
   # If APPLY_FIXES is used, defines if the fixes are directly committed (commit)
   # or posted in a PR (pull_request)
-  APPLY_FIXES_MODE: pull_request
+  APPLY_FIXES_MODE: commit
 
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}
@@ -161,15 +161,12 @@ jobs:
         run: sudo chown -Rc $UID .git/
 
       - name: Commit and push applied linter fixes
-        uses: stefanzweifel/git-auto-commit-action@v5
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "<>"
+          if ! git diff-index --quiet HEAD; then
+            git commit -am "[MegaLinter] Apply linters fixes"
+            git push
+          fi
+        shell: bash
         if: ${{ env.APPLY_FIXES_IF_COMMIT == 'true' && ! cancelled() }}
-        with:
-          branch: >-
-            ${{
-              github.event.pull_request.head.ref ||
-              github.head_ref ||
-              github.ref
-            }}
-          commit_message: "[MegaLinter] Apply linters fixes"
-          commit_user_name: megalinter-bot
-          commit_user_email: <>
