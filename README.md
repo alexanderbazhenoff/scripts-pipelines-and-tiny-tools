@@ -7,7 +7,7 @@
 
 A set of system administration, Linux/Unix engineering scripts, CI pipelines, and tiny tools.
 <!-- markdown-link-check-disable -->
-[![MegaLinter](https://github.com/alexanderbazhenoff/jenkins-universal-wrapper-pipeline/actions/workflows/mega-linter.yml/badge.svg?branch=master)](https://megalinter.io/)
+[![MegaLinter](https://github.com/alexanderbazhenoff/scripts-pipelines-and-tiny-tools/actions/workflows/mega-linter.yml/badge.svg?branch=master)](https://megalinter.io/)
 [![GitHub License](https://img.shields.io/github/license/alexanderbazhenoff/scripts-pipelines-and-tiny-tools)](LICENSE)
 <!-- markdown-link-check-enable -->
 </div>
