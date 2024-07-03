@@ -2,16 +2,3 @@
 DISABLE_LINTERS:
   - REPOSITORY_DEVSKIM
   - SPELL_CSPELL
-PRE_COMMANDS:
-  - command: python3 -m pip install poetry
-    cwd: root
-    continue_if_failed: false
-  - command: poetry export --without-hashes -f requirements.txt -o /venvs/requirements.txt
-    cwd: workspace
-    continue_if_failed: false
-  - command: python3 -m pip install --no-cache-dir -r /venvs/requirements.txt
-    venv: pylint
-    continue_if_failed: false
-  - command: python3 -m pip install --no-cache-dir -r /venvs/requirements.txt
-    venv: pyright
-    continue_if_failed: false
