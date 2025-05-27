@@ -186,7 +186,7 @@ fi
 
 if [[ -z $PASSWORD_FILE_PATH ]]; then
   echo "Error! Password path/file wasn't specified."
-  usage_eror
+  usage_error
 fi
 
 if [[ ! -f "$PASSWORD_FILE_PATH" ]]; then

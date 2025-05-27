@@ -39,21 +39,30 @@
 # actions with this script are at your own risk.
 
 usage_error() {
-  echo "Error: unrecognized option(s): $POSITIONAL"
-  echo ""
-  echo "Usage:"
-  echo "   -a|--action backup|restore"
-  echo "   -s|--source|--source-path /path/to/source/folder/or/file"
-  echo "     (Remember that you should set /path/to/file in encrypt and no compression mode)"
-  echo "   -d|--destination|--destination-path /path/to/destination/folder"
-  echo "   -f|--filename some_filename"
-  echo "   -p|--password some_password"
-  echo "   -e|--excludelist /path/to/filename_of_list_to_exclude.txt"
-  echo "   --encrypt"
-  echo "   --compress"
-  echo "   --clean-destination"
-  echo "   --debug"
+  cat <<EOF >&2
+Error: unrecognized option(s): $POSITIONAL
+
+Usage:
+   -a|--action backup|restore
+   -s|--source|--source-path /path/to/source/folder/or/file
+     (Remember that you should set /path/to/file in encrypt and no compression mode)
+   -d|--destination|--destination-path /path/to/destination/folder
+   -f|--filename some_filename
+   -p|--password some_password
+   -e|--exclude-list /path/to/filename_of_list_to_exclude.txt
+   --encrypt
+   --compress
+   --clean-destination
+   --debug
+EOF
   exit 1
+}
+
+clean_destination() {
+  $CLEAN_DESTINATION && (
+    echo "Removing previous $1 file"
+    rm -f "$1"
+  )
 }
 
 FILENAME=""
@@ -69,33 +78,27 @@ while [[ $# -gt 0 ]]; do
   case $key in
   -a | --action)
     ACTION="$2"
-    shift
-    shift
+    shift 2
     ;;
   -s | --source | --source-path)
     SOURCE_PATH="$2"
-    shift
-    shift
+    shift 2
     ;;
   -d | --destination | --destination-path)
     DESTINATION_PATH="$2"
-    shift
-    shift
+    shift 2
     ;;
   -f | --filename)
     FILENAME="$2"
-    shift
-    shift
+    shift 2
     ;;
   -p | --password)
     PASSWORD="$2"
-    shift
-    shift
+    shift 2
     ;;
-  -e | --excludelist)
+  -e | --exclude-list)
     COMPRESS_EXCLUDE="--exclude-from=$2"
-    shift
-    shift
+    shift 2
     ;;
   --encrypt)
     ENCRYPT=true
@@ -123,31 +126,16 @@ done
 
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-if [[ -z $SOURCE_PATH ]]; then
-  SOURCE_PATH=$(pwd)
-fi
-if [[ -z $DESTINATION_PATH ]]; then
-  DESTINATION_PATH=$(pwd)
-fi
+FULL_SOURCE_PATH="${SOURCE_PATH:-"$(pwd)/$FILENAME"}"
+FULL_DESTINATION_PATH="${DESTINATION_PATH:-"$(pwd)/$FILENAME"}"
+CURRENT_PATH="$(pwd)"
 
-echo "DATE                 = $(date)"
-echo "ACTION               = ${ACTION}"
-echo "SOURCE PATH          = ${SOURCE_PATH}"
-echo "DESTINATION PATH     = ${DESTINATION_PATH}"
-echo "ENCRYPT              = ${ENCRYPT}"
-echo "CLEAN DESTINATION    = ${CLEAN_DESTINATION}"
-echo "COMPRESS             = ${COMPRESS}"
-# shellcheck disable=SC2001
-echo "PASSWORD             = $(echo $$PASSWORD | sed s/\./*/g)"
-
-FULL_DESTINATION_PATH="${DESTINATION_PATH}/${FILENAME}"
-FULL_SOURCE_PATH="${SOURCE_PATH}/${FILENAME}"
-CURRENT_PATH=$(pwd)
-
-echo "FILENAME             = ${FILENAME}"
-echo "CURRENT PATH         = ${CURRENT_PATH}"
-echo "COMPRESS EXTRA ARGS  = ${COMPRESS_EXCLUDE}"
-echo ""
+for v in DATE ACTION ENCRYPT CLEAN_DESTINATION COMPRESS FILENAME CURRENT PATH COMPRESS EXTRA ARGS; do
+  printf '%-20s %s\n' "$v" "${!v}"
+done
+printf '%-20s %s\n' SOURCE_PATH "$(dirname "$FULL_SOURCE_PATH")"
+printf '%-20s %s\n' DESTINATION_PATH "$(dirname "$FULL_DESTINATION_PATH")"
+printf '%-20s %s\n' PASSWORD "$(echo $PASSWORD | sed s/\./*/g)"
 
 # error handling
 if [[ -n $1 ]]; then
@@ -162,7 +150,7 @@ fi
 
 if [[ -z $FILENAME ]]; then
   echo "Error! Filename wasn't specified."
-  usage_eror
+  usage_error
 fi
 
 if [[ $ENCRYPT && -z $PASSWORD ]]; then
@@ -184,71 +172,45 @@ set -e
 
 # backup or restore with compression and no encryption
 if [[ $ACTION == "backup" ]] && $COMPRESS && ! $ENCRYPT; then
-  if $CLEAN_DESTINATION; then
-    if [[ -f "$FULL_DESTINATION_PATH" ]]; then
-      echo "Removing previous ${FULL_DESTINATION_PATH} file"
-      rm -f "$FULL_DESTINATION_PATH"
-    fi
-  fi
-  cd "$SOURCE_PATH" || exit 1
-  tar "$COMPRESS_EXCLUDE" -czvf "$FULL_DESTINATION_PATH" . --numeric-owner
+  clean_destination "$FULL_DESTINATION_PATH"
+  tar $COMPRESS_EXCLUDE --numeric-owner -C "$(dirname "$FULL_SOURCE_PATH")" -czvf "$FULL_DESTINATION_PATH" .
 fi
 if [[ $ACTION == "restore" ]] && $COMPRESS && ! $ENCRYPT; then
   if $CLEAN_DESTINATION; then
     echo "Unable to clean-up path $DESTINATION_PATH in '-a restore --compress' mode."
   fi
-  cd "$DESTINATION_PATH" || exit 1
-  tar --numeric-owner -xzvf "$FULL_SOURCE_PATH" --directory "$(pwd)"
+  tar --numeric-owner -C "$(dirname "$FULL_DESTINATION_PATH")" -xzvf "$FULL_SOURCE_PATH"
 fi
 
 # backup or restore with compression and encryption
 if $ENCRYPT && $COMPRESS; then
   if [[ $ACTION == "backup" ]]; then
-    if $CLEAN_DESTINATION; then
-      if [[ -f "$FULL_DESTINATION_PATH.enc" ]]; then
-        echo "Removing previous ${FULL_DESTINATION_PATH}.enc file"
-        rm -f "$FULL_DESTINATION_PATH".enc
-      fi
-    fi
-    cd "$SOURCE_PATH" || exit 1
-    tar "$COMPRESS_EXCLUDE" --numeric-owner -czvf - . | gpg2 --symmetric --batch --yes \
-      --passphrase "$PASSWORD" --output "$FULL_DESTINATION_PATH".enc --yes --force-mdc
+    clean_destination "$FULL_DESTINATION_PATH".enc
+    tar $COMPRESS_EXCLUDE --numeric-owner -C "$(dirname "$FULL_SOURCE_PATH")" -czvf - . | gpg2 --symmetric --batch \
+      --yes --passphrase "$PASSWORD" --output "$FULL_DESTINATION_PATH".enc --force-mdc
   fi
   if [[ $ACTION == "restore" ]]; then
     if $CLEAN_DESTINATION; then
       echo "Unable to clean-up path $DESTINATION_PATH in '-a restore --encrypt --compress' mode."
     fi
-    cd "$DESTINATION_PATH" || exit 1
-    echo "123"
     gpg2 --decrypt --batch --yes --passphrase "$PASSWORD" "$FULL_SOURCE_PATH".enc |
-      tar --numeric-owner -xzvf -
+      tar --numeric-owner -C "$(dirname "$FULL_DESTINATION_PATH")" -xzvf -
   fi
 fi
 
 # backup or restore with encryption and no compression
 if $ENCRYPT && ! $COMPRESS; then
   if [[ $ACTION == "backup" ]]; then
-    if $CLEAN_DESTINATION; then
-      if [[ -f "$FULL_DESTINATION_PATH.enc" ]]; then
-        echo "Removing previous ${FULL_DESTINATION_PATH}.enc file"
-        rm -f "$FULL_DESTINATION_PATH".enc
-      fi
-    fi
-    cd "$SOURCE_PATH" || exit 1
-    gpg2 --symmetric --batch --yes --passphrase "$PASSWORD" \
-      --output "$FULL_DESTINATION_PATH".enc --force-mdc "$FILENAME"
+    clean_destination "$FULL_DESTINATION_PATH".enc
+    gpg2 --symmetric --batch --yes --passphrase "$PASSWORD" --output "$FULL_DESTINATION_PATH".enc --force-mdc \
+      "$FULL_SOURCE_PATH"
     rm -f "$FULL_DESTINATION_PATH"
   fi
   if [[ $ACTION == "restore" ]]; then
-    if $CLEAN_DESTINATION; then
-      if [[ -f "$FULL_DESTINATION_PATH" ]]; then
-        echo "Removing $FULL_DESTINATION_PATH file"
-        rm -f "$FULL_DESTINATION_PATH"
-      fi
-    fi
-    cd "$DESTINATION_PATH" || exit 1
+    clean_destination "$FULL_DESTINATION_PATH"
     gpg2 --decrypt --batch --yes --passphrase "$PASSWORD" \
       --output "$FILENAME" "$FULL_SOURCE_PATH".enc
+    gpg2 --decrypt --batch --yes --passphrase "$PASSWORD" --output "$FULL_DESTINATION_PATH" "$FULL_SOURCE_PATH".enc
   fi
 fi
 
