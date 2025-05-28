@@ -78,18 +78,51 @@ PARSED=$(getopt -o a:s:d:f:p:e: \
 eval set -- "$PARSED"
 while true; do
   case "$1" in
-    -a|--action)         ACTION="$2";                  shift 2 ;;
-    -s|--source|--source-path) SOURCE_PATH="$2";       shift 2 ;;
-    -d|--destination|--destination-path) DESTINATION_PATH="$2"; shift 2 ;;
-    -f|--filename)       FILENAME="$2";                shift 2 ;;
-    -p|--password)       PASSWORD="$2";                shift 2 ;;
-    -e|--exclude-list)   COMPRESS_EXCLUDE="--exclude-from=$2"; shift 2 ;;
-    --encrypt)           ENCRYPT=true;                 shift ;;
-    --compress)          COMPRESS=true;                shift ;;
-    --clean-destination) CLEAN_DESTINATION=true;       shift ;;
-    --debug)             DEBUG=true;                   shift ;;
-    --) shift; break ;;
-    *) usage_error ;;
+  -a | --action)
+    ACTION="$2"
+    shift 2
+    ;;
+  -s | --source | --source-path)
+    SOURCE_PATH="$2"
+    shift 2
+    ;;
+  -d | --destination | --destination-path)
+    DESTINATION_PATH="$2"
+    shift 2
+    ;;
+  -f | --filename)
+    FILENAME="$2"
+    shift 2
+    ;;
+  -p | --password)
+    PASSWORD="$2"
+    shift 2
+    ;;
+  -e | --exclude-list)
+    COMPRESS_EXCLUDE="--exclude-from=$2"
+    shift 2
+    ;;
+  --encrypt)
+    ENCRYPT=true
+    shift
+    ;;
+  --compress)
+    COMPRESS=true
+    shift
+    ;;
+  --clean-destination)
+    CLEAN_DESTINATION=true
+    shift
+    ;;
+  --debug)
+    DEBUG=true
+    shift
+    ;;
+  --)
+    shift
+    break
+    ;;
+  *) usage_error ;;
   esac
 done
 
