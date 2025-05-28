@@ -43,17 +43,17 @@ usage_error() {
 Error: unrecognized option(s): $POSITIONAL
 
 Usage:
-   -a|--action backup|restore
-   -s|--source|--source-path /path/to/source/folder/or/file
-     (Remember that you should set /path/to/file in encrypt and no compression mode)
-   -d|--destination|--destination-path /path/to/destination/folder
-   -f|--filename some_filename
-   -p|--password some_password
-   -e|--exclude-list /path/to/filename_of_list_to_exclude.txt
-   --encrypt
-   --compress
-   --clean-destination
-   --debug
+  -a|--action backup|restore
+  -s|--source|--source-path /path/to/source/folder/or/file
+    (Remember that you should set /path/to/file in encrypt and no compression mode)
+  -d|--destination|--destination-path /path/to/destination/folder
+  -f|--filename some_filename
+  -p|--password some_password
+  -e|--exclude-list /path/to/filename_of_list_to_exclude.txt
+  --encrypt
+  --compress
+  --clean-destination
+  --debug
 EOF
   exit 1
 }
@@ -71,66 +71,32 @@ ENCRYPT=false
 COMPRESS=false
 DEBUG=false
 CLEAN_DESTINATION=false
-POSITIONAL=()
-while [[ $# -gt 0 ]]; do
-  key="$1"
 
-  case $key in
-  -a | --action)
-    ACTION="$2"
-    shift 2
-    ;;
-  -s | --source | --source-path)
-    SOURCE_PATH="$2"
-    shift 2
-    ;;
-  -d | --destination | --destination-path)
-    DESTINATION_PATH="$2"
-    shift 2
-    ;;
-  -f | --filename)
-    FILENAME="$2"
-    shift 2
-    ;;
-  -p | --password)
-    PASSWORD="$2"
-    shift 2
-    ;;
-  -e | --exclude-list)
-    COMPRESS_EXCLUDE="--exclude-from=$2"
-    shift 2
-    ;;
-  --encrypt)
-    ENCRYPT=true
-    shift
-    ;;
-  --compress)
-    COMPRESS=true
-    shift
-    ;;
-  --clean-destination)
-    CLEAN_DESTINATION=true
-    shift
-    ;;
-  --debug)
-    DEBUG=true
-    shift
-    ;;
-
-  *)                   # unknown option
-    POSITIONAL+=("$1") # save it in an array for later
-    shift
-    ;;
+PARSED=$(getopt -o a:s:d:f:p:e: \
+  -l action:,source-path:,destination-path:,filename:,password:,exclude-list:,encrypt,compress,clean-destination,debug \
+  -- "$@") || usage_error
+eval set -- "$PARSED"
+while true; do
+  case "$1" in
+    -a|--action)         ACTION="$2";                  shift 2 ;;
+    -s|--source|--source-path) SOURCE_PATH="$2";       shift 2 ;;
+    -d|--destination|--destination-path) DESTINATION_PATH="$2"; shift 2 ;;
+    -f|--filename)       FILENAME="$2";                shift 2 ;;
+    -p|--password)       PASSWORD="$2";                shift 2 ;;
+    -e|--exclude-list)   COMPRESS_EXCLUDE="--exclude-from=$2"; shift 2 ;;
+    --encrypt)           ENCRYPT=true;                 shift ;;
+    --compress)          COMPRESS=true;                shift ;;
+    --clean-destination) CLEAN_DESTINATION=true;       shift ;;
+    --debug)             DEBUG=true;                   shift ;;
+    --) shift; break ;;
+    *) usage_error ;;
   esac
 done
 
-set -- "${POSITIONAL[@]}" # restore positional parameters
-
 FULL_SOURCE_PATH="${SOURCE_PATH:-"$(pwd)/$FILENAME"}"
 FULL_DESTINATION_PATH="${DESTINATION_PATH:-"$(pwd)/$FILENAME"}"
-CURRENT_PATH="$(pwd)"
 
-for v in DATE ACTION ENCRYPT CLEAN_DESTINATION COMPRESS FILENAME CURRENT PATH COMPRESS EXTRA ARGS; do
+for v in ACTION FILENAME COMPRESS_EXCLUDE ENCRYPT COMPRESS CLEAN_DESTINATION DEBUG; do
   printf '%-20s %s\n' "$v" "${!v}"
 done
 printf '%-20s %s\n' SOURCE_PATH "$(dirname "$FULL_SOURCE_PATH")"
@@ -173,7 +139,7 @@ set -e
 # backup or restore with compression and no encryption
 if [[ $ACTION == "backup" ]] && $COMPRESS && ! $ENCRYPT; then
   clean_destination "$FULL_DESTINATION_PATH"
-  tar $COMPRESS_EXCLUDE --numeric-owner -C "$(dirname "$FULL_SOURCE_PATH")" -czvf "$FULL_DESTINATION_PATH" .
+  tar "$COMPRESS_EXCLUDE" --numeric-owner -C "$(dirname "$FULL_SOURCE_PATH")" -czvf "$FULL_DESTINATION_PATH" .
 fi
 if [[ $ACTION == "restore" ]] && $COMPRESS && ! $ENCRYPT; then
   if $CLEAN_DESTINATION; then
@@ -186,7 +152,7 @@ fi
 if $ENCRYPT && $COMPRESS; then
   if [[ $ACTION == "backup" ]]; then
     clean_destination "$FULL_DESTINATION_PATH".enc
-    tar $COMPRESS_EXCLUDE --numeric-owner -C "$(dirname "$FULL_SOURCE_PATH")" -czvf - . | gpg2 --symmetric --batch \
+    tar "$COMPRESS_EXCLUDE" --numeric-owner -C "$(dirname "$FULL_SOURCE_PATH")" -czvf - . | gpg2 --symmetric --batch \
       --yes --passphrase "$PASSWORD" --output "$FULL_DESTINATION_PATH".enc --force-mdc
   fi
   if [[ $ACTION == "restore" ]]; then
@@ -208,10 +174,6 @@ if $ENCRYPT && ! $COMPRESS; then
   fi
   if [[ $ACTION == "restore" ]]; then
     clean_destination "$FULL_DESTINATION_PATH"
-    gpg2 --decrypt --batch --yes --passphrase "$PASSWORD" \
-      --output "$FILENAME" "$FULL_SOURCE_PATH".enc
     gpg2 --decrypt --batch --yes --passphrase "$PASSWORD" --output "$FULL_DESTINATION_PATH" "$FULL_SOURCE_PATH".enc
   fi
 fi
-
-cd "$CURRENT_PATH" || exit
