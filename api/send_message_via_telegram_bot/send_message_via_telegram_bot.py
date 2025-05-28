@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 """
-Send a message via Telegram Bot.
-Writen by Aleksandr Bazhenov, 2023.
+Minimal CLI helper for sending a message via Telegram Bot API.
+Written by Aleksandr Bazhenov, 2023.
 
 Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -38,7 +38,6 @@ import sys
 # pylint: disable=E0401
 import requests
 
-API_TOKEN = None
 API_URL = "https://api.telegram.org/bot"
 HELP_URL = "https://core.telegram.org/bots"
 
@@ -46,10 +45,9 @@ HELP_URL = "https://core.telegram.org/bots"
 def parse_arguments():
     """Command-line arguments parser"""
 
-    def pretty_formatter(prog):
-        return argparse.HelpFormatter(prog)
-
-    parser = argparse.ArgumentParser(formatter_class=pretty_formatter)
+    parser = argparse.ArgumentParser(
+        formatter_class = argparse.RawTextHelpFormatter
+    )
     parser.add_argument("message", metavar="MESSAGE", help="Message to send.")
     parser.add_argument(
         "-c",
@@ -69,7 +67,7 @@ def parse_arguments():
         "-T",
         "--message_thread_id",
         type=int,
-        default=0,
+        default=None,
         help=(
             "Message thread ID. Unique identifier for the target message "
             "thread (topic) of the forum; for forum supergroups only."
@@ -94,8 +92,7 @@ def parse_arguments():
     parser.add_argument(
         "-n",
         "--disable_notification",
-        type=bool,
-        default=False,
+        action="store_true",
         help=(
             "Sends the message silently (default: False). "
             "Users will receive a notification with no sound."
@@ -104,8 +101,7 @@ def parse_arguments():
     parser.add_argument(
         "-P",
         "--protect_content",
-        type=bool,
-        default=False,
+        action="store_true",
         help=(
             "Protects the contents of the sent message from forwarding and saving (default: False)."
         ),
@@ -132,7 +128,7 @@ def parse_arguments():
     )
     args = parser.parse_args()
     if not args.token:
-        raise log_value_error(
+        log_value_error(
             "API token required. Please specify them via 'TELEGRAM_API_TOKEN' "
             "environment variable or '-o' ('--token') argument."
         )
@@ -143,41 +139,47 @@ def log_value_error(msg):
     """Logging value error function wrapper."""
 
     logging.critical(msg)
-    return ValueError
+    return ValueError(msg)
 
 
 def send_message(request_url, args):
     """Send a message to a telegram channel"""
 
     try:
-        response = requests.post(
-            request_url,
-            json={
-                "chat_id": args.chat_id,
-                "text": args.message,
-                "message_thread_id": args.message_thread_id,
-                "parse_mode": args.parse_mode,
-                "disable_notification": args.disable_notification,
-                "protect_content": args.protect_content,
-                "link_preview_options": args.link_preview_options,
-                "reply_parameters": args.reply_parameters,
-            },
-            timeout=args.timeout,
-        )
+        payload = {
+            "chat_id": args.chat_id,
+            "text": args.message,
+            "parse_mode": args.parse_mode,
+            "disable_notification": args.disable_notification,
+            "protect_content": args.protect_content,
+            }
+
+        if args.message_thread_id:
+            payload["message_thread_id"] = args.message_thread_id
+
+        if args.link_preview_options:
+            payload["link_preview_options"] = args.link_preview_options
+
+        if args.reply_parameters:
+            payload["reply_parameters"] = args.reply_parameters
+
+        response = requests.post(request_url, json=payload, timeout=args.timeout)
         response.raise_for_status()
         logging.info("Message sent, response: %s", response.text)
-    except Exception as err:  # pylint: disable=broad-exception-caught
+    except requests.RequestException as err:
         logging.error("Error sending request:", exc_info=err)
 
-
-if __name__ == "__main__":
-    ar = parse_arguments()
-    # pylint: disable=duplicate-code
+def main():
+    """Entry point for the CLI tool."""
+    cli_args = parse_arguments()
     logging.basicConfig(
         stream=sys.stdout,
         level=logging.INFO,
         format="%(asctime)s.%(msecs)03d %(module)s %(levelname)s: %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
-    REQUEST_URL = f"{API_URL}{ar.token}/sendMessage"
-    send_message(REQUEST_URL, ar)
+    request_url = f"{API_URL}{cli_args.token}/sendMessage"
+    send_message(request_url, cli_args)
+
+if __name__ == "__main__":
+    sys.exit(main())

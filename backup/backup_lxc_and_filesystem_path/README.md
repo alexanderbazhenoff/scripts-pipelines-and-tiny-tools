@@ -1,25 +1,26 @@
-# Backup LXC and filesystem path
+# Backup LXC containers and filesystem paths
 
-These scripts perform backing up a filesystem path with UID/GID saving using tar and gpg. Possible to save and upload
-the whole containers.
+These scripts back up filesystem paths while preserving UID/GID, using `tar` and `gpg`. Entire containers can also be
+saved and uploaded.
 
-**WARNING! Running this file, you accept that you know what you're doing. All actions with this script are at your own
-risk.**
+**WARNING! By running this script, you acknowledge that you know what you're doing. Use at your own risk.**
 
 ## Usage
 
 1. Upload this folder content to your Linux system, e.g., inside of `/opt/scripts` folder.
 2. (Optional) Set up your [rclone](https://rclone.org/drive/) to mount destination drive, e.g. Google Drive, Dropbox,
-Amazon Drive, Amazon S3 Compliant Storage Providers (including AWS, Alibaba, Ceph, Digital Ocean, Dreamhost, IBM COS,
-Minio, SeaweedFS, and Tencent COS), Google Cloud Storage, Hadoop distributed file system, Mail.Ru Cloud, Mega,
-Microsoft Azure Blob Storage, Microsoft OneDrive, OpenStack Swift, QingCloud Object Storage, Yandex Disk, Uptobox, Zoho
-or another connection method(s) like ftp, ssh, sftp, http. Or mount your backup path manually, e.g. `/mnt/backup`.
-3. Fill your `empty_password.txt` with gpg key if you wish to encrypt your files or leave them empty.
-4. Edit `lxc_exclude` list of an excluded path.
+   Amazon Drive, Amazon S3 Compliant Storage Providers (including AWS, Alibaba, Ceph, Digital Ocean, Dreamhost, IBM COS,
+   Minio, SeaweedFS, and Tencent COS), Google Cloud Storage, Hadoop distributed file system, Mail.Ru Cloud, Mega,
+   Microsoft Azure Blob Storage, Microsoft OneDrive, OpenStack Swift, QingCloud Object Storage, Yandex Disk, Uptobox, 
+   Zoho or another connection method(s) such as FTP, SSH, SFTP, or HTTP. Alternatively, mount your backup path manually,
+   e.g. `/mnt/backup`.
+3. Fill `empty_password.txt` with your GPG password if you want to encrypt the files, or leave it empty to skip
+   encryption.
+4. Edit the `lxc_exclude` file to specify paths to exclude.
 5. (Optional) Put your error notification commands to `error_notification.sh` if you would like to receive error
-messages.
+   messages.
 6. Edit your `backup_container.sh` with appropriate params of rclone mount (optional) and `backup_path_tar_gpg.sh` with
-appropriate backup and path params.
+   appropriate backup and path params.
 7. Run:
 
 ```bash
@@ -67,10 +68,10 @@ process_path "/var/lib/lxc/container_name" "$BACKUP_DESTINATION" "$ACTION" \
 "bareos_lxc_$(date +%y%m%d).tar.gz" "$(cat empty_password)" true true false "/opt/scripts/lxc_exclude"
 task_error $? '/var/lib/lxc/container_name'
 
-# So you don't need to clean up destination path becuse your archive name contains year, month and day. Otherwise set
-# them to true.
+# You don’t need to clean up the destination path because the archive name includes the year, month, and day.
+# Otherwise set them to true.
 
-# You can also disable compression, but leave encryption enabled. In this way you'll get encrypted gpg file with .enc
+# You can also disable compression and keep encryption enabled. This will produce an encrypted .gpg file with a .enc
 # extension.
 ```
 
@@ -84,8 +85,8 @@ fusermount -uz /mnt/backup
 
 ## Advanced usage
 
-You can use `backup_path_tar_gpg.sh` directly by separate call of each backup path. Run
-`./backup_path_tar_gpg.sh --help` for the help.
+You can use `backup_path_tar_gpg.sh` directly to back up specific paths. Run `./backup_path_tar_gpg.sh --help` for usage
+details.
 
 ## License
 

@@ -1,18 +1,23 @@
-# backup btrfs filesystem using snapshot
+# Backup Btrfs Filesystem Using Snapshot
 
-**WARNING! Running this file, you accept that you know what you're doing. All actions with this script are at your own
-risk.**
+**WARNING! By running this script, you acknowledge that you understand what you are doing. All actions are performed at
+your own risk.**
 
-Example of how to perform backup of btrfs filesystem using
-[snapshot(s)](https://archive.kernel.org/oldwiki/btrfs.wiki.kernel.org/index.php/Incremental_Backup.html).
-Before you begin to check your kernel version,
-[btrfs status](https://archive.kernel.org/oldwiki/btrfs.wiki.kernel.org/index.php/Status.html) and
-[btrfs changelog](https://archive.kernel.org/oldwiki/btrfs.wiki.kernel.org/index.php/Changelog.html).
-Some old versions may have a non-working functional.
+This is an example of how to back up a Btrfs filesystem using
+[snapshots](https://archive.kernel.org/oldwiki/btrfs.wiki.kernel.org/index.php/Incremental_Backup.html).
 
-Variables inside a script:
+Before getting started, check your kernel version,
+the [Btrfs status](https://archive.kernel.org/oldwiki/btrfs.wiki.kernel.org/index.php/Status.html), and the
+[Btrfs changelog](https://archive.kernel.org/oldwiki/btrfs.wiki.kernel.org/index.php/Changelog.html).
+Older versions may contain broken or incomplete functionality.
 
-- **SOURCE_FILESYSTEM_PATH** (e.g. `"/mnt/data/ssd/folder"`): Source btrfs filesystem to create snapshot from.
-- **BACKUP_FILESYSTEM_PATH** (e.g `"/mnt/data/backup"`): Destination filesystem to send created snapshot. In general
-this is a backup path.
-- **SNAPSHOTS_PATH** (e.g. `"/mnt/data/ssd/.snapshots"`): Temporary filesystem to create snapshot.
+Script variables:
+
+- **SOURCE_FILESYSTEM_PATH** (e.g. `"/mnt/data/ssd/folder"`):  
+  The source Btrfs filesystem from which to create a snapshot.
+
+- **BACKUP_FILESYSTEM_PATH** (e.g. `"/mnt/data/backup"`):  
+  The destination filesystem to which the snapshot will be sent. Typically, this is your backup location.
+
+- **SNAPSHOTS_PATH** (e.g. `"/mnt/data/ssd/.snapshots"`):  
+  A temporary location used to store the created snapshots.
