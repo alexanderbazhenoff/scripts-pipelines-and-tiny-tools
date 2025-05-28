@@ -38,76 +38,71 @@
 # Warning! Running this file you accept that you know what you're doing. All
 # actions with this script are at your own risk.
 
-# constants
+# Constants.
 BACKUP_DESTINATION="/mnt/backup_drive_path"
 BACKUP_SCRIPT_PATH="/opt/scripts/backup_path_tar_gpg.sh"
 ERROR_NOTIFICATION_SCRIPT_PATH="/opt/scripts/error_notification.sh"
 
 usage_error() {
-  echo "Error: unrecognized option(s): $POSITIONAL"
-  echo ""
-  echo "Usage:"
-  echo "   -s|--source|--source-path /path/to/source/folder/or/file"
-  echo "   -d|--destination|--destination-path /path/to/destination/folder"
-  echo "   -p|--password |--password-file /path/to/password/file/name"
-  echo "   -b|--backup"
-  echo "   -r|--restore"
-  echo "   --debug"
+  cat <<EOF >&2
+Error: unrecognized option(s): $POSITIONAL
+
+Usage:
+  -s|--source|--source-path      /path/to/source/folder/or/file
+  -d|--destination|--destination-path  /path/to/destination/folder
+  -p|--password|--password-file  /path/to/password/file/name
+  -b|--backup
+  -r|--restore
+  --debug
+EOF
   exit 1
 }
 
+# If the given return code is non-zero, invoke the error notification script with the provided message.
+# $1: return code to check;
+# $2: error message to pass to notifier.
 task_error() {
-  local RETURN_CODE=$1
-  local ERROR_MESSAGE=$2
-  if [[ $RETURN_CODE -ne 0 ]]; then
+  if [[ $1 -ne 0 ]]; then
     echo "Sending $REMOTE_DRIVE_NAME error message"
-    chrt -i 0 /.$ERROR_NOTIFICATION_SCRIPT_PATH "$ERROR_MESSAGE"
+    chrt -i 0 "$ERROR_NOTIFICATION_SCRIPT_PATH" "$2"
   fi
 }
 
+# Execute a chrt‐priority backup/restore command with encryption, compression and cleanup options.
+# $1: source path;
+# $2: destination path;
+# $3: action (backup|restore);
+# $4: output filename;
+# $5: encryption password;
+# $6: encrypt flag (true|false);
+# $7: compress flag (true|false);
+# $8: clean‐destination flag (true|false);
+# $9: exclude‐list filepath (optional).
 process_path() {
-  local CURRENT_SOURCE_PATH=$1
-  local CURRENT_DESTINATION_PATH=$2
-  local CURRENT_ACTION=$3
-  local CURRENT_FILENAME=$4
-  local CURRENT_PASSWORD=$5
-  local CURRENT_ENCRYPT_FLAG=$6
-  local CURRENT_COMPRESS_FLAG=$7
-  local CURRENT_CLEAN_DEST_FLAG=$8
-  local CURRENT_EXCLUDE_LIST=$9
-  if [[ $CURRENT_ACTION == "restore" ]]; then
-    echo "Please note: $CURRENT_SOURCE_PATH and $CURRENT_DESTINATION_PATH will be swapped in restore mode"
-    local TEMP_PATH=$CURRENT_SOURCE_PATH
-    CURRENT_SOURCE_PATH=$CURRENT_DESTINATION_PATH
-    CURRENT_DESTINATION_PATH=$TEMP_PATH
+  local src=$1 dest=$2
+  if [[ $3 == "restore" ]]; then
+    echo "Please note: $1 and $2 will be swapped in restore mode"
+    src=$2
+    dest=$1
   fi
-  if [[ -n $SOURCE_PATH ]]; then # override source path when this was set during script run
-    CURRENT_SOURCE_PATH=$SOURCE_PATH
-    echo "Source path override: $SOURCE_PATH"
+
+  # Override paths from global CLI options, if provided.
+  if [[ -n "$SOURCE_PATH" ]]; then
+    src="$SOURCE_PATH"
+    echo "Source path override: $src"
   fi
-  if [[ -n $DESTINATION_PATH ]]; then # override destination path when this was set during script run
-    CURRENT_DESTINATION_PATH=$DESTINATION_PATH
-    echo "Destination path override: $DESTINATION_PATH"
+  if [[ -n "$DESTINATION_PATH" ]]; then
+    dest="$DESTINATION_PATH"
+    echo "Destination path override: $dest"
   fi
-  local ARGS="-a $CURRENT_ACTION -s $CURRENT_SOURCE_PATH -d $CURRENT_DESTINATION_PATH "
-  ARGS+="-f $CURRENT_FILENAME -p $CURRENT_PASSWORD "
-  if [[ -n "$CURRENT_EXCLUDE_LIST" ]]; then
-    ARGS+="-e $CURRENT_EXCLUDE_LIST "
-  fi
-  if $CURRENT_ENCRYPT_FLAG; then
-    ARGS+="--encrypt "
-  fi
-  if $CURRENT_COMPRESS_FLAG; then
-    ARGS+="--compress "
-  fi
-  if $CURRENT_CLEAN_DEST_FLAG; then
-    ARGS+="--clean-destination "
-  fi
-  if $DEBUG; then
-    ARGS+="--debug"
-  fi
-  # set your params for chrt command to change process priority.
-  chrt -i 0 "/.$BACKUP_SCRIPT_PATH" "$ARGS" && return 0 || return 34
+  local -a args=(-a "$3" -s "$src" -d "$dest" -f "$4" -p "$5")
+  [[ -n "$9" ]] && args+=(-e "$9")
+  $6 && args+=(--encrypt)
+  $7 && args+=(--compress)
+  $8 && args+=(--clean-destination)
+  $DEBUG && args+=(--debug)
+  # Run the backup script with real-time priority.
+  chrt -i 0 "/.$BACKUP_SCRIPT_PATH" "${args[@]}" && return 0 || return 34
 }
 
 flush_caches() {
@@ -123,7 +118,7 @@ SOURCE_PATH=""
 DESTINATION_PATH=""
 PASSWORD_FILE_PATH=""
 
-# parse options via getopt
+# Parse options via getopt.
 PARSED=$(getopt -o s:d:p:br \
   -l source:,source-path:,destination:,destination-path:,password:,password-file:,backup,restore,debug -- "$@") ||
   usage_error
@@ -164,18 +159,12 @@ while true; do
   esac
 done
 
-echo "SOURCE PATH (global)      = ${SOURCE_PATH}"
-echo "DESTINATION PATH (global) = ${DESTINATION_PATH}"
-echo "PASSWORD FILE PATH        = ${PASSWORD_FILE_PATH}"
-echo "BACKUP MODE               = ${BACKUP_MODE}"
-echo "RESTORE MODE              = ${RESTORE_MODE}"
-echo "DEBUG                     = ${DEBUG}"
-echo ""
+for var in SOURCE_PATH DESTINATION_PATH PASSWORD_FILE_PATH BACKUP_MODE RESTORE_MODE DEBUG; do
+  printf '%-20s = %s\n' "$var" "${!var}"
+done
 
-# error handling
-if $DEBUG; then
-  set -x
-fi
+$DEBUG && set -x
+
 if [[ -n $1 ]]; then
   echo "Error! Unknown option: $1"
   usage_error
@@ -209,7 +198,6 @@ else
   ACTION="restore"
 fi
 
-# backup
 flush_caches
 sleep 5
 

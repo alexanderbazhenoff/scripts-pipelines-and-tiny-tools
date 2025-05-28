@@ -136,7 +136,7 @@ printf '%-20s %s\n' SOURCE_PATH "$(dirname "$FULL_SOURCE_PATH")"
 printf '%-20s %s\n' DESTINATION_PATH "$(dirname "$FULL_DESTINATION_PATH")"
 printf '%-20s %s\n' PASSWORD "$(echo "$PASSWORD" | sed s/\./*/g)"
 
-# error handling
+# Error handling.
 if [[ -n $1 ]]; then
   echo "Error! Unknown option: $1"
   usage_error
@@ -161,7 +161,7 @@ if $DEBUG; then
   set -x
 fi
 
-# create dir and process
+# Create destination directory if it does not exist.
 if [[ ! -d "$DESTINATION_PATH" ]]; then
   echo "No ${DESTINATION_PATH} found, creating..."
   mkdir -p "$DESTINATION_PATH"
@@ -169,7 +169,7 @@ fi
 
 set -e
 
-# backup or restore with compression and no encryption
+# Backup or restore with compression only (no encryption).
 if [[ $ACTION == "backup" ]] && $COMPRESS && ! $ENCRYPT; then
   clean_destination "$FULL_DESTINATION_PATH"
   tar "$COMPRESS_EXCLUDE" --numeric-owner -C "$(dirname "$FULL_SOURCE_PATH")" -czvf "$FULL_DESTINATION_PATH" .
@@ -181,7 +181,7 @@ if [[ $ACTION == "restore" ]] && $COMPRESS && ! $ENCRYPT; then
   tar --numeric-owner -C "$(dirname "$FULL_DESTINATION_PATH")" -xzvf "$FULL_SOURCE_PATH"
 fi
 
-# backup or restore with compression and encryption
+# Backup or restore with both compression and encryption.
 if $ENCRYPT && $COMPRESS; then
   if [[ $ACTION == "backup" ]]; then
     clean_destination "$FULL_DESTINATION_PATH".enc
@@ -197,7 +197,7 @@ if $ENCRYPT && $COMPRESS; then
   fi
 fi
 
-# backup or restore with encryption and no compression
+# Backup or restore with encryption only (no compression).
 if $ENCRYPT && ! $COMPRESS; then
   if [[ $ACTION == "backup" ]]; then
     clean_destination "$FULL_DESTINATION_PATH".enc

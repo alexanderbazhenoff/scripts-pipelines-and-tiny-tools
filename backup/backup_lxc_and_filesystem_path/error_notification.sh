@@ -2,5 +2,5 @@
 
 MESSAGE=$1
 
-# do something to post error message to messangers, etc...
+# Do something to post error message to messengers...
 echo "$MESSAGE"
