@@ -47,7 +47,17 @@
 # when you set 'dumb' action <pool_name_for_dumb> <pool_path_for_dumb> may be specified, e.g.:
 # /batch_process_bareos_volumes.sh delete Incremental- 0032 1200 /mnt/backup
 
-# Set up default pool path, e.g.: "/mnt/backup"
+usage() {
+  cat <<EOF
+Usage: $0 <action> <name_mask> <start> <end> <force|print> pool_name_for_dumb> <pool_path_for_dumb>
+  action: prune | purge | delete | dumb
+  For dumb action you can also specify pool path (e.g. '/mnt/backup'):
+  $0 <action> <name_mask> <start> <end> <force|print> /mnt/backup
+EOF
+  exit 1
+}
+
+# Set up default pool path, e.g.: "/mnt/backup".
 DEFAULT_POOL_PATH="/mnt/backup"
 
 VOL_ACTION=$1
@@ -55,46 +65,40 @@ VOL_MASK=$2
 VOL_START=$3
 VOL_END=$4
 VOL_OPT=$5
-VOL_PATH=$6
-OPTIONS_ERROR=0
+VOL_PATH=${6:-"$DEFAULT_POOL_PATH"}
+USAGE_ERR=false
 
-[[ -z "$VOL_MASK" ]] && echo "Error! <name_mask> is undefined." && OPTIONS_ERROR=1
-[[ -z "$VOL_ACTION" ]] && echo "Error! <action> is undefined." && OPTIONS_ERROR=1
-[[ -z "$VOL_START" ]] && echo "Error! <start> is undefined." && OPTIONS_ERROR=1
-[[ -z "$VOL_END" ]] && echo "Error! <end> is undefined." && OPTIONS_ERROR=1
-[[ -z "$VOL_PATH" ]] && VOL_PATH=$DEFAULT_POOL_PATH
+for var in VOL_ACTION VOL_MASK VOL_START VOL_END; do
+  if [[ -z "${!var}" ]]; then
+    echo "Error: '$var' is required."
+    USAGE_ERR=true
+  fi
+done
 
-case $VOL_START in
-'' | *[!0-9]*) echo "Error! <start> is not a number." && OPTIONS_ERROR=1 ;;
-esac
-case $VOL_END in
-'' | *[!0-9]*) echo "Error! <end> is not a number." && OPTIONS_ERROR=1 ;;
-esac
+[[ $VOL_ACTION =~ ^(prune|purge|delete|dumb)$ ]] || {
+  echo "Error: invalid action specified."
+  USAGE_ERR=true
+}
+[[ -z $VOL_OPT || $VOL_OPT =~ ^(force|print)$ ]] || {
+  echo "Error: volume option should be empty, 'force' or 'print'."
+  USAGE_ERR=true
+}
+[[ $VOL_START =~ ^[0-9]+$ ]] || {
+  echo "Error: start volume is not a number"
+  USAGE_ERR=true
+}
+[[ $VOL_END =~ ^[0-9]+$ ]] || {
+  echo "Error: end volume is not a number"
+  USAGE_ERR=true
+}
 
-if [[ -n "$VOL_OPT" ]] && [[ $VOL_OPT != "force" ]] && [[ $VOL_OPT != "print" ]]; then
-  echo "Syntax error in additional options: $VOL_OPT" && OPTIONS_ERROR=1
-fi
-
-if [[ $VOL_ACTION != "prune" ]] && [[ $VOL_ACTION != "purge" ]] && [[ $VOL_ACTION != "delete" ]] &&
-  [[ $VOL_ACTION != "dumb" ]]; then
-  echo "Syntax error in action option: $VOL_ACTION" && OPTIONS_ERROR=1
-fi
-
-if [[ $OPTIONS_ERROR -gt 0 ]]; then
-  printf "Error: unrecognized option(s): %s" "$POSITIONAL"
-  printf "Usage:\n\n"
-  printf "%s %s\n" "# ./batch_process_bareos_volumes.sh <action> <name_mask> <start> <end> <force|print>" \
-    "<pool_name_for_dumb> <pool_path_for_dumb>"
-  printf "where action: prune|purge|delete|dumb.\n\n"
-  printf "For dumb action you can also specify pool path (e.g. '/mnt/backup'):\n"
-  printf "# ./batch_process_bareos_volumes.sh <action> <name_mask> <start> <end> <force|print> /mnt/backup\n"
-  exit 1
+if $USAGE_ERR; then
+  usage
 fi
 
 echo "WARNING! This will process selected range of volumes in Bareos pool:"
 echo "${VOL_ACTION} from ${VOL_START} to ${VOL_END} by mask ${VOL_MASK}"
-echo "Sleep 30 for sure."
-sleep 30
+read -p "Press Enter to proceed or Ctrl+C to abort..."
 
 if [[ $VOL_ACTION == "dumb" ]]; then
   for RANGE_ITEM in $(seq -w "$VOL_START" "$VOL_END"); do
