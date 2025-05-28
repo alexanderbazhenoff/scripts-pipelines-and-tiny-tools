@@ -45,9 +45,7 @@ HELP_URL = "https://core.telegram.org/bots"
 def parse_arguments():
     """Command-line arguments parser"""
 
-    parser = argparse.ArgumentParser(
-        formatter_class = argparse.RawTextHelpFormatter
-    )
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("message", metavar="MESSAGE", help="Message to send.")
     parser.add_argument(
         "-c",
@@ -152,7 +150,7 @@ def send_message(request_url, args):
             "parse_mode": args.parse_mode,
             "disable_notification": args.disable_notification,
             "protect_content": args.protect_content,
-            }
+        }
 
         if args.message_thread_id:
             payload["message_thread_id"] = args.message_thread_id
@@ -169,6 +167,7 @@ def send_message(request_url, args):
     except requests.RequestException as err:
         logging.error("Error sending request:", exc_info=err)
 
+
 def main():
     """Entry point for the CLI tool."""
     cli_args = parse_arguments()
@@ -180,6 +179,7 @@ def main():
     )
     request_url = f"{API_URL}{cli_args.token}/sendMessage"
     send_message(request_url, cli_args)
+
 
 if __name__ == "__main__":
     sys.exit(main())

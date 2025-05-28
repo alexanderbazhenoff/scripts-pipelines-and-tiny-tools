@@ -11,7 +11,7 @@ saved and uploaded.
 2. (Optional) Set up your [rclone](https://rclone.org/drive/) to mount destination drive, e.g. Google Drive, Dropbox,
    Amazon Drive, Amazon S3 Compliant Storage Providers (including AWS, Alibaba, Ceph, Digital Ocean, Dreamhost, IBM COS,
    Minio, SeaweedFS, and Tencent COS), Google Cloud Storage, Hadoop distributed file system, Mail.Ru Cloud, Mega,
-   Microsoft Azure Blob Storage, Microsoft OneDrive, OpenStack Swift, QingCloud Object Storage, Yandex Disk, Uptobox, 
+   Microsoft Azure Blob Storage, Microsoft OneDrive, OpenStack Swift, QingCloud Object Storage, Yandex Disk, Uptobox,
    Zoho or another connection method(s) such as FTP, SSH, SFTP, or HTTP. Alternatively, mount your backup path manually,
    e.g. `/mnt/backup`.
 3. Fill `empty_password.txt` with your GPG password if you want to encrypt the files, or leave it empty to skip
