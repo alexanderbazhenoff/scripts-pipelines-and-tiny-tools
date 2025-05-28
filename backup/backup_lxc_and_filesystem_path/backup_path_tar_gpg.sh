@@ -134,7 +134,7 @@ for v in ACTION FILENAME COMPRESS_EXCLUDE ENCRYPT COMPRESS CLEAN_DESTINATION DEB
 done
 printf '%-20s %s\n' SOURCE_PATH "$(dirname "$FULL_SOURCE_PATH")"
 printf '%-20s %s\n' DESTINATION_PATH "$(dirname "$FULL_DESTINATION_PATH")"
-printf '%-20s %s\n' PASSWORD "$(echo $PASSWORD | sed s/\./*/g)"
+printf '%-20s %s\n' PASSWORD "$(echo "$PASSWORD" | sed s/\./*/g)"
 
 # error handling
 if [[ -n $1 ]]; then

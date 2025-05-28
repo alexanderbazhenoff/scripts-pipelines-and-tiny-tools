@@ -110,30 +110,37 @@ process_path() {
   chrt -i 0 "/.$BACKUP_SCRIPT_PATH" "$ARGS" && return 0 || return 34
 }
 
+flush_caches() {
+  sync
+  echo 3 >/proc/sys/vm/drop_caches
+  sync
+}
+
 BACKUP_MODE=false
 RESTORE_MODE=false
 DEBUG=false
 SOURCE_PATH=""
 DESTINATION_PATH=""
-POSITIONAL=()
-while [[ $# -gt 0 ]]; do
-  KEY="$1"
+PASSWORD_FILE_PATH=""
 
-  case $KEY in
+# parse options via getopt
+PARSED=$(getopt -o s:d:p:br \
+  -l source:,source-path:,destination:,destination-path:,password:,password-file:,backup,restore,debug -- "$@") ||
+  usage_error
+eval set -- "$PARSED"
+while true; do
+  case "$1" in
   -s | --source | --source-path)
     SOURCE_PATH="$2"
-    shift
-    shift
+    shift 2
     ;;
   -d | --destination | --destination-path)
     DESTINATION_PATH="$2"
-    shift
-    shift
+    shift 2
     ;;
   -p | --password | --password-file)
     PASSWORD_FILE_PATH="$2"
-    shift
-    shift
+    shift 2
     ;;
   -b | --backup)
     BACKUP_MODE=true
@@ -147,15 +154,15 @@ while [[ $# -gt 0 ]]; do
     DEBUG=true
     shift
     ;;
-
-  *)                   # unknown option
-    POSITIONAL+=("$1") # save it in an array for later
+  --)
     shift
+    break
+    ;;
+  *)
+    usage_error
     ;;
   esac
 done
-
-set -- "${POSITIONAL[@]}" # restore positional parameters
 
 echo "SOURCE PATH (global)      = ${SOURCE_PATH}"
 echo "DESTINATION PATH (global) = ${DESTINATION_PATH}"
@@ -203,9 +210,7 @@ else
 fi
 
 # backup
-sync
-echo 3 >/proc/sys/vm/drop_caches
-sync
+flush_caches
 sleep 5
 
 # Backup all these scripts from /opt/script
@@ -218,6 +223,4 @@ process_path "/var/lib/lxc/bareos.emzior" "$BACKUP_DESTINATION" "$ACTION" \
   "bareos_lxc_$(date +%y%m%d).tar.gz" "$PASSWORD" false true true "/opt/scripts/lxc_exclude"
 task_error $? '/var/lib/lxc/lxc_container_name'
 
-sync
-echo 3 >/proc/sys/vm/drop_caches
-sync
+flush_caches
