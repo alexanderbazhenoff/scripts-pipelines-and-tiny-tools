@@ -83,26 +83,22 @@ done
 [[ -z $VOL_OPT || $VOL_OPT =~ ^(force|print)$ ]] || { error "Error: option should be empty, 'force' or 'print'."; }
 [[ $VOL_START =~ ^[0-9]+$ ]] || { error "Error: start volume is not a number."; }
 [[ $VOL_END =~ ^[0-9]+$ ]] || { error "Error: end volume is not a number."; }
-
 if $USAGE_ERR; then
   usage
 fi
 
 echo "WARNING! This will process selected range of volumes in Bareos pool:"
 echo "${VOL_ACTION} from ${VOL_START} to ${VOL_END} by mask ${VOL_MASK}"
-read -p "Press Enter to proceed or Ctrl+C to abort..."
+read -r -p "Press Enter to proceed or Ctrl+C to abort..."
 
-if [[ $VOL_ACTION == "dumb" ]]; then
-  for RANGE_ITEM in $(seq -w "$VOL_START" "$VOL_END"); do
-    RANGE_FILE="$VOL_MASK$RANGE_ITEM"
-    echo "Creating an empty '$RANGE_FILE'..."
-    touch "$VOL_PATH/$RANGE_FILE"
-  done
-else
-  for RANGE_ITEM in $(eval "echo {$VOL_START..$VOL_END}"); do
+for RANGE_ITEM in $(seq -w "$VOL_START" "$VOL_END"); do
+  if [[ $VOL_ACTION == "dumb" ]]; then
+    echo "Creating an empty '${VOL_MASK}${RANGE_ITEM}'..."
+    touch "$VOL_PATH/${VOL_MASK}${RANGE_ITEM}"
+  else
     echo "${VOL_ACTION} volume: ${VOL_MASK}${RANGE_ITEM} $VOL_OPT"
     if [[ $VOL_OPT != 'print' ]]; then
       echo "${VOL_ACTION} volume=${VOL_MASK}${RANGE_ITEM} $([[ $VOL_OPT == 'force' ]] && echo 'yes')" | bconsole
     fi
-  done
-fi
+  fi
+done
