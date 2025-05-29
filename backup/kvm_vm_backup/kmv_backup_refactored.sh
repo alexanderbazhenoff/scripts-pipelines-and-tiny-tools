@@ -57,63 +57,79 @@ EOF
   exit 1
 }
 
-# start new log.
-starting_log() {
-  mkdir -p "$BACKUP_DIR/$ACTIVEVM"
+init_log() {
+  (( LOG_INITIALIZED )) && return
+  mkdir -p "$(dirname "$LOGFILE")"
   exec >> >(tee -a "$LOGFILE") 2>&1
-  echo "$(date +'%Y-%m-%d %H:%M:%S') Starting backup of $ACTIVEVM"
+  LOG_INITIALIZED=1
 }
 
+start_log() {
+  mkdir -p "$BACKUP_DIR/$ACTIVEVM"
+  echo "$(date +'%Y-%m-%d %H:%M:%S') Starting backup of $ACTIVEVM"
+}
 # backup config of VM.
 backup_vm_config() {
   virsh dumpxml "$ACTIVEVM" >"$BACKUP_DIR/$ACTIVEVM/$ACTIVEVM".xml
   echo "$(date '+%Y-%m-%d %H:%M:%S') Saved $ACTIVEVM domain XML"
 }
 
+# double‑checks the path we are about to delete.
+safe_rm() {
+  local target="$1"
+  [[ -z "$target" || "$target" == "/" ]] && fatal "Refusing to remove empty or root path"
+  [[ ! -e "$target" ]] && fatal "safe_rm: '$target' does not exist"
+  rm -rf --one-file-system -- "$target"
+}
+
 # Getting a list and a path of disk images.
 vm_disks_get() {
   # robust domblklist parsing using separator
-  mapfile -t DISK_INFO < <(virsh domblklist --details --type disk --noheadings --separator '|' "$ACTIVEVM")
+  mapfile -t DISK_INFO < <(virsh domblklist --details --type disk --noheadings --separator '|' "$ACTIVEVM" 2>/dev/null)
   DISK_LIST=()
   DISK_PATH=()
   for line in "${DISK_INFO[@]}"; do
-    IFS='|' read -r _dev _type target source <<<"$line"
+    IFS='|' read -r target source _type _dev <<<"$line"
     DISK_LIST+=("$target")
     DISK_PATH+=("$source")
   done
-  echo "$(date '+%Y-%m-%d %H:%M:%S') Disk targets: ${DISK_LIST[*]}"
-  echo "$(date '+%Y-%m-%d %H:%M:%S') Disk paths  : ${DISK_PATH[*]}"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') Disk targets: ${DISK_LIST[*]}";
+  echo "$(date '+%Y-%m-%d %H:%M:%S') Disk paths  : ${DISK_PATH[*]}";
 }
 
 # Getting a block device which is a snapshot.
-get_vm_shapshots() {
+get_snapshots() {
   virsh snapshot-list --domain "$ACTIVEVM" --no-metadata --name 2>/dev/null || true
 }
+
 
 # Entry point.
 set -euo pipefail
 IFS=$'\n\t'
+shopt -s nocasematch
 
 [[ $# -lt 2 ]] && usage
-COMMAND_USE="$1"
-shift
+COMMAND_USE="$1"; shift
 
 [[ $EUID -ne 0 ]] && fatal "Please run as root (e.g. sudo $0 ...)"
 
 case "$COMMAND_USE" in
---active | --stopped | --clean) ;;
-*) usage ;;
+  --active|--stopped|--clean) ;;
+  *) usage ;;
 esac
 
+LOG_INITIALIZED=0
+init_log
+
 for ACTIVEVM in "$@"; do
-  SNAPSHOT_NAME="snapshot-$(date +%s)"
+  SNAPSHOT_NAME="snapshot-${ACTIVEVM}-$(date +%s%N)"
   start_log
   backup_vm_config
   vm_disks_get
 
   if [[ $COMMAND_USE == "--active" ]]; then
     echo "Creating live snapshot $SNAPSHOT_NAME for $ACTIVEVM"
-    if ! get_snapshots | grep -q "$SNAPSHOT_NAME"; then
+    if ! get_snapshots | grep -Fxq "$SNAPSHOT_NAME"; then
       virsh snapshot-create-as --domain "$ACTIVEVM" "$SNAPSHOT_NAME" --disk-only \
         --atomic --quiesce --no-metadata
     else
@@ -125,11 +141,8 @@ for ACTIVEVM in "$@"; do
 
     for SRC in "${DISK_PATH[@]}"; do
       FILENAME=$(basename "$SRC")
-      [[ "$SRC" == "-" || "$SRC" =~ \\.iso$ || "$SRC" =~ \\.ISO$ ]] && {
-        echo "Skip removable/media: $SRC"
-        continue
-      }
-      echo "Copying $SRC -> $BACKUP_DIR/$ACTIVEVM/$FILENAME"
+      [[ "$SRC" == "-" || "$SRC" == *.iso ]] && { echo "Skip removable/media: $SRC" && continue; }
+      echo "Copying $SRC -> $BACKUP_DIR/$ACTIVEVM/$FILENAME";
       cp --reflink=auto --sparse=always "$SRC" "$BACKUP_DIR/$ACTIVEVM/$FILENAME"
     done
 
@@ -137,10 +150,12 @@ for ACTIVEVM in "$@"; do
     for disk in "${DISK_LIST[@]}"; do
       virsh blockcommit "$ACTIVEVM" "$disk" --active --verbose --pivot || echo "Nothing to commit for $disk"
     done
+    vm_disks_get
     # remove snapshot file(s)
-    for snap in $(get_snapshots); do
-      echo "Removing snapshot file $snap"
-      safe_rm "$snap" || true
+    for p in "${DISK_PATH[@]}"; do
+      [[ $p == *.snapshot ]] || continue
+      echo "Removing leftover snapshot layer $p"
+      rm -f -- "$p"
     done
     echo "Backup of $ACTIVEVM finished"
 
@@ -148,20 +163,17 @@ for ACTIVEVM in "$@"; do
     echo "Shutting down $ACTIVEVM"
     virsh shutdown "$ACTIVEVM" || true
     COUNTER=40 # 40*3=120s
-    while virsh list | grep -q " $ACTIVEVM " && ((COUNTER-- > 0)); do
+    while virsh list --name | grep -Fxq "$ACTIVEVM" && (( COUNTER-- > 0 )); do
       sleep 3
     done
-    if virsh list | grep -q " $ACTIVEVM "; then
+    if virsh list --name | grep -Fxq "$ACTIVEVM"; then
       echo "Force‑off $ACTIVEVM"
       virsh destroy "$ACTIVEVM"
     fi
 
     for SRC in "${DISK_PATH[@]}"; do
       FILENAME=$(basename "$SRC")
-      [[ "$SRC" == "-" || "$SRC" =~ \\.iso$ || "$SRC" =~ \\.ISO$ ]] && {
-        echo "Skip removable/media: $SRC"
-        continue
-      }
+      [[ "$SRC" == "-" || "$SRC" == *.iso ]] && { echo "Skip removable/media: $SRC" && continue; }
       cp --reflink=auto --sparse=always "$SRC" "$BACKUP_DIR/$ACTIVEVM/$FILENAME"
     done
 
