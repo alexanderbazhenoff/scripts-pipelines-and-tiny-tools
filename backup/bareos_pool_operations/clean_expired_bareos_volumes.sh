@@ -85,12 +85,12 @@ print_usage_help() {
   cat <<EOF
 
 Usage:
-   -n, --name     Pool name ('Full-', etc)
-   -a, --action   Action after expiration: delete|purge|prune
-   -e, --expire   Expiration in days (integer)
-   -f, --filter   Filter by status: none|Purged|Pruned
-   -d, --dry-run  Dry-run mode: yes|no
-   -h, --help     Show this help
+  -n, --name     Pool name ('Full-', etc)
+  -a, --action   Action after expiration: delete|purge|prune
+  -e, --expire   Expiration in days (integer)
+  -f, --filter   Filter by status: none|Purged|Pruned
+  -d, --dry-run  Dry-run mode: yes|no
+  -h, --help     Show this help
 EOF
   if [[ $# -gt 0 ]]; then
     exit 1
@@ -164,21 +164,20 @@ fi
 log INFO "Performing '${POOL_ACTION}' '${POOL_NAME}' volumes after ${POOL_EXPIRE} days, filtered by '${POOL_FILTER}' \
 status... Test mode: '${DRY_RUN}'."
 cd "$POOL_PATH" || log ERROR "Cannot cd to $POOL_PATH"
-FILE_LIST=$(find . -maxdepth 1 -type f -mtime +$POOL_EXPIRE -printf '%f\n' | grep -F "$POOL_NAME")
+FILE_LIST=$(find . -maxdepth 1 -type f -mtime +"$POOL_EXPIRE" -printf '%f\n' | grep -F "$POOL_NAME")
 
 if [[ -z $FILE_LIST ]]; then
   log WARNING "No expired volumes in '$POOL_NAME' pool by specified criteria ($POOL_EXPIRE days), nothing to \
 '$POOL_ACTION'."
-  exit 0
-fi
-
-for FILENAME in $FILE_LIST; do
-  FILE_DATE="$(stat --printf='%y' "$FILENAME")"
-  if [[ $POOL_FILTER == "none" ]]; then
-    process_volume "$FILENAME" "$FILE_DATE" "$DRY_RUN"
-  else
-    # Filter by volume status if $POOL_FILTER is set.
-    [[ -n $(echo "list volume" | bconsole | grep "$POOL_FILTER" | grep "$FILENAME" | cut -d ' ' -f6) ]] &&
+else
+  for FILENAME in $FILE_LIST; do
+    FILE_DATE="$(stat --printf='%y' "$FILENAME")"
+    if [[ $POOL_FILTER == "none" ]]; then
       process_volume "$FILENAME" "$FILE_DATE" "$DRY_RUN"
-  fi
-done
+    else
+      # Filter by volume status if $POOL_FILTER is set.
+      [[ -n $(echo "list volume" | bconsole | grep "$POOL_FILTER" | grep "$FILENAME" | cut -d ' ' -f6) ]] &&
+        process_volume "$FILENAME" "$FILE_DATE" "$DRY_RUN"
+    fi
+  done
+fi
