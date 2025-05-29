@@ -54,121 +54,133 @@ LOG_PATH=""
 # Path of the pool, e.g.: /mnt/pool_path
 POOL_PATH="/mnt/backup"
 
+# Logging function: prints timestamp and level; exits on ERROR.
+log() {
+  local level=$1 message=$2
+  printf '%s [%s] %s\n' "$(date +'%Y-%m-%dT%H:%M:%S')" "$level" "$message" | tee -a "${LOG_PATH:-/dev/null}"
+  [[ $level == "ERROR" ]] && exit 1
+}
+
 # Process volume function. In test mode prints only command (use for debug).
 process_volume() {
-  local F_NAME=$1
-  local F_DATE=$2
-  local MODE=$3
-  echo "Processing: $F_NAME | $F_DATE"
-  if [[ -n "$LOG_PATH" ]]; then
-    echo "Processing: $F_NAME | $F_DATE"
-  fi
+  local file=$1
+  log INFO "Processing: $file | $2"
 
-  if [[ $MODE == "no" ]]; then
-    echo "$POOL_ACTION volume=$POOL_PATH$F_NAME yes" | bconsole
+  if [[ $3 == "no" ]]; then
+    echo "$POOL_ACTION volume=${POOL_PATH}${file} yes" | bconsole
     # Perform physical delete of file from $POOL_PATH when "--action delete".
     # Doesn't matter if this volume is absent in Bareos database, this will be removed.
     if [[ $POOL_ACTION = "delete" ]]; then
-      echo "Performing physical delete of ${F_NAME} from ${POOL_PATH}..."
-      rm -f "$POOL_PATH/$F_NAME" && echo "Removed." || echo "${F_NAME} not found."
+      log INFO "Performing physical delete of ${file} from ${POOL_PATH}..."
+      rm -f "$POOL_PATH/$file" && echo "Removed." || echo "${file} not found."
     fi
   else
-    echo "(test mode): echo \"$POOL_ACTION volume=$POOL_PATH$F_NAME yes\" | bconsole"
+    echo "(test mode): echo \"$POOL_ACTION volume=${POOL_PATH}${file} yes\" | bconsole"
   fi
 }
 
 print_usage_help() {
-  echo "Error: unrecognized option(s): $POSITIONAL"
-  echo ""
-  echo "Usage:"
-  echo ""
-  echo "   -n | --name"
-  echo "          Pool name ('Full-', etc)."
-  echo "   -a | --action [delete|purge|prune]"
-  echo "          Action after expiration days."
-  echo "   -e | --expire"
-  echo "          Filter by time expiration (days)."
-  echo "   -f | --filter [none|Purged|Pruned]"
-  echo "          Filter by status of volume."
-  echo "   -d | --dry-run [yes|no]"
-  exit 1
+  if [[ $# -gt 0 ]]; then
+    echo "Error: unrecognized option(s): $*"
+  fi
+  cat <<EOF
+
+Usage:
+   -n, --name     Pool name ('Full-', etc)
+   -a, --action   Action after expiration: delete|purge|prune
+   -e, --expire   Expiration in days (integer)
+   -f, --filter   Filter by status: none|Purged|Pruned
+   -d, --dry-run  Dry-run mode: yes|no
+   -h, --help     Show this help
+EOF
+  if [[ $# -gt 0 ]]; then
+    exit 1
+  else
+    exit 0
+  fi
 }
 
 # entry point
+set -euo pipefail
+IFS=$'\n\t'
+
 POOL_NAME="Full-"
 POOL_ACTION="delete"
 POOL_EXPIRE='31'
 POOL_FILTER='none'
 DRY_RUN="no"
 
-while [[ $# -gt 0 ]]; do
-  KEY="$1"
-
-  case $KEY in
-  -n | --name)
-    POOL_NAME="$2"
-    shift
-    shift
+OPTIND=1
+while getopts ":n:a:e:f:d:h-:" opt; do
+  case "$opt" in
+  n) POOL_NAME=$OPTARG ;;
+  a) POOL_ACTION=$OPTARG ;;
+  e) POOL_EXPIRE=$OPTARG ;;
+  f) POOL_FILTER=$OPTARG ;;
+  d) DRY_RUN=$OPTARG ;;
+  h) print_usage_help ;;
+  -)
+    case "$OPTARG" in
+    help)
+      print_usage_help
+      ;;
+    name)
+      POOL_NAME="${!OPTIND}"
+      OPTIND=$((OPTIND + 1))
+      ;;
+    action)
+      POOL_ACTION="${!OPTIND}"
+      OPTIND=$((OPTIND + 1))
+      ;;
+    expire)
+      POOL_EXPIRE="${!OPTIND}"
+      OPTIND=$((OPTIND + 1))
+      ;;
+    filter)
+      POOL_FILTER="${!OPTIND}"
+      OPTIND=$((OPTIND + 1))
+      ;;
+    dry-run)
+      DRY_RUN="${!OPTIND}"
+      OPTIND=$((OPTIND + 1))
+      ;;
+    *)
+      print_usage_help "$OPTARG"
+      ;;
+    esac
     ;;
-  -a | --action)
-    POOL_ACTION="$2"
-    shift
-    shift
-    ;;
-  -e | --expire)
-    POOL_EXPIRE="$2"
-    shift
-    shift
-    ;;
-  -f | --filter)
-    POOL_FILTER="$2"
-    shift
-    shift
-    ;;
-  -d | --dry-run)
-    DRY_RUN="$2"
-    shift
-    shift
-    ;;
-  *)                   # unknown option
-    POSITIONAL+=("$1") # save it in an array for later
-    shift
-    ;;
+  *) print_usage_help ;;
   esac
 done
+shift $((OPTIND - 1))
 
-# error handling
-if [[ $DRY_RUN != "no" ]] && [[ $SELECTION != "yes" ]]; then
-  POSITIONAL+=("$SELECTION")
+# Check for any leftover arguments.
+if [[ $# -gt 0 ]]; then
+  log ERROR "Unknown parameters: $*"
 fi
-for VALUE in "${POSITIONAL[@]}"; do
-  echo "$VALUE"
-  if [[ -n $VALUE ]]; then
-    print_usage_help
+
+[[ $DRY_RUN =~ ^(yes|no)$ ]] || log ERROR "Wrong dry-run options, should be 'yes' or 'no'."
+[[ $POOL_ACTION =~ ^(delete|prune|purge)$ ]] || log ERROR "Wrong pool action, should be 'delete', 'prune' or 'purge'."
+
+log INFO "Performing '${POOL_ACTION}' '${POOL_NAME}' volumes after ${POOL_EXPIRE} days, filtered by '${POOL_FILTER}' \
+status... Test mode: '${DRY_RUN}'."
+
+cd "$POOL_PATH" || log ERROR "Cannot cd to $POOL_PATH"
+FILE_LIST=$(find . -maxdepth 1 -type f -mtime +$POOL_EXPIRE -printf '%f\n' | grep -F "$POOL_NAME")
+if [[ -z $FILE_LIST ]]; then
+  log WARNING "No expired volumes in '$POOL_NAME' pool by specified criteria ($POOL_EXPIRE days), nothing to \
+'$POOL_ACTION'."
+  exit 0
+fi
+
+for FILENAME in $FILE_LIST; do
+  FILE_DATE="$(stat --printf='%y' "$FILENAME")"
+  if [[ $POOL_FILTER == "none" ]]; then
+    process_volume "$FILENAME" "$FILE_DATE" "$DRY_RUN"
+  else
+    # Filter by volume status if $POOL_FILTER is set.
+    [[ -n $(echo "list volume" | bconsole | grep "$POOL_FILTER" | grep "$FILENAME" | cut -d ' ' -f6) ]] &&
+      process_volume "$FILENAME" "$FILE_DATE" "$DRY_RUN"
   fi
 done
 
-printf "%s %s\n" "Performing '${POOL_ACTION}' '${POOL_NAME}' volumes after '${POOL_EXPIRE}' days, filtered by" \
-  "'${POOL_FILTER}' status... Test mode: '${DRY_RUN}'."
-if [[ $POOL_ACTION = "delete" ]] || [[ $POOL_ACTION = "prune" ]] || [[ $POOL_ACTION = "purge" ]]; then
-  cd $POOL_PATH || exit 1
-  FILELIST=$(find . -mtime +"$POOL_EXPIRE" -print | grep "$POOL_NAME" | sed 's/[./]//g')
-  if [[ -z $FILELIST ]]; then
-    printf "%s %s\n" "No expired by volumes in '$POOL_NAME' pool by specified criteria ('$POOL_EXPIRE' days), nothing" \
-      "to '$POOL_ACTION'."
-  fi
-  for FILENAME in $FILELIST; do
-    # shellcheck disable=SC2012
-    FILEDATE=$(ls -lh "$FILENAME" | awk '{print $7" "$6" "$8}')
-    if [[ $POOL_FILTER == "none" ]]; then
-      process_volume "$FILENAME" "$FILEDATE" "$DRY_RUN"
-    else
-      # filter by volume status if $POOL_FILTER is not 'none'
-      [[ -n $(echo "list volume" | bconsole | grep "$POOL_FILTER" | grep "$FILENAME" | cut -d ' ' -f6) ]] &&
-        process_volume "$FILENAME" "$FILEDATE" "$DRY_RUN"
-    fi
-  done
-else
-  echo "Error! Uknown action: '$POOL_ACTION'. Use 'prune', 'purge' or 'delete'."
-  exit 1
-fi
