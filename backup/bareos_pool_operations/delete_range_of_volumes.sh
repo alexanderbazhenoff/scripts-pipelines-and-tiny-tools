@@ -14,8 +14,7 @@
 VOLUME_NAME="Full-"
 
 echo "WARNING! This will remove selected range of volumes in pool."
-echo "Sleep 10 for sure."
-sleep 10
+read -r -p "Press Enter to proceed or Ctrl+C to abort..."
 
 for I in {8702..8771}; do
   echo "Delete volume: ${VOLUME_NAME}${I}"

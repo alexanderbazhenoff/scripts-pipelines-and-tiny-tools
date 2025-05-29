@@ -15,9 +15,9 @@
 POOL_PATH="/mnt/backup"
 
 cd $POOL_PATH || exit 1
-FILELIST=$(find . -maxdepth 1 -type f -printf "%f\n")
-[[ -z $FILELIST ]] && echo "Nothing to process."
-for I in $FILELIST; do
+FILE_LIST=$(find . -maxdepth 1 -type f -printf "%f\n")
+[[ -z $FILE_LIST ]] && echo "Nothing to process."
+for I in $FILE_LIST; do
   echo "list volume=$I" | bconsole | if grep --quiet "No results to list"; then
     echo "$I is ready to be deleted"
     rm -f $POOL_PATH/"$I"

@@ -1,33 +1,33 @@
 # Bareos scripts
 
-**WARNING!** Running all these scripts may cause potential data loss. Do on your own risk; otherwise you know what
-you're doing.
+**WARNING!** Running these scripts may result in data loss. Use at your own risk, and only if you understand what you're
+doing.
 
 These scripts are for troubleshooting and a little help when you need to clean up, prune or prune Bareos pool after
-unsuccessful or made by mistake task. Basically two scripts
+a failed or mistakenly executed task. Basically two scripts
 ([clean_expired_bareos_volumes.sh](clean_expired_bareos_volumes.sh) and
-[batch_process_bareos_volumes.sh](batch_process_bareos_volumes.sh)) is more that enough, but here is some deprecated
-scripts (see [Other Bareos troubleshooting examples](#other-bareos-troubleshooting-examples)) without a pass of arguments
-from command-line.
+[batch_process_bareos_volumes.sh](batch_process_bareos_volumes.sh)) are more that enough, but here are some deprecated
+scripts (see [Other Bareos troubleshooting examples](#other-bareos-troubleshooting-examples)) that do not accept
+command-line arguments.
 
-Some scripts are only for file storage devices on SSF/HDD only (`Media Type = File`), e.g.:
+Some scripts are intended for file-based storage devices on SSD/HDD only (`Media Type = File`), e.g.:
 [batch_process_bareos_volumes.sh](batch_process_bareos_volumes.sh),
 [clean_expired_baros_volumes.sh](clean_expired_bareos_volumes.sh) or
 [clean_missing_volumes.sh](clean_missing_volumes.sh) because of direct operations on files in storage pool. This has
-never been tested on other types of pools (e.g. tapes).
+never been tested on other types of pools (e.g., tapes).
 
 ## Common scripts
 
 ### clean_expired_bareos_volumes.sh
 
 This script is useful if you need to delete a few volumes in the pool chosen by expiration date, pool name and(or)
-volume status. Basically, this script is for autoclean of Bareos storage pool. But you can also gather expiration
-volumes statistics, running with `--test yes` option.
+volume status. Basically, this script is for autoclean of Bareos storage pool. But you can also gather statistics about
+expired volumes, running with `--test yes` option.
 
 **Requirements:**
 
-- permissions to run `bconsole` command and access to **$poolpath** (don't mind if you run this script from Bareos Admin
-  Job you're, otherwise you should edit `/etc/sudoers` or run from root).
+- permissions to run `bconsole` command and access to **$poolpath** (not needed if you run this script via a Bareos
+  Admin Job. Otherwise, you should edit `/etc/sudoers` or run from root).
 - git package (`apt` or `yum install git` depending on your linux distro).
 
 **Usage:**
@@ -37,8 +37,8 @@ volumes statistics, running with `--test yes` option.
 - Use `--test yes` key for test mode.
 - Or run: `# ./clean_expired_baros_volumes.sh --help` for the help.
 
-On large installations, it takes a long time to purge or shift data. Maybe you also want to delete force some volumes.
-So you can use Admin Job with this script.
+On large installations, it can take a long time to purge or move data. Maybe you may want to forcibly delete some
+volumes. So you can use Admin Job with this script.
 
 **Bareos Admin Job Example:**
 
@@ -71,7 +71,7 @@ an additional bash script. Create `/etc/bareos/bareos-dir.d/my_wrapper_script.sh
 /etc/bareos/bareos-dir.d/clean_expired_bareos_volumes.sh --action delete --expire 60 --name Full-
 ```
 
-and run them via a Bareos Admin job without parameters pass:
+and run them via a Bareos Admin job without passing parameters:
 
 ```text
        Command = "/etc/bareos/bareos-dir.d/my_wrapper_script.sh"
@@ -94,7 +94,7 @@ Job {
 
 ### batch_process_bareos_volumes.sh
 
-Common-usage and the most multifunctional script for Bareos pool and volumes troubleshooting.
+The most versatile and commonly used script for Bareos pool and volumes troubleshooting.
 
 Apply action for a range of volumes:
 
@@ -103,12 +103,12 @@ Apply action for a range of volumes:
 ```
 
 Action for the range of volumes in the pool with 'name_mask' (something like 'Incremental-' or 'Full-') to apply from
-'start' to 'end' volume sequence. Action should be 'prune', 'purge' 'delete' or 'dumb'. Also, you need to set 'force' to
-skip confirmation request or 'print' to get the info about the selected range of volumes. 'print' will not perform
+'start' to 'end' volume sequence. The action can be 'prune', 'purge', 'delete', or 'dumb'. Also, you need to set 'force'
+to skip confirmation request or 'print' to get the info about the selected range of volumes. 'print' will not perform
 changes in volume status, just output info. Specifying `<pool_path_for_dumb>` will affect only for 'dumb' action.
 
-Action 'dumb' will create a range of an empty volume files (via `touch`command). Creating 'dumb' volumes required when
-you have removed existing volume by mistake, but it still exists in a Bareos database.
+Action 'dumb' will create a range of an empty volume files (via `touch`command). Creating 'dumb' volumes is useful if a
+volume was accidentally deleted but still exists in the Bareos database, but it still exists in a Bareos database.
 
 ## Other Bareos troubleshooting examples
 
@@ -122,16 +122,16 @@ inside the script and run.
 
 ### delete_all_volumes_from_pool_mysql.sh / delete_all_volumes_from_pool_pgsql.sh
 
-Delete all volumes from the pool for an old MySQL Bareos installations, or newer PostgreSQL. Set your `$POOL_NAME`
+Delete all volumes from the pool for older MySQL-based Bareos installations, or newer PostgreSQL. Set your `$POOL_NAME`
 inside the script and run.
 
 ### purge_all_volumes_from_pool_mysql.sh / purge_all_volumes_from_pool_pgsql.sh
 
-Set all volumes in defined pool to "purged" state. Set your `$POOL_NAME` inside the script and run.
+Mark all volumes in the specified pool as 'purged'. Set your `$POOL_NAME` inside the script and run.
 
 ### prune_all_volumes_from_pool_mysql.sh / prune_all_volumes_from_pool_pgsql.sh
 
-Same as the previous scripts, but sets to 'pruned' state.
+Similar to the previous scripts, but marks volumes as 'pruned'.
 
 ### remove_purged_volumes.sh
 

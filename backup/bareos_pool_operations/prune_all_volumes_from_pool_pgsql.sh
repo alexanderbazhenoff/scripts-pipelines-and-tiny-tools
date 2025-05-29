@@ -17,12 +17,12 @@ POOL_NAME="Full"
 PWD_R=$(pwd)
 cd /var/lib/postgresql || exit 1
 VOLUMES=$(sudo -u postgres -H -- psql -d bareos -c "SELECT volumename FROM media ORDER BY volumename" | tail -n+3 |
-  head -n -2 | grep $POOL_NAME)
-[[ -z $VOLUMES ]] && echo "No volumes in the pool, nothing to do." && exit
+  head -n -2 | grep "$POOL_NAME")
+[[ -z $VOLUMES ]] && { echo "No volumes in the pool, nothing to do." && exit 0; }
 cd "$PWD_R" || exit 1
 
-echo "This will prune all volumes in $POOL_NAME. Sleep 30 for sure."
-sleep 30
+echo "This will prune all volumes in $POOL_NAME."
+read -r -p "Press Enter to proceed or Ctrl+C to abort..."
 
 for VOL_ITEM in $VOLUMES; do
   echo "prune volume=$VOL_ITEM yes" | bconsole

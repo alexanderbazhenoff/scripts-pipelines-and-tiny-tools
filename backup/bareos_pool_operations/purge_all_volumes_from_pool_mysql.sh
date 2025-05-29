@@ -14,11 +14,11 @@
 # Set pool name, e.g.: "Incremental" or "Full"
 POOL_NAME="Full"
 
-VOLUMES=$(mysql -u root -B -e'select VolumeName from Media order by VolumeName;' bareos | tail -n+2 | grep $POOL_NAME)
-[[ -z $VOLUMES ]] && echo "No volumes in the pool, nothing to do." && exit
+VOLUMES=$(mysql -u root -B -e'select VolumeName from Media order by VolumeName;' bareos | tail -n+2 | grep "$POOL_NAME")
+[[ -z $VOLUMES ]] && { echo "No volumes in the pool, nothing to do." && exit 0; }
 
-echo "This will purge all volumes in $POOL_NAME. Sleep 30 for sure."
-sleep 30
+echo "This will purge all volumes in $POOL_NAME."
+read -r -p "Press Enter to proceed or Ctrl+C to abort..."
 
 for VOL_ITEM in $VOLUMES; do
   echo "purge volume=$VOL_ITEM yes" | bconsole

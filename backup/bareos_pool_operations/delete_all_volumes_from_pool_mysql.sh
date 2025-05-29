@@ -17,8 +17,8 @@ POOL_NAME="Full"
 VOLUMES=$(mysql -u root -B -e'select VolumeName from Media order by VolumeName;' bareos | tail -n+2 | grep $POOL_NAME)
 [[ -z $VOLUMES ]] && echo "No volumes in the pool, nothing to do." && exit
 
-echo "This will delete all volumes in ${POOL_NAME}. Sleep 10 for sure."
-sleep 10
+echo "This will delete all volumes in ${POOL_NAME}."
+read -r -p "Press Enter to proceed or Ctrl+C to abort..."
 
 for VOL_ITEM in $VOLUMES; do
   echo "delete volume=${VOL_ITEM} yes" | bconsole

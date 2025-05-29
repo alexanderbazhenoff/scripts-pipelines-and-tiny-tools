@@ -14,15 +14,15 @@
 # Set pool name, e.g.: "Incremental" or "Full"
 POOL_NAME="Full-"
 
-PWD_R=$(pwd)
+PWD_R="$(pwd)"
 cd /var/lib/postgresql || exit 1
 VOLUMES=$(sudo -u postgres -H -- psql -d bareos -c "SELECT volumename FROM media ORDER BY volumename" | tail -n+3 |
-  head -n -2 | grep $POOL_NAME)
-[[ -z $VOLUMES ]] && echo "No volumes in the pool, nothing to do." && exit
+  head -n -2 | grep "$POOL_NAME")
+[[ -z $VOLUMES ]] && { echo "No volumes in the pool, nothing to do." && exit 0; }
 cd "$PWD_R" || exit 1
 
-echo "This will delete all volumes in ${POOL_NAME}. Sleep 10 for sure."
-sleep 10
+echo "This will delete all volumes in ${POOL_NAME}."
+read -r -p "Press Enter to proceed or Ctrl+C to abort..."
 
 for vol in $VOLUMES; do
   echo "delete volume=${vol} yes" | bconsole
