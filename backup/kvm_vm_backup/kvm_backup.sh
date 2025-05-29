@@ -82,16 +82,16 @@ get_vm_shapshots() {
   virsh domblklist "$1" | grep '.snapshot' | awk '{print $2}'
 }
 
-
 # Entry point.
 [[ $# -lt 2 ]] && usage
-COMMAND_USE="$1"; shift
+COMMAND_USE="$1"
+shift
 
 [[ $EUID -ne 0 ]] && fatal "Please run as root (e.g. sudo $0 ...)"
 
 case "$COMMAND_USE" in
-  --active|--stopped|--clean) ;;
-  *) usage ;;
+--active | --stopped | --clean) ;;
+*) usage ;;
 esac
 
 #

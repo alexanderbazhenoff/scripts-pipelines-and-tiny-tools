@@ -81,8 +81,8 @@ vm_disks_get() {
     DISK_LIST+=("$target")
     DISK_PATH+=("$source")
   done
-  echo "$(date '+%Y-%m-%d %H:%M:%S') Disk targets: ${DISK_LIST[*]}";
-  echo "$(date '+%Y-%m-%d %H:%M:%S') Disk paths  : ${DISK_PATH[*]}";
+  echo "$(date '+%Y-%m-%d %H:%M:%S') Disk targets: ${DISK_LIST[*]}"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') Disk paths  : ${DISK_PATH[*]}"
 }
 
 # Getting a block device which is a snapshot.
@@ -90,19 +90,19 @@ get_vm_shapshots() {
   virsh snapshot-list --domain "$ACTIVEVM" --no-metadata --name 2>/dev/null || true
 }
 
-
 # Entry point.
 set -euo pipefail
 IFS=$'\n\t'
 
 [[ $# -lt 2 ]] && usage
-COMMAND_USE="$1"; shift
+COMMAND_USE="$1"
+shift
 
 [[ $EUID -ne 0 ]] && fatal "Please run as root (e.g. sudo $0 ...)"
 
 case "$COMMAND_USE" in
-  --active|--stopped|--clean) ;;
-  *) usage ;;
+--active | --stopped | --clean) ;;
+*) usage ;;
 esac
 
 for ACTIVEVM in "$@"; do
@@ -126,8 +126,10 @@ for ACTIVEVM in "$@"; do
     for SRC in "${DISK_PATH[@]}"; do
       FILENAME=$(basename "$SRC")
       [[ "$SRC" == "-" || "$SRC" =~ \\.iso$ || "$SRC" =~ \\.ISO$ ]] && {
-        echo "Skip removable/media: $SRC"; continue; }
-      echo "Copying $SRC -> $BACKUP_DIR/$ACTIVEVM/$FILENAME";
+        echo "Skip removable/media: $SRC"
+        continue
+      }
+      echo "Copying $SRC -> $BACKUP_DIR/$ACTIVEVM/$FILENAME"
       cp --reflink=auto --sparse=always "$SRC" "$BACKUP_DIR/$ACTIVEVM/$FILENAME"
     done
 
@@ -146,7 +148,7 @@ for ACTIVEVM in "$@"; do
     echo "Shutting down $ACTIVEVM"
     virsh shutdown "$ACTIVEVM" || true
     COUNTER=40 # 40*3=120s
-    while virsh list | grep -q " $ACTIVEVM " && (( COUNTER-- > 0 )); do
+    while virsh list | grep -q " $ACTIVEVM " && ((COUNTER-- > 0)); do
       sleep 3
     done
     if virsh list | grep -q " $ACTIVEVM "; then
