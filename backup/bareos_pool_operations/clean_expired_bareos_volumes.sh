@@ -65,7 +65,6 @@ log() {
 process_volume() {
   local file=$1
   log INFO "Processing: $file | $2"
-
   if [[ $3 == "no" ]]; then
     echo "$POOL_ACTION volume=${POOL_PATH}${file} yes" | bconsole
     # Perform physical delete of file from $POOL_PATH when "--action delete".
@@ -100,7 +99,7 @@ EOF
   fi
 }
 
-# entry point
+# Entry point.
 set -euo pipefail
 IFS=$'\n\t'
 
@@ -158,15 +157,15 @@ shift $((OPTIND - 1))
 if [[ $# -gt 0 ]]; then
   log ERROR "Unknown parameters: $*"
 fi
-
+# Check for wrong parameters.
 [[ $DRY_RUN =~ ^(yes|no)$ ]] || log ERROR "Wrong dry-run options, should be 'yes' or 'no'."
 [[ $POOL_ACTION =~ ^(delete|prune|purge)$ ]] || log ERROR "Wrong pool action, should be 'delete', 'prune' or 'purge'."
 
 log INFO "Performing '${POOL_ACTION}' '${POOL_NAME}' volumes after ${POOL_EXPIRE} days, filtered by '${POOL_FILTER}' \
 status... Test mode: '${DRY_RUN}'."
-
 cd "$POOL_PATH" || log ERROR "Cannot cd to $POOL_PATH"
 FILE_LIST=$(find . -maxdepth 1 -type f -mtime +$POOL_EXPIRE -printf '%f\n' | grep -F "$POOL_NAME")
+
 if [[ -z $FILE_LIST ]]; then
   log WARNING "No expired volumes in '$POOL_NAME' pool by specified criteria ($POOL_EXPIRE days), nothing to \
 '$POOL_ACTION'."
@@ -183,4 +182,3 @@ for FILENAME in $FILE_LIST; do
       process_volume "$FILENAME" "$FILE_DATE" "$DRY_RUN"
   fi
 done
-
