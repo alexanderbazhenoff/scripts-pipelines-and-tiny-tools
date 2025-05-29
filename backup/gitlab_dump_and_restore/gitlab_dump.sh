@@ -1,35 +1,28 @@
 #!/usr/bin/env bash
 
-# Create GitLab dump data
+# Create GitLab backup dump.
 # Copyright (c) December, 2018, Aleksandr Bazhenov
 
 # This Source Code Form is subject to the terms of the BSD 3-Clause License.
 # If a copy of the source distributed without this file, you can obtain one at:
 # https://github.com/alexanderbazhenoff/scripts-pipelines-and-tiny-tools/blob/master/LICENSE
 
-# WARNING! Running this file may cause a potential data loss and assumes you accept
-# that you know what you're doing. All actions with this script at your own risk.
+# WARNING! Running this script may result in potential data loss.
+# Proceed only if you understand what you're doing. Use at your own risk.
 
-# You can set you additional options like 'SKIP=artifacts' if built artifacts
-# not required. More information:
+# You can set additional options like 'SKIP=artifacts' if build artifacts
+# are not required. More information:
 # - https://docs.gitlab.com/ee/raketasks/backup_gitlab.html
 # - https://docs.gitlab.com/ee/raketasks/backup_restore.html
 
-set -x
+set -ex
 
-if [[ -d /var/opt/gitlab/backups ]]; then
-  sudo rm -rf /var/opt/gitlab/backups
-fi
+sudo mkdir -p /var/opt/gitlab/backups
+sudo find /var/opt/gitlab/backups -mindepth 1 -exec rm -rf {} +
 
-sudo mkdir /var/opt/gitlab/backups
 sudo chown git /var/opt/gitlab/backups
-if [[ -d /var/opt/gitlab/backups ]]; then
-  sudo gitlab-rake gitlab:backup:create SKIP=artifacts 2>&1 |
-    tee -a /var/opt/gitlab/backups/gitlab-dump.log |
-    grep -v " ... $" || exit 1
-else
+if ! sudo gitlab-rake gitlab:backup:create SKIP=artifacts 2>&1 | tee -a /var/opt/gitlab/backups/gitlab-dump.log; then
+  echo "Backup failed."
   exit 1
 fi
-
 echo "Dumping GitLab completed."
-exit 0

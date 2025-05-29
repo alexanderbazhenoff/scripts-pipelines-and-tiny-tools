@@ -16,48 +16,42 @@ ERROR_NOTIFICATION_SCRIPT_PATH="/opt/scripts/error_notification.sh"
 SOURCE_PATH="/mnt/backup/"
 
 usage_error() {
-  echo ""
-  echo "Usage:"
-  echo "   -s|--source|--source-path /path/to/source/folder/or/file"
-  echo "                             (defaults: $SOURCE_PATH)"
+  cat <<EOF
+Usage:
+  -s|--source|--source-path /path/to/source/folder/or/file
+                            (defaults: $SOURCE_PATH)
+EOF
   exit 1
 }
 
 task_error() {
-  local RETURN_CODE=$1
-  local ERROR_MESSAGE=$2
-  if [[ $RETURN_CODE -ne 0 ]]; then
+  if [[ $1 -ne 0 ]]; then
     echo "Sending $REMOTE_DRIVE_NAME error message"
-    chrt -i 0 /.$ERROR_NOTIFICATION_SCRIPT_PATH "$ERROR_MESSAGE"
+    chrt -i 0 "$ERROR_NOTIFICATION_SCRIPT_PATH" "$2"
   fi
 }
 
 while [[ $# -gt 0 ]]; do
   KEY="$1"
-
   case $KEY in
   -s | --source | --source-path)
     SOURCE_PATH="$2"
     shift
     shift
     ;;
-
-  *) # unknown option
-    POSITIONAL+=("$1")
-    shift
+  *)
+    usage_error
     ;;
   esac
 done
 
-set -- "${POSITIONAL[@]}"
+echo "Ready to calculate md5 checksum on $(hostname) for directory: $SOURCE_PATH"
+cd "$SOURCE_PATH" || { echo "Failed to change directory to $SOURCE_PATH" && exit 1; }
 
-HOSTNAME="$(hostname)"
-echo "Ready to calculate md5 checksum on $HOSTNAME for directory: $SOURCE_PATH"
-cd "$SOURCE_PATH" || exit 1
-
-if ! ls -1 ./*.md5 -I ./*md5.md5; then
-  /./opt/scripts/check_error_notification.sh "no_md5_files_found!"
-fi
+# List all “*.md5” files except “*.md5.md5” and alert error if none are found.
+shopt -s nullglob extglob
+set -- !(*.md5.md5).md5
+(($#)) || "$ERROR_NOTIFICATION_SCRIPT_PATH" "no_md5_files_found!"
 
 find . -type f -name '*.md5' ! -name '*.md5.md5' -exec bash -c \
   '[[ -f ${1//.md5} ]] && (md5sum -c ${1#./} || /./opt/scripts/check_error_notification.sh ${1#./})' -- {} \;

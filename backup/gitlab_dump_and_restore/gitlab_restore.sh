@@ -7,12 +7,10 @@
 # If a copy of the source distributed without this file, you can obtain one at:
 # https://github.com/alexanderbazhenoff/scripts-pipelines-and-tiny-tools/blob/master/LICENSE
 
-# WARNING! Running this file may cause a potential data loss and assumes you accept
-# that you know what you're doing. All actions with this script at your own risk.
-
+# WARNING! This script may cause irreversible data loss. Use at your own risk.
 # More info: https://docs.gitlab.com/ee/raketasks/backup_restore.html
 
-rm -fr /var/opt/gitlab/backups/*
+sudo find /var/opt/gitlab/backups -mindepth 1 -exec rm -rf {} +
 sudo chown git /var/opt/gitlab/backups
-sudo gitlab-rake gitlab:backup:restore "$(ls /var/opt/gitlab/backups)" force=yes
+sudo gitlab-rake gitlab:backup:restore "$(ls -1 "$BACKUP_DIR"/*.tar 2>/dev/null | sort | tail -n 1)" force=yes
 sudo gitlab-ctl restart

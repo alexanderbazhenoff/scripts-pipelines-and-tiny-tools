@@ -15,20 +15,22 @@
 SOURCE_PATH="/mnt/backup/"
 
 usage_error() {
-  echo "Error: unrecognized option: $POSITIONAL"
-  echo ""
-  echo "Usage:"
-  echo "   -s|--source|--source-path /path/to/source/folder/or/file"
-  echo "                             (defaults: $SOURCE_PATH)"
+  cat <<EOF
+Error: unrecognized option: $1
+
+Usage:
+  -s|--source|--source-path /path/to/source/folder/or/file
+                            (defaults: $SOURCE_PATH)
+EOF
   exit 1
 }
 
 check_md5() {
-  FILENAME="$1"
-  echo "Checking exising ${FILENAME#./}'s md5..."
-  md5sum -c "$FILENAME.md5" ||
-    (echo "Re-calculating md5 for $FILENAME..." &&
-      md5sum -b "$FILENAME" | tee "$FILENAME".md5)
+  echo "Checking existing ${1#./}'s md5..."
+  if ! md5sum -c "$1.md5"; then
+    echo "Re-calculating md5 for $1..."
+    md5sum -b "$1" | tee "$1.md5"
+  fi
 }
 
 while [[ $# -gt 0 ]]; do
@@ -40,20 +42,15 @@ while [[ $# -gt 0 ]]; do
     shift
     shift
     ;;
-
-  *) # unknown option
-    POSITIONAL+=("$1")
-    usage_error
+  *)
+    usage_error "$1"
     ;;
   esac
 done
 
-set -- "${POSITIONAL[@]}"
 export -f check_md5
 
-HOSTNAME="$(hostname)"
-echo "Ready to calculate md5 checksum on $HOSTNAME for directory: $SOURCE_PATH"
-
+echo "Ready to calculate md5 checksum on $(hostname) for directory: $SOURCE_PATH"
 find . ! -name '*.md5' -type f -exec bash -c \
   'if [[ -f $1.md5 ]]; then check_md5 $1; else md5sum -b $1 | tee $1.md5; fi' -- {} \; ||
   /./opt/scripts/check_error_notification.sh "md5" && exit 1
