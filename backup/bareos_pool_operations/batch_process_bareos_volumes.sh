@@ -49,12 +49,17 @@
 
 usage() {
   cat <<EOF
-Usage: $0 <action> <name_mask> <start> <end> <force|print> pool_name_for_dumb> <pool_path_for_dumb>
-  action: prune | purge | delete | dumb
+Usage: $0 <action> <name_mask> <start> <end> <force|print> <pool_name_for_dumb> <pool_path_for_dumb>
+  Where action is: prune | purge | delete | dumb
   For dumb action you can also specify pool path (e.g. '/mnt/backup'):
   $0 <action> <name_mask> <start> <end> <force|print> /mnt/backup
 EOF
   exit 1
+}
+
+error() {
+  echo "$1"
+  USAGE_ERR=true
 }
 
 # Set up default pool path, e.g.: "/mnt/backup".
@@ -70,27 +75,14 @@ USAGE_ERR=false
 
 for var in VOL_ACTION VOL_MASK VOL_START VOL_END; do
   if [[ -z "${!var}" ]]; then
-    echo "Error: '$var' is required."
-    USAGE_ERR=true
+    error "Error: '$var' is required."
   fi
 done
 
-[[ $VOL_ACTION =~ ^(prune|purge|delete|dumb)$ ]] || {
-  echo "Error: invalid action specified."
-  USAGE_ERR=true
-}
-[[ -z $VOL_OPT || $VOL_OPT =~ ^(force|print)$ ]] || {
-  echo "Error: volume option should be empty, 'force' or 'print'."
-  USAGE_ERR=true
-}
-[[ $VOL_START =~ ^[0-9]+$ ]] || {
-  echo "Error: start volume is not a number"
-  USAGE_ERR=true
-}
-[[ $VOL_END =~ ^[0-9]+$ ]] || {
-  echo "Error: end volume is not a number"
-  USAGE_ERR=true
-}
+[[ $VOL_ACTION =~ ^(prune|purge|delete|dumb)$ ]] || { error "Error: invalid action specified."; }
+[[ -z $VOL_OPT || $VOL_OPT =~ ^(force|print)$ ]] || { error "Error: option should be empty, 'force' or 'print'."; }
+[[ $VOL_START =~ ^[0-9]+$ ]] || { error "Error: start volume is not a number."; }
+[[ $VOL_END =~ ^[0-9]+$ ]] || { error "Error: end volume is not a number."; }
 
 if $USAGE_ERR; then
   usage
