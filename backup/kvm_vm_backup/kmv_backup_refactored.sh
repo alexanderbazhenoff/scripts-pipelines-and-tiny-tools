@@ -68,6 +68,7 @@ start_log() {
   mkdir -p "$BACKUP_DIR/$ACTIVEVM"
   echo "$(date +'%Y-%m-%d %H:%M:%S') Starting backup of $ACTIVEVM"
 }
+
 # backup config of VM.
 backup_vm_config() {
   virsh dumpxml "$ACTIVEVM" >"$BACKUP_DIR/$ACTIVEVM/$ACTIVEVM".xml
@@ -84,15 +85,14 @@ safe_rm() {
 
 # Getting a list and a path of disk images.
 vm_disks_get() {
-  # robust domblklist parsing using separator
-  mapfile -t DISK_INFO < <(virsh domblklist --details --type disk --noheadings --separator '|' "$ACTIVEVM" 2>/dev/null)
   DISK_LIST=()
   DISK_PATH=()
-  for line in "${DISK_INFO[@]}"; do
-    IFS='|' read -r target source _type _dev <<<"$line"
-    DISK_LIST+=("$target")
-    DISK_PATH+=("$source")
-  done
+  while IFS=' ' read -r tgt src _; do
+    [[ -z $src || $src == "-" ]] && continue
+    DISK_LIST+=("$tgt")
+    DISK_PATH+=("$src")
+  done < <(virsh domblklist "$ACTIVEVM" | awk 'NR>2')
+
   echo "$(date '+%Y-%m-%d %H:%M:%S') Disk targets: ${DISK_LIST[*]}"
   echo "$(date '+%Y-%m-%d %H:%M:%S') Disk paths  : ${DISK_PATH[*]}"
 }
@@ -104,7 +104,6 @@ get_snapshots() {
 
 # Entry point.
 set -euo pipefail
-IFS=$'\n\t'
 shopt -s nocasematch
 
 [[ $# -lt 2 ]] && usage
@@ -126,6 +125,8 @@ for ACTIVEVM in "$@"; do
   start_log
   backup_vm_config
   vm_disks_get
+  BASE_LIST=("${DISK_LIST[@]}")
+  BASE_PATH=("${DISK_PATH[@]}")
 
   if [[ $COMMAND_USE == "--active" ]]; then
     echo "Creating live snapshot $SNAPSHOT_NAME for $ACTIVEVM"
@@ -136,10 +137,9 @@ for ACTIVEVM in "$@"; do
       echo "Snapshot $SNAPSHOT_NAME already exists – skipping create"
     fi
 
-    # refresh disk list after snapshot so we copy the backing image layer
     vm_disks_get
-
-    for SRC in "${DISK_PATH[@]}"; do
+    SNAP_PATH=("${DISK_PATH[@]}")
+    for SRC in "${BASE_PATH[@]}"; do
       FILENAME=$(basename "$SRC")
       [[ "$SRC" == "-" || "$SRC" == *.iso ]] && { echo "Skip removable/media: $SRC" && continue; }
       echo "Copying $SRC -> $BACKUP_DIR/$ACTIVEVM/$FILENAME"
@@ -147,12 +147,12 @@ for ACTIVEVM in "$@"; do
     done
 
     # commit + remove snapshot layer
-    for disk in "${DISK_LIST[@]}"; do
+    for disk in "${BASE_LIST[@]}"; do
       virsh blockcommit "$ACTIVEVM" "$disk" --active --verbose --pivot || echo "Nothing to commit for $disk"
     done
     vm_disks_get
     # remove snapshot file(s)
-    for p in "${DISK_PATH[@]}"; do
+    for p in "${SNAP_PATH[@]}"; do
       [[ $p == *.snapshot ]] || continue
       echo "Removing leftover snapshot layer $p"
       rm -f -- "$p"
@@ -162,7 +162,7 @@ for ACTIVEVM in "$@"; do
   elif [[ $COMMAND_USE == "--stopped" ]]; then
     echo "Shutting down $ACTIVEVM"
     virsh shutdown "$ACTIVEVM" || true
-    COUNTER=40 # 40*3=120s
+    COUNTER=40
     while virsh list --name | grep -Fxq "$ACTIVEVM" && ((COUNTER-- > 0)); do
       sleep 3
     done
