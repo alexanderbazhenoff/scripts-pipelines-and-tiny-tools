@@ -32,13 +32,17 @@
 # WARNING! Running this file may cause a potential data loss and assumes you accept
 # that you know what you're doing. All actions with this script at your own risk.
 
-# specify backup folder here:
+# Specify backup folder here:
 BACKUP_DIR="/var/lib/libvirt/images/backup"
-
-# specify log file path here:
+# Specify log file path here:
 LOGFILE="/var/log/kvm_backup.log"
 
-fatal() { echo "Error: $*" >&2 && exit 1; }
+log() {
+  echo "$(date '+%Y-%m-%d %H:%M:%S') [$ACTIVE_VM] $1"
+  if [[ ${2:-} == true ]]; then
+    exit 1
+  fi
+}
 
 usage() {
   cat <<EOF
@@ -65,21 +69,32 @@ init_log() {
 }
 
 start_log() {
-  mkdir -p "$BACKUP_DIR/$ACTIVEVM"
-  echo "$(date +'%Y-%m-%d %H:%M:%S') Starting backup of $ACTIVEVM"
+  log "Starting backup"
+  mkdir -p "$BACKUP_DIR/$ACTIVE_VM"
 }
 
-# backup config of VM.
 backup_vm_config() {
-  virsh dumpxml "$ACTIVEVM" >"$BACKUP_DIR/$ACTIVEVM/$ACTIVEVM".xml
-  echo "$(date '+%Y-%m-%d %H:%M:%S') Saved $ACTIVEVM domain XML"
+  virsh dumpxml "$ACTIVE_VM" >"$BACKUP_DIR/$ACTIVE_VM/$ACTIVE_VM".xml
+  log "Saved domain XML"
 }
 
-# double‑checks the path we are about to delete.
+copy_base_images() {
+  log "Copying base images"
+  for SRC in "${BASE_PATH[@]}"; do
+    [[ "$SRC" == "-" || "$SRC" == *.iso ]] && {
+      log "Skip media: $SRC"
+      continue
+    }
+    log "Copying base image $SRC to backup"
+    cp --reflink=auto --sparse=always "$SRC" "$BACKUP_DIR/$ACTIVE_VM/"
+  done
+}
+
+# Double‑checks the path we are about to delete.
 safe_rm() {
   local target="$1"
-  [[ -z "$target" || "$target" == "/" ]] && fatal "Refusing to remove empty or root path"
-  [[ ! -e "$target" ]] && fatal "safe_rm: '$target' does not exist"
+  [[ -z "$target" || "$target" == "/" ]] && log "Refusing to remove empty or root path" true
+  [[ ! -e "$target" ]] && log "safe_rm: '$target' does not exist" true
   rm -rf --one-file-system -- "$target"
 }
 
@@ -91,15 +106,14 @@ vm_disks_get() {
     [[ -z $src || $src == "-" ]] && continue
     DISK_LIST+=("$tgt")
     DISK_PATH+=("$src")
-  done < <(virsh domblklist "$ACTIVEVM" | awk 'NR>2')
-
-  echo "$(date '+%Y-%m-%d %H:%M:%S') Disk targets: ${DISK_LIST[*]}"
-  echo "$(date '+%Y-%m-%d %H:%M:%S') Disk paths  : ${DISK_PATH[*]}"
+  done < <(virsh domblklist "$ACTIVE_VM" | awk 'NR>2')
+  log "Disk targets: ${DISK_LIST[*]}"
+  log "Disk paths: ${DISK_PATH[*]}"
 }
 
 # Getting a block device which is a snapshot.
 get_snapshots() {
-  virsh snapshot-list --domain "$ACTIVEVM" --no-metadata --name 2>/dev/null || true
+  virsh snapshot-list --domain "$ACTIVE_VM" --no-metadata --name 2>/dev/null || true
 }
 
 # Entry point.
@@ -109,8 +123,7 @@ shopt -s nocasematch
 [[ $# -lt 2 ]] && usage
 COMMAND_USE="$1"
 shift
-
-[[ $EUID -ne 0 ]] && fatal "Please run as root (e.g. sudo $0 ...)"
+[[ $EUID -ne 0 ]] && log "Please run as root (e.g. sudo $0 ...)" true
 
 case "$COMMAND_USE" in
 --active | --stopped | --clean) ;;
@@ -120,8 +133,8 @@ esac
 LOG_INITIALIZED=0
 init_log
 
-for ACTIVEVM in "$@"; do
-  SNAPSHOT_NAME="snapshot-${ACTIVEVM}-$(date +%s%N)"
+for ACTIVE_VM in "$@"; do
+  SNAPSHOT_NAME="snapshot-${ACTIVE_VM}-$(date +%s%N)"
   start_log
   backup_vm_config
   vm_disks_get
@@ -129,61 +142,54 @@ for ACTIVEVM in "$@"; do
   BASE_PATH=("${DISK_PATH[@]}")
 
   if [[ $COMMAND_USE == "--active" ]]; then
-    echo "Creating live snapshot $SNAPSHOT_NAME for $ACTIVEVM"
+    log "Creating live snapshot $SNAPSHOT_NAME"
     if ! get_snapshots | grep -Fxq "$SNAPSHOT_NAME"; then
-      virsh snapshot-create-as --domain "$ACTIVEVM" "$SNAPSHOT_NAME" --disk-only \
-        --atomic --quiesce --no-metadata
+      virsh snapshot-create-as --domain "$ACTIVE_VM" "$SNAPSHOT_NAME" --disk-only --atomic --quiesce --no-metadata
     else
-      echo "Snapshot $SNAPSHOT_NAME already exists – skipping create"
+      log "Snapshot $SNAPSHOT_NAME already exists – skipping"
     fi
 
     vm_disks_get
     SNAP_PATH=("${DISK_PATH[@]}")
-    for SRC in "${BASE_PATH[@]}"; do
-      FILENAME=$(basename "$SRC")
-      [[ "$SRC" == "-" || "$SRC" == *.iso ]] && { echo "Skip removable/media: $SRC" && continue; }
-      echo "Copying $SRC -> $BACKUP_DIR/$ACTIVEVM/$FILENAME"
-      cp --reflink=auto --sparse=always "$SRC" "$BACKUP_DIR/$ACTIVEVM/$FILENAME"
-    done
+    copy_base_images
 
-    # commit + remove snapshot layer
+    log "Committing and removing snapshot layers"
     for disk in "${BASE_LIST[@]}"; do
-      virsh blockcommit "$ACTIVEVM" "$disk" --active --verbose --pivot || echo "Nothing to commit for $disk"
+      log "Blockcommit disk $disk"
+      virsh blockcommit "$ACTIVE_VM" "$disk" --active --verbose --pivot || echo "Nothing to commit for $disk"
     done
     vm_disks_get
-    # remove snapshot file(s)
+    log "Removing snapshot files"
     for p in "${SNAP_PATH[@]}"; do
       [[ $p == *.snapshot ]] || continue
-      echo "Removing leftover snapshot layer $p"
+      log "Removing leftover snapshot layer $p"
       rm -f -- "$p"
     done
-    echo "Backup of $ACTIVEVM finished"
+    log "Active backup completed"
 
   elif [[ $COMMAND_USE == "--stopped" ]]; then
-    echo "Shutting down $ACTIVEVM"
-    virsh shutdown "$ACTIVEVM" || true
-    COUNTER=40
-    while virsh list --name | grep -Fxq "$ACTIVEVM" && ((COUNTER-- > 0)); do
-      sleep 3
-    done
-    if virsh list --name | grep -Fxq "$ACTIVEVM"; then
-      echo "Force‑off $ACTIVEVM"
-      virsh destroy "$ACTIVEVM"
+    log "Shutting down VM"
+    if ! virsh shutdown "$ACTIVE_VM"; then
+      log "Shutdown failed, waiting anyway..."
     fi
 
-    for SRC in "${DISK_PATH[@]}"; do
-      FILENAME=$(basename "$SRC")
-      [[ "$SRC" == "-" || "$SRC" == *.iso ]] && { echo "Skip removable/media: $SRC" && continue; }
-      cp --reflink=auto --sparse=always "$SRC" "$BACKUP_DIR/$ACTIVEVM/$FILENAME"
+    COUNTER=40
+    while virsh list --name | grep -Fxq "$ACTIVE_VM" && ((COUNTER-- > 0)); do
+      sleep 3
     done
+    if virsh list --name | grep -Fxq "$ACTIVE_VM"; then
+      log "Force‑off"
+      virsh destroy "$ACTIVE_VM"
+    fi
 
-    echo "Starting $ACTIVEVM"
-    virsh start "$ACTIVEVM"
-
-  else # --clean
-    echo "Cleaning backups of $ACTIVEVM"
-    safe_rm "$BACKUP_DIR/$ACTIVEVM" || true
+    log "Copying stopped VM disks"
+    copy_base_images
+    log "Starting VM"
+    virsh start "$ACTIVE_VM"
+  else
+    log "Cleaning old backups"
+    safe_rm "$BACKUP_DIR/$ACTIVE_VM" || true
   fi
 
-  echo "Completed $ACTIVEVM"
+  log "All operations finished"
 done

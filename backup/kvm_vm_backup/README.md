@@ -1,6 +1,6 @@
 # BACKUP SCRIPT FOR KVM VIRTUAL MACHINES
 
-*Running this script may cause potential data loss. Do on your own risk; otherwise you know what you're doing.*
+*Running this script may cause potential data loss. Use at your own risk; otherwise you know what you're doing.*
 
 This scripts allows you to perform backups of selected KVM virtual machines in various modes: active (live backup) or
 stopped (every VM will be off before making a backup). Backing up of running machines based on
@@ -14,11 +14,11 @@ kvm_backup.sh [command] <vmname1 vmname2 vmname3 ... vmnameN>
 
 ### Commands
 
-Available the next commands (or scripts actions):
+The following commands are available:
 
 - `--active` - Create backup of running VM(s). Required: qemu-guest-agent installed on virtual machine and qemu-channel
   device created.
-- `--stoped` - Stop, create backup and run virtual machine.
+- `--stopped` - Stop the virtual machine, create a backup, then start it.
 - `--clean` - Clean previous backups from backup folder.
 
 ### Examples
@@ -32,7 +32,7 @@ kvm_backup.sh --clean vmname1 vmname2 vmname3
 ### Using with Bareos
 
 It's possible to use this script to back up your KVM images with [Bareos](https://www.bareos.com/): use 'before' and
-'after scripts'. The example bellows shows you how to back up virtual machine named 'my_machine' from 'my_server.domain'
+'after scripts'. The example below shows you how to back up virtual machine named 'my_machine' from 'my_server.domain'
 in active mode then clean up on finish:
 
 */etc/bareos/bareos-dir.d/job/my_machine.conf:*
@@ -61,8 +61,8 @@ Job {
 JobDefs {
   Name = "my_jobdef"
   Type = Backup
-  Client = my_server.domain               # some of these params will be overwrite by job, but most of them should be 
-  Schedule = "my_schedule"                # set here
+  Client = my_server.domain               # some of these parameters will be overridden by the job, but most of them 
+  Schedule = "my_schedule"                # should be set here
   Storage = File
   Messages = Standard
   Pool = Full
@@ -116,8 +116,8 @@ to your channel device section of VM config, e.g.:
 
 - Please avoid the name included to another name of virtual machines in `--stoped` mode, e.g.: "test" and "test-24".
   Otherwise, the time of creating backups will be increased on every including.
-- There is no power-on detection in `--active` mode. Anyway the backup up of powered-off machine in `--active` mode will
-  work and the machine boots up.
+- There is no power-on detection in `--active` mode. In any case, backing up a powered-off VM in `--active` mode will
+  still work and the machine boots up.
 
 ## License
 

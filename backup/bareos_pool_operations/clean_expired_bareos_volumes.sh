@@ -38,20 +38,13 @@
 #      (don't mind if you run this script from Bareos Admin Job, otherwise - you should
 #      edit /etc/sudoers or run from root)
 
-# Usage:
-#    # ./clean_expired_bareos_volumes.sh --name Full- --action delete --expire 10 --filter Pruned
-# or
-#   # ./clean_expired_bareos_volumes.sh --help
-#
-# Use "--test yes" key for test mode (only output, no actions).
 # For more information about volume status read Bareos manual:
 #   * http://doc.bareos.org/master/html/bareos-manual-main-reference.html
 
-# Logs file path
-# Leave empty if you don't wish additional log file
+# Logs file path (leave empty if you don't wish additional log file):
 LOG_PATH=""
 
-# Path of the pool, e.g.: /mnt/pool_path
+# Path of the pool (e.g.: /mnt/pool_path):
 POOL_PATH="/mnt/backup"
 
 # Logging function: prints timestamp and level; exits on ERROR.

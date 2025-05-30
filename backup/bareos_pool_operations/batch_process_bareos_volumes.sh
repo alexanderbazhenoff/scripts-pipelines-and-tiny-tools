@@ -33,24 +33,14 @@
 # that you know what you're doing. All actions with this script at your own risk.
 # ------------------------------------------------------------------------------------------
 
-# Usage:
-#
-# ./batch_process_bareos_volumes.sh <action> <name_mask> <start> <end> <force/print> <pool_path_for_dumb>
-#
-# where: action should be 'prune', 'purge', 'delete' or 'dumb. Optional you can use: 'force'
-#        to skip confirmation request or 'print' to get the info about selected range
-#        of volumes. 'print' will not perform changes in volume status, just output an
-#        info.
-# e.g:
-# ./batch_process_bareos_volumes.sh delete Incremental- 0032 1200
-#
-# when you set 'dumb' action <pool_name_for_dumb> <pool_path_for_dumb> may be specified, e.g.:
-# /batch_process_bareos_volumes.sh delete Incremental- 0032 1200 /mnt/backup
-
 usage() {
   cat <<EOF
 Usage: $0 <action> <name_mask> <start> <end> <force|print> <pool_name_for_dumb> <pool_path_for_dumb>
   Where action is: prune | purge | delete | dumb
+
+e.g:
+  ./batch_process_bareos_volumes.sh delete Incremental- 0032 1200
+
   For dumb action you can also specify pool path (e.g. '/mnt/backup'):
   $0 <action> <name_mask> <start> <end> <force|print> /mnt/backup
 EOF

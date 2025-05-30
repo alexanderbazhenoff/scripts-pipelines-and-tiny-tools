@@ -11,7 +11,7 @@
 # WARNING! Running this file may cause a potential data loss and assumes you accept
 # that you know what you're doing. All actions with this script at your own risk.
 
-# Set pool name, e.g.: "Incremental" or "Full"
+# Set pool name (e.g.: "Incremental" or "Full"):
 POOL_NAME="Full"
 
 PWD_R=$(pwd)
