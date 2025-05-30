@@ -48,11 +48,11 @@ usage() {
   cat <<EOF
 Usage: $0 [--active|--stopped|--clean] <vm1 vm2 ...>
 
-  --active           Create backup of running VM(s). Required
-                     qemu-guest-agent installed on virtual machine
-                     and qemu-channel device created
-  --stopped          Stop, create backup and run virtual machine
-  --clean            Clean previous backups from backup folder
+  --active      Create backup of running VM(s). Required
+                qemu-guest-agent installed on virtual machine
+                and qemu-channel device created.
+  --stopped     Stop, create backup and run virtual machine.
+  --clean       Clean previous backups from backup folder.
 
 Examples:
   $0 --active vm_name1 vm_name2
