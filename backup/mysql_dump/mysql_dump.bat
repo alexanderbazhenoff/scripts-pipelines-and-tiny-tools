@@ -1,97 +1,67 @@
-title MySQL Dump batch file
+@echo off
+:: MySQL Dump batch file.
+:: Dumps a MySQL schema, compresses it with 7‑Zip and copies the archive to reserve storage.
+:: Written by Bazhenov Aleksandr, August 2014.
+:: BSD 3‑Clause License — see LICENSE in repository.
 
+setlocal EnableExtensions EnableDelayedExpansion
 
-:: Dump MySQL for Windows operation systems.
-:: Written by Bazhenov Aleksandr. August, 2014.
-:: -------------------------------------------------------------------------------------------------
+:: Configuration.
+set "DB_LOGIN=root"
+set "DB_PASS=y0ur_p@ssw0rd"
+set "DB_NAME=schema_name"
+set "DB_HOST=localhost"
+set "DB_PORT=3306"
+set "BACKUP_PATH=D:\backup\db\"
+set "COPY_PATH=Y:\backup\"
+set "MYSQLDUMP=C:\Program Files\MySQL\MySQL Server 5.6\bin\mysqldump.exe"
+set "SEVENZIP=7za.exe"
 
-:: This Source Code Form is subject to the terms of the BSD 3-Clause License. You can obtain one at:
-:: https://github.com/alexanderbazhenoff/scripts-pipelines-and-tiny-tools/blob/master/LICENSE
+:: Generate timestamp in format YYYYMMDD_HHMMSS for filenames.
+for /f "tokens=1-3 delims=:. " %%a in ("%TIME%") do (set hh=%%a & set mm=%%b & set ss=%%c)
+if "%hh:~0,1%"==" " set hh=0%hh:~1,1%
+for /f "tokens=2-4 delims=/.- " %%a in ("%DATE%") do set dt=%%a%%b%%c
+set "ts=%dt%_%hh%%mm%%ss%"
+set "fname=mysql_backup__%DB_NAME%__%ts%"
 
+:: Simple sub‑routine that logs both to console and to a file in BACKUP_PATH.
+:log
+  echo [%DATE% %TIME%] %~1
+  >>"%BACKUP_PATH%%fname%_log.txt" echo [%DATE% %TIME%] %~1
+  goto :eof
 
-set CURRENT_TIME=%TIME:~0,2%
-if "%CURRENT_TIME:~0,1%" == " " (set CURRENT_TIME=0%CURRENT_TIME:~1,1%)
-set CURRENT_TIME=%CURRENT_TIME%_%TIME:~3,2%_%TIME:~6,2%
-set TIME_FMT=%CURRENT_TIME%
-set DATE_FMT=%DATE%
+:: Ensure backup and reserve directories exist.
+if not exist "%BACKUP_PATH%" mkdir "%BACKUP_PATH%"
+if not exist "%COPY_PATH%"   mkdir "%COPY_PATH%"
 
+call :log "Backup started for %DB_NAME%."
 
-:: -------------------------------------------------------------------------------------------------
-:: DB_PASS=database password
-:: DB_NAME=database schema name
-:: DB_HOST=host or ip
-:: DB_LOGIN=database user login
-:: BACKUP_PATH=path to backup
-:: BACKUP_COPY_PATH=path to copy of backup (e.g. pre-mounted volume)
-set DB_PASS=y0ur_p@ssw0rd
-set DB_NAME=schema_name
-set DB_HOST=localhost
-set DB_PORT=3306
-set DB_LOGIN=root
-set BACKUP_PATH=D:\backup\db\
-set BACKUP_COPY_PATH=Y:\backup\
-:: -------------------------------------------------------------------------------------------------
+:: Create schema dump.
+"%MYSQLDUMP%" -u"%DB_LOGIN%" -p"%DB_PASS%" -h"%DB_HOST%" -P%DB_PORT% --default-character-set=utf8 "%DB_NAME%" ^
+    >"%BACKUP_PATH%%fname%.sql"
+if errorlevel 1 (call :log "ERROR: mysqldump failed." & exit /b 1)
+call :log "Dump completed: %fname%.sql."
 
+:: Compress dump to 7‑Zip archive.
+call :log "Compressing dump."
+"%SEVENZIP%" a -t7z "%BACKUP_PATH%%fname%.7z" "%BACKUP_PATH%%fname%.sql" >nul
+if errorlevel 1 (call :log "ERROR: archive failed." & exit /b 1)
+call :log "Archive created: %fname%.7z."
 
-(
-    REM.
-    echo MySQL Database Backup v0.1
-    echo --------------------------
-    echo.
+:: Remove raw SQL file to save space.
+call :log "Deleting raw SQL file."
+del "%BACKUP_PATH%%fname%.sql"
 
-    echo DB_HOST:DB_PORT @ USER = %DB_HOST%:%DB_PORT% @ %DB_LOGIN%
-    echo Database tree name = %DB_NAME%
-    echo Backup path = %BACKUP_PATH%
-    echo NAS Backup path = %BACKUP_COPY_PATH%
-    echo.
-    echo %DATE% %TIME%: Backup Started
+:: Copy archive and log to reserve storage.
+for %%F in ("%fname%.7z" "%fname%_log.txt") do (
+  call :log "Copying %%~F to reserve."
+  copy /Y "%BACKUP_PATH%%%~F" "%COPY_PATH%" >nul
+  if errorlevel 1 (
+    call :log "WARNING: failed to copy %%~F."
+  ) else (
+    call :log "Copied %%~F to reserve."
+  )
+)
 
-    set ERRORLEVEL=0
-    MD %BACKUP_PATH%
-    echo %DATE% %TIME%: Creating backup directory: %ERRORLEVEL% (0 if done)
-    echo %DATE% %TIME%: Starting mysqldump
-    echo.
-
-    "C:\Program Files\MySQL\MySQL Server 5.6\bin\mysqldump.exe" -v --debug-info=TRUE --log-error=temp_log.txt ^
-        --default-character-set=utf8 --host=%DB_HOST% --port=%DB_PORT% --user %DB_LOGIN% ^
-        --password=%DB_PASS% %DB_NAME% > %BACKUP_PATH%mysql_backup__%DB_NAME%__%DATE_FMT%_%TIME_FMT%.sql
-    echo ------------------------------------------------------------------------------
-    copy temp_log.txt %BACKUP_PATH%mysql_backup_log__%DB_NAME%__%DATE_FMT%_%TIME_FMT%.txt
-
-    echo %DATE% %TIME%: Creating 7zip archive
-    7za.exe a -t7z %BACKUP_PATH%mysql_backup__%DB_NAME%__%DATE_FMT%_%TIME_FMT%.7z ^
-        %BACKUP_PATH%mysql_backup__%DB_NAME%__%DATE_FMT%_%TIME_FMT%.sql
-    echo ------------------------------------------------------------------------------
-    7za.exe l %BACKUP_PATH%mysql_backup__%DB_NAME%__%DATE_FMT%_%TIME_FMT%.7z
-    echo ------------------------------------------------------------------------------
-    7za.exe t %BACKUP_PATH%mysql_backup__%DB_NAME%__%DATE_FMT%_%TIME_FMT%.7z *.*
-    echo ------------------------------------------------------------------------------
-
-    echo.
-    del %BACKUP_PATH%mysql_backup__%DB_NAME%__%DATE_FMT%_%TIME_FMT%.sql
-    echo %DATE% %TIME% Deleting unarchived database file ERRORLEVEL is %ERRORLEVEL% (0 if done)
-
-    echo %DATE% %TIME%: Making reserve copy...
-    echo %DATE% %TIME%: Copying: %BACKUP_PATH%mysql_backup_log__%DB_NAME%__%DATE_FMT%_%TIME_FMT%.txt
-    echo TO: %BACKUP_COPY_PATH%backup_log.txt
-
-    copy %BACKUP_PATH%mysql_backup_log__%DB_NAME%__%DATE_FMT%_%TIME_FMT%.txt %BACKUP_COPY_PATH%backup_log.txt
-    echo %DATE% %TIME%: Copying: %BACKUP_PATH%mysql_backup__%DB_NAME%__%DATE_FMT%_%TIME_FMT%.7z
-    echo TO: %BACKUP_COPY_PATH%mysql_backup.7z
-    copy %BACKUP_PATH%mysql_backup__%DB_NAME%__%DATE_FMT%_%TIME_FMT%.7z %BACKUP_COPY_PATH%mysql_backup.7z
-    echo %DATE% %TIME%: Making reserve copy ERRORLEVEL is %ERRORLEVEL% (0 if done)
-    echo.
-
-    copy temp_log.txt %BACKUP_PATH%mysql_backup_log__%DB_NAME%__%DATE_FMT%_%TIME_FMT%.txt
-    copy temp_log.txt %BACKUP_COPY_PATH%backup_log.txt
-
-    echo %DATE% %TIME%: Attempting to create log file: %ERRORLEVEL% (0 if done)
-    set ERRORLEVEL=0
-
-    echo ------------------------------------------------------------------------------
-    echo.
-    echo %DATE% %TIME%: Backup successfully DONE.
-) >> temp_log.txt
-copy temp_log.txt %BACKUP_PATH%mysql_backup_log__%DB_NAME%__%DATE_FMT%_%TIME_FMT%.txt
-copy temp_log.txt %BACKUP_COPY_PATH%backup_log.txt
-del temp_log.txt
+call :log "Backup completed successfully."
+endlocal
