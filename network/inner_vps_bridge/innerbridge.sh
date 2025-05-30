@@ -10,7 +10,7 @@
 # iface lo inet loopback
 
 # ----------------------------------------------------------------------------
-# WARNING! Running this file may cause a potential network connetcion loss and
+# WARNING! Running this file may cause a potential network connection loss and
 # assumes you accept that you know what you're doing. All actions with this
 # script at your own risk.
 
